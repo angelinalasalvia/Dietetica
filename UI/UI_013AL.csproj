@@ -1,0 +1,332 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CF3FF687-1686-4B00-8E1C-EE45A39CBF61}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>UI</RootNamespace>
+    <AssemblyName>UI</AssemblyName>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.4.0\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.4, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.4\lib\net461\itextsharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Bcl.AsyncInterfaces, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Bcl.AsyncInterfaces.8.0.0\lib\net462\Microsoft.Bcl.AsyncInterfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+    <Reference Include="System" />
+    <Reference Include="System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Buffers.4.5.1\lib\net461\System.Buffers.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Core" />
+    <Reference Include="System.DirectoryServices" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Numerics.Vectors, Version=4.1.4.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Numerics.Vectors.4.5.0\lib\net46\System.Numerics.Vectors.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Runtime.CompilerServices.Unsafe, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Runtime.CompilerServices.Unsafe.6.0.0\lib\net461\System.Runtime.CompilerServices.Unsafe.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Threading.Tasks.Extensions, Version=4.2.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Threading.Tasks.Extensions.4.5.4\lib\net461\System.Threading.Tasks.Extensions.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Transactions" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Deployment" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BitácoraEventos_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="BitácoraEventos_013AL.Designer.cs">
+      <DependentUpon>BitácoraEventos_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CambiarContraseña_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CambiarContraseña_013AL.Designer.cs">
+      <DependentUpon>CambiarContraseña_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CambiarIdioma_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CambiarIdioma_013AL.Designer.cs">
+      <DependentUpon>CambiarIdioma_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="CobrarVenta_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="CobrarVenta_013AL.Designer.cs">
+      <DependentUpon>CobrarVenta_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Cotizaciones_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Cotizaciones_013AL.Designer.cs">
+      <DependentUpon>Cotizaciones_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GestionarFamilias_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GestionarFamilias_013AL.Designer.cs">
+      <DependentUpon>GestionarFamilias_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GestorPerfiles_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GestorPerfiles_013AL.Designer.cs">
+      <DependentUpon>GestorPerfiles_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GestorUsuarios_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GestorUsuarios_013AL.Designer.cs">
+      <DependentUpon>GestorUsuarios_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Login_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Login_013AL.Designer.cs">
+      <DependentUpon>Login_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GenerarFactura_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="GenerarFactura_013AL.Designer.cs">
+      <DependentUpon>GenerarFactura_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Inicio_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Inicio_013AL.Designer.cs">
+      <DependentUpon>Inicio_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="OrdenCompraForm_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="OrdenCompraForm_013AL.Designer.cs">
+      <DependentUpon>OrdenCompraForm_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="PagarProducto_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PagarProducto_013AL.Designer.cs">
+      <DependentUpon>PagarProducto_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Productos_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Productos_013AL.Designer.cs">
+      <DependentUpon>Productos_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Productos_C_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Productos_C_013AL.Designer.cs">
+      <DependentUpon>Productos_C_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Program.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="PreregistrarProveedor_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="PreregistrarProveedor_013AL.Designer.cs">
+      <DependentUpon>PreregistrarProveedor_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Proveedores_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Proveedores_013AL.Designer.cs">
+      <DependentUpon>Proveedores_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RecepciónProductos_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RecepciónProductos_013AL.Designer.cs">
+      <DependentUpon>RecepciónProductos_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RegistrarCliente_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RegistrarCliente_013AL.Designer.cs">
+      <DependentUpon>RegistrarCliente_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="RegistrarCompra_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="RegistrarCompra_013AL.Designer.cs">
+      <DependentUpon>RegistrarCompra_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Respaldos_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Respaldos_013AL.Designer.cs">
+      <DependentUpon>Respaldos_013AL.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SeleccionarProducto_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SeleccionarProducto_013AL.Designer.cs">
+      <DependentUpon>SeleccionarProducto_013AL.cs</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="BitácoraEventos_013AL.resx">
+      <DependentUpon>BitácoraEventos_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CambiarContraseña_013AL.resx">
+      <DependentUpon>CambiarContraseña_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CambiarIdioma_013AL.resx">
+      <DependentUpon>CambiarIdioma_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="CobrarVenta_013AL.resx">
+      <DependentUpon>CobrarVenta_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Cotizaciones_013AL.resx">
+      <DependentUpon>Cotizaciones_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GestionarFamilias_013AL.resx">
+      <DependentUpon>GestionarFamilias_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GestorPerfiles_013AL.resx">
+      <DependentUpon>GestorPerfiles_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GestorUsuarios_013AL.resx">
+      <DependentUpon>GestorUsuarios_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Login_013AL.resx">
+      <DependentUpon>Login_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="GenerarFactura_013AL.resx">
+      <DependentUpon>GenerarFactura_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Inicio_013AL.resx">
+      <DependentUpon>Inicio_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="OrdenCompraForm_013AL.resx">
+      <DependentUpon>OrdenCompraForm_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="PagarProducto_013AL.resx">
+      <DependentUpon>PagarProducto_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Productos_013AL.resx">
+      <DependentUpon>Productos_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Productos_C_013AL.resx">
+      <DependentUpon>Productos_C_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <EmbeddedResource Include="PreregistrarProveedor_013AL.resx">
+      <DependentUpon>PreregistrarProveedor_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Proveedores_013AL.resx">
+      <DependentUpon>Proveedores_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RecepciónProductos_013AL.resx">
+      <DependentUpon>RecepciónProductos_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RegistrarCliente_013AL.resx">
+      <DependentUpon>RegistrarCliente_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="RegistrarCompra_013AL.resx">
+      <DependentUpon>RegistrarCompra_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Respaldos_013AL.resx">
+      <DependentUpon>Respaldos_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SeleccionarProducto_013AL.resx">
+      <DependentUpon>SeleccionarProducto_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="en.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="es.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="packages.config" />
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BE\BE_013AL.csproj">
+      <Project>{aedd46ee-fb37-4d63-a94f-f900221ae16e}</Project>
+      <Name>BE_013AL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\BLL\BLL_013AL.csproj">
+      <Project>{f201735b-dff3-4adc-9a43-e74b4e7f17e9}</Project>
+      <Name>BLL_013AL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\DAL\DAL_013AL.csproj">
+      <Project>{D2CA9DF5-92B3-4D18-AD5B-6FC8184C3965}</Project>
+      <Name>DAL_013AL</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Servicios\Servicios_013AL.csproj">
+      <Project>{ca5217ca-d1de-4b5f-9301-44f3e2010af6}</Project>
+      <Name>Servicios_013AL</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="BaseDatos511.sql" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

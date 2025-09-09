@@ -1,0 +1,708 @@
+﻿using BE_013AL;
+using BLL_013AL;
+using Servicios_013AL;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+using System.Transactions;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
+
+namespace UI
+{
+    public partial class GestorUsuarios_013AL : Form, IObserver_013AL
+    {
+        DataSet dsUsuariosCopia;
+        DataSet dsUsuariosBD;
+
+        public GestorUsuarios_013AL()
+        {
+            InitializeComponent();
+            /*int contador = -1;
+            contador = dataGridView1.Rows.Count;*/
+            //txtNumUsers.Text = Convert.ToString(contador);
+            LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
+            ActualizarIdioma_013AL();
+            CargarRolesCombo_013AL();
+        }
+        public void ActualizarIdioma_013AL()
+        {
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                    string dniSeleccionado = selectedRow.Cells["DNI-013AL"].Value.ToString();
+
+                    DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
+                    DataRow rowToUpdate = dtUsuarios.AsEnumerable()
+                        .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
+
+                    if (rowToUpdate == null)
+                    {
+                        MessageBox.Show("No se encontró el usuario en la tabla.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    // Validar si ya está eliminado
+                    bool yaEliminado = Convert.ToBoolean(rowToUpdate["Eliminado-013AL"]);
+                    if (yaEliminado)
+                    {
+                        MessageBox.Show("El usuario ya está marcado como eliminado.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Marcar como eliminado
+                    rowToUpdate["Eliminado-013AL"] = true;
+
+                    MessageBox.Show("Presione 'Guardar' para confirmar la eliminación lógica del usuario.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    // Bitácora
+                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Eliminación lógica de usuario", 2);
+
+                    bool mostrarActivos = radioButton1.Checked;
+                    if (mostrarActivos)
+                    {
+                        radioButton1.Checked = true;
+                    }
+                    else
+                    {
+                        radioButton2.Checked = true;
+                    }
+
+                }
+                else
+                {
+                    MessageBox.Show("Por favor, seleccione un usuario para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        private void btnAgregar_Click(object sender, EventArgs e)
+        {
+            UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
+            DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
+
+            string dniNuevo = textBox6.Text;
+
+            // Verificar si el DNI ya existe en la tabla
+            bool dniExiste = dtUsuarios.AsEnumerable().Any(row => row["DNI-013AL"].ToString() == dniNuevo);
+
+            if (dniExiste)
+            {
+                MessageBox.Show("El DNI ingresado ya pertenece a otro usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return; // Detener la ejecución
+            }
+            if (!EsEmailValido_013AL(textBox1.Text))
+            {
+                MessageBox.Show("El correo electrónico debe tener el formato correcto y terminar en '.com'.", "Formato inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            DataRow newRow = dtUsuarios.NewRow();
+
+            try
+            {
+                newRow["Mail-013AL"] = textBox1.Text;
+                string inputPassword = textBox2.Text;
+                string hashedInputPassword = HashHelper_013AL.CalcularSHA256_013AL(inputPassword);
+                newRow["Contraseña-013AL"] = hashedInputPassword;
+                newRow["Nombres-013AL"] = textBox3.Text;
+                newRow["Apellidos-013AL"] = textBox4.Text;
+                Rol_013AL rolSeleccionado = (Rol_013AL)cborol.SelectedItem;
+                newRow["CodRol-013AL"] = rolSeleccionado.CodRol_013AL;
+                newRow["DNI-013AL"] = dniNuevo;
+                newRow["Login-013AL"] = textBox7.Text;
+
+                newRow["Bloqueo-013AL"] = checkBox1.Checked;
+                newRow["Activo-013AL"] = checkBox2.Checked;
+
+                dtUsuarios.Rows.Add(newRow);
+
+                MessageBox.Show("El usuario se agregó con éxito. Presione 'Guardar' para guardar definitivamente los cambios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Agregar Usuario", 2);
+
+                bool mostrarActivos = radioButton1.Checked;
+                if (mostrarActivos)
+                {
+                    radioButton1.Checked = true;
+                }
+                else
+                {
+                    radioButton2.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+
+
+        private void radioButton2_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioButton2.Checked)
+            {
+                UsuarioBLL_013AL usuarioBLL = new UsuarioBLL_013AL();
+                dsUsuariosBD = usuarioBLL.ObtenerUsuarios_013AL();
+                dsUsuariosCopia = dsUsuariosBD.Copy();
+
+
+                // Obtener la lista de roles
+                List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
+
+                AgregarNombresDeRol(dsUsuariosBD);
+
+                if (dataGridView1.Columns["Eliminado-013AL"] != null)
+                {
+                    dataGridView1.Columns["Eliminado-013AL"].Visible = true;
+                }
+
+                int contador = dataGridView1.Rows.Count;
+                if (dataGridView1.AllowUserToAddRows)
+                    contador--;
+                txtNumUsers.Text = contador.ToString();
+
+                radioButton2.Checked = true;
+            }
+        }
+
+        private void radioButton1_CheckedChanged(object sender, EventArgs e)
+        {
+            
+            try
+            {
+                UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
+                dsUsuariosBD = bll.ListarUsuariosActivos_013AL();
+
+                AgregarNombresDeRol(dsUsuariosBD);
+
+                dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];      
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+            int contador = dataGridView1.Rows.Count;
+            if (dataGridView1.AllowUserToAddRows)
+                contador--;
+            txtNumUsers.Text = contador.ToString();
+        }
+
+        private void btnDesbloquear_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    // Obtener el DNI del usuario seleccionado en el DataGridView
+                    string dniSeleccionado = dataGridView1.SelectedRows[0].Cells["DNI-013AL"].Value.ToString();
+
+                    // Acceder a la tabla del DataSet
+                    DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
+
+                    // Buscar el DataRow correspondiente al DNI
+                    DataRow usuarioRow = dtUsuarios.AsEnumerable()
+                        .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
+
+                    if (usuarioRow != null)
+                    {
+                        bool estaBloqueado = Convert.ToBoolean(usuarioRow["Bloqueo-013AL"]);
+
+                        if (estaBloqueado)
+                        {
+                            usuarioRow["Bloqueo-013AL"] = false;
+
+
+                            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                            bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Desbloquear Usuario", 2);
+
+                            MessageBox.Show("El usuario fue desbloqueado con éxito. Presione 'Guardar' para aplicar los cambios definitivamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            bool mostrarActivos = radioButton1.Checked;
+                            if (mostrarActivos)
+                            {
+                                radioButton1.Checked = true;
+                            }
+                            else
+                            {
+                                radioButton2.Checked = true;
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("El usuario seleccionado no está bloqueado.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se encontró el usuario en la tabla del DataSet.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Por favor, seleccione un usuario para desbloquear.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        private void GestorUsuarios_Load(object sender, EventArgs e)
+        {
+            
+            dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
+            dataGridView1.AllowUserToAddRows = false;
+            
+            radioButton1.CheckedChanged += radioButton1_CheckedChanged;
+            radioButton2.CheckedChanged += radioButton2_CheckedChanged;
+            radioButton1.Checked = true;
+
+            CargarUsuarios_013AL();
+
+            dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
+
+        }
+
+        private void dataGridView1_RowPrePaint(object sender, DataGridViewRowPrePaintEventArgs e)
+        {
+            var dgv = sender as DataGridView;
+            if (dgv == null) return;
+
+            // Verificar que la columna "Activo-013AL" exista
+            if (!dgv.Columns.Contains("Activo-013AL")) return;
+
+            var row = dgv.Rows[e.RowIndex];
+            if (row.Cells["Activo-013AL"].Value != null &&
+                bool.TryParse(row.Cells["Activo-013AL"].Value.ToString(), out bool activo))
+            {
+                if (!activo) 
+                {
+                    row.DefaultCellStyle.BackColor = Color.Red;
+                    row.DefaultCellStyle.ForeColor = Color.White; 
+                }
+                else
+                {
+                    row.DefaultCellStyle.BackColor = Color.White;
+                    row.DefaultCellStyle.ForeColor = Color.Black;
+                }
+            }
+        }
+
+        private void CargarUsuarios_013AL()
+        {
+            UsuarioBLL_013AL usuarioBLL = new UsuarioBLL_013AL();
+            dsUsuariosBD = usuarioBLL.ObtenerUsuarios_013AL();
+            dsUsuariosCopia = dsUsuariosBD.Copy();
+
+
+            // Obtener la lista de roles
+            List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
+
+            AgregarNombresDeRol(dsUsuariosBD);
+
+            if (dataGridView1.Columns["Eliminado-013AL"] != null)
+            {
+                dataGridView1.Columns["Eliminado-013AL"].Visible = true;
+            }
+
+            int contador = dataGridView1.Rows.Count;
+            if (dataGridView1.AllowUserToAddRows)
+                contador--;
+            txtNumUsers.Text = contador.ToString();
+
+            radioButton2.Checked = true;
+        }
+
+
+        private void btnGuardar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                bool mostrarActivos = radioButton1.Checked;
+
+                dataGridView1.EndEdit();
+                dataGridView1.BindingContext[dataGridView1.DataSource].EndCurrentEdit();
+                // Guardar los usuarios en la base de datos
+                UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
+                // Antes de guardar, encriptar todas las contraseñas en el DataSet
+                /*foreach (DataRow row in dsUsuarios.Tables["Usuario"].Rows)
+                {
+                    string contraseñaEncriptada = HashHelper.CalcularSHA256(row["Contraseña"].ToString());
+                    row["Contraseña"] = contraseñaEncriptada;
+                }*/
+                // Llamar al método de la BLL para guardar
+                bll.GuardarUsuarios_013AL("Usuario", dsUsuariosCopia);
+
+                /*if (mostrarActivos)
+                {
+                    radioButton1.Checked = true;
+                }
+                else
+                {
+                    radioButton2.Checked = true;
+                }*/
+
+                this.CargarUsuarios_013AL();
+                MessageBox.Show("Datos actualizados correctamente");
+
+                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Guardar Modificaciones", 2);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al guardar usuarios: " + ex.Message);
+            }
+
+            /*try
+            {
+                UsuarioBLL bll = new UsuarioBLL();
+                bll.GuardarUsuarios("Usuario", dsUsuarios);
+                this.CargarUsuarios();
+                MessageBox.Show("Datos actualizados correctamente");
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al guardar usuarios: " + ex.Message);
+            }*/
+        }
+
+        private void btnEliminar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    foreach (DataGridViewRow selectedRow in dataGridView1.SelectedRows)
+                    {
+                        string dniSeleccionado = selectedRow.Cells["DNI-013AL"].Value.ToString();
+
+                        // Buscar la fila correspondiente en el DataSet de trabajo
+                        DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
+                        DataRow fila = dtUsuarios.AsEnumerable()
+                            .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
+
+                        if (fila != null)
+                        {
+                            fila.Delete(); // Marca la fila como eliminada en el DataSet copia
+                        }
+                    }
+
+                    MessageBox.Show("El usuario fue marcado para eliminación. Presione 'Guardar' para aplicar los cambios definitivamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    bool mostrarActivos = radioButton1.Checked;
+                    if (mostrarActivos)
+                    {
+                        radioButton1.Checked = true;
+                    }
+                    else
+                    {
+                        radioButton2.Checked = true;
+                    }
+                    // Bitácora
+                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Eliminar Usuario", 2);
+                }
+                else
+                {
+                    MessageBox.Show("Seleccione al menos un usuario para eliminar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error: " + ex.Message);
+            }
+        }
+
+        PermisoBLL_013AL bllpermisos = new PermisoBLL_013AL();
+
+        public void CargarRolesCombo_013AL()
+        {
+            List<Rol_013AL> rol = bllpermisos.ListarRoles_013AL();
+
+            cborol.DisplayMember = "Nombre_013AL";
+            cborol.ValueMember = "CodRol_013AL";
+            cborol.DataSource = rol;
+        }
+
+        private void btnModificar_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                    string dniSeleccionado = selectedRow.Cells["DNI-013AL"].Value.ToString();
+
+                    DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
+                    DataRow rowToModify = dtUsuarios.AsEnumerable()
+                        .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
+
+                    if (rowToModify == null)
+                    {
+                        MessageBox.Show("No se encontró el usuario en la tabla para modificar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    string dniNuevo = textBox6.Text;
+
+                    // Verificar si se quiere cambiar el DNI a uno que ya existe
+                    if (dniNuevo != dniSeleccionado)
+                    {
+                        bool dniExiste = dtUsuarios.AsEnumerable()
+                            .Any(row => row["DNI-013AL"].ToString() == dniNuevo);
+
+                        if (dniExiste)
+                        {
+                            MessageBox.Show("El DNI ingresado ya pertenece a otro usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+                    }
+
+                    if (!EsEmailValido_013AL(textBox1.Text))
+                    {
+                        MessageBox.Show("El correo electrónico debe tener el formato correcto y terminar en '.com'.", "Formato inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    // Actualizar los valores en la fila del DataTable
+                    rowToModify["Mail-013AL"] = textBox1.Text;
+
+                    /*string inputPassword = textBox2.Text;
+                    if (!string.IsNullOrWhiteSpace(inputPassword))
+                    {
+                        string hashedInputPassword = HashHelper_013AL.CalcularSHA256_013AL(inputPassword);
+                        rowToModify["Contraseña-013AL"] = hashedInputPassword;
+                    }*/
+
+                    rowToModify["Nombres-013AL"] = textBox3.Text;
+                    rowToModify["Apellidos-013AL"] = textBox4.Text;
+
+                    Rol_013AL rolSeleccionado = (Rol_013AL)cborol.SelectedItem;
+                    rowToModify["CodRol-013AL"] = rolSeleccionado.CodRol_013AL;
+
+                    //rowToModify["DNI-013AL"] = dniNuevo;
+                    rowToModify["Login-013AL"] = textBox7.Text;
+                    rowToModify["Bloqueo-013AL"] = checkBox1.Checked;
+                    rowToModify["Activo-013AL"] = checkBox2.Checked;
+
+                    // Bitácora
+                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Modificar Usuario", 3);
+
+                    MessageBox.Show("El usuario se modificó con éxito. Presione 'Guardar' para guardar definitivamente los cambios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    bool mostrarActivos = radioButton1.Checked;
+                    if (mostrarActivos)
+                    {
+                        radioButton1.Checked = true;
+                    }
+                    else
+                    {
+                        radioButton2.Checked = true;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Seleccione un usuario para modificar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+        }
+        private void AgregarNombresDeRol(DataSet ds)
+        {
+            List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
+
+            if (!ds.Tables["Usuario"].Columns.Contains("NombreRol-013AL"))
+            {
+                ds.Tables["Usuario"].Columns.Add("NombreRol-013AL", typeof(string));
+            }
+
+            foreach (DataRow row in ds.Tables["Usuario"].Rows)
+            {
+                int idRol = Convert.ToInt32(row["CodRol-013AL"]);
+                Rol_013AL rolEncontrado = listaRoles.FirstOrDefault(r => r.CodRol_013AL == idRol);
+                if (rolEncontrado != null)
+                {
+                    row["NombreRol-013AL"] = rolEncontrado.Nombre_013AL;
+                }
+            }
+            // Ocultar la columna IdRol y mostrar NombreRol
+            dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];
+            if (dataGridView1.Columns["CodRol-013AL"] != null)
+            {
+                dataGridView1.Columns["CodRol-013AL"].Visible = false;
+            }
+        }
+
+        private void btnCancelar_Click(object sender, EventArgs e)
+        {
+            /*bool mostrarActivos = radioButton1.Checked;
+                       
+            if (mostrarActivos)
+            {
+                radioButton1.Checked = true;
+            }
+            else
+            {
+                radioButton2.Checked = true;
+            }*/
+            this.CargarUsuarios_013AL();
+            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+            bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Cancelar Cambios", 2);
+
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (dataGridView1.SelectedRows.Count > 0)
+                {
+                    DataGridViewRow selectedRow = dataGridView1.SelectedRows[0];
+                    string dniSeleccionado = selectedRow.Cells["DNI-013AL"].Value.ToString();
+
+                    DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
+                    DataRow rowToUpdate = dtUsuarios.AsEnumerable()
+                        .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
+
+                    if (rowToUpdate == null)
+                    {
+                        MessageBox.Show("No se encontró el usuario en la tabla.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
+
+                    bool estaActivo = Convert.ToBoolean(rowToUpdate["Activo-013AL"]);
+
+                    if (estaActivo)
+                    {
+                        rowToUpdate["Activo-013AL"] = false;
+                        MessageBox.Show("Usuario desactivado exitosamente. Presione 'Guardar' para confirmar este cambio definitivamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        rowToUpdate["Activo-013AL"] = true;
+                        MessageBox.Show("Usuario activado exitosamente.Presione 'Guardar' para confirmar este cambio definitivamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+
+                    // Bitácora
+                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Activar/Desactivar Usuario", 2);
+
+                    bool mostrarActivos = radioButton1.Checked;
+                    if (mostrarActivos)
+                    {
+                        radioButton1.Checked = true;
+                    }
+                    else
+                    {
+                        radioButton2.Checked = true;
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Por favor, seleccione un usuario para activar o desactivar.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+
+
+        }
+        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                DataGridViewRow row = dataGridView1.SelectedRows[0];
+
+                textBox1.Text = row.Cells["Mail-013AL"].Value?.ToString();
+                textBox2.Text = ""; // Contraseña nunca debe mostrarse
+                textBox3.Text = row.Cells["Nombres-013AL"].Value?.ToString();
+                textBox4.Text = row.Cells["Apellidos-013AL"].Value?.ToString();
+                textBox6.Text = row.Cells["DNI-013AL"].Value?.ToString();
+                textBox7.Text = row.Cells["Login-013AL"].Value?.ToString();
+
+                checkBox1.Checked = Convert.ToBoolean(row.Cells["Bloqueo-013AL"].Value);
+                checkBox2.Checked = Convert.ToBoolean(row.Cells["Activo-013AL"].Value);
+
+                // Asignar el rol en el ComboBox
+                int codRol = Convert.ToInt32(row.Cells["CodRol-013AL"].Value);
+                foreach (Rol_013AL item in cborol.Items)
+                {
+                    if (item.CodRol_013AL == codRol)
+                    {
+                        cborol.SelectedItem = item;
+                        break;
+                    }
+                }
+
+                // Hacer que el campo DNI sea solo lectura
+                textBox2.ReadOnly = true;
+                textBox6.ReadOnly = true;
+            }
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            textBox1.Text = "";
+            textBox2.Text = "";
+            textBox3.Text = "";
+            textBox4.Text = "";
+            textBox6.Text = "";
+            textBox7.Text = "";
+            cborol.Text = "";
+            checkBox1.Checked = false;
+            checkBox2.Checked = false;
+            dataGridView1.ClearSelection();
+            textBox2.ReadOnly = false;
+            textBox6.ReadOnly = false;
+        }
+
+        private bool EsEmailValido_013AL(string email)
+        {
+            return Regex.IsMatch(email, @"^[^@\s]+@[^@\s]+\.(com)$");
+        }
+
+    }
+}

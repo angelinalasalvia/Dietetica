@@ -28,9 +28,6 @@ namespace UI
         public GestorUsuarios_013AL()
         {
             InitializeComponent();
-            /*int contador = -1;
-            contador = dataGridView1.Rows.Count;*/
-            //txtNumUsers.Text = Convert.ToString(contador);
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
             CargarRolesCombo_013AL();
@@ -45,6 +42,12 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
+
+        
+        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        Usuarios_013AL user;
+        private List<string> eventosPendientes = new List<string>();
+
         private void button2_Click(object sender, EventArgs e)
         {
             try
@@ -64,22 +67,24 @@ namespace UI
                         return;
                     }
 
-                    // Validar si ya está eliminado
                     bool yaEliminado = Convert.ToBoolean(rowToUpdate["Eliminado-013AL"]);
                     if (yaEliminado)
                     {
                         MessageBox.Show("El usuario ya está marcado como eliminado.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        try
+                        {
+                            user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                            bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Usuario ya eliminado", 1);
+                        }
+                        catch (Exception ex) { Console.WriteLine(ex); }
                         return;
                     }
 
-                    // Marcar como eliminado
                     rowToUpdate["Eliminado-013AL"] = true;
 
                     MessageBox.Show("Presione 'Guardar' para confirmar la eliminación lógica del usuario.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    // Bitácora
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Eliminación lógica de usuario", 2);
 
                     bool mostrarActivos = radioButton1.Checked;
@@ -111,17 +116,28 @@ namespace UI
 
             string dniNuevo = textBox6.Text;
 
-            // Verificar si el DNI ya existe en la tabla
             bool dniExiste = dtUsuarios.AsEnumerable().Any(row => row["DNI-013AL"].ToString() == dniNuevo);
 
             if (dniExiste)
             {
                 MessageBox.Show("El DNI ingresado ya pertenece a otro usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return; // Detener la ejecución
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "DNI ya pertenece a un Usuario", 1);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
+                return; 
             }
             if (!EsEmailValido_013AL(textBox1.Text))
             {
                 MessageBox.Show("El correo electrónico debe tener el formato correcto y terminar en '.com'.", "Formato inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Formato incorrecto de DNI", 1);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
                 return;
             }
 
@@ -147,9 +163,7 @@ namespace UI
 
                 MessageBox.Show("El usuario se agregó con éxito. Presione 'Guardar' para guardar definitivamente los cambios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Agregar Usuario", 2);
+                eventosPendientes.Add($"Se agregó el usuario {textBox7.Text}");
 
                 bool mostrarActivos = radioButton1.Checked;
                 if (mostrarActivos)
@@ -164,6 +178,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                eventosPendientes.Add($"{ex}");
             }
 
         }
@@ -177,8 +192,6 @@ namespace UI
                 dsUsuariosBD = usuarioBLL.ObtenerUsuarios_013AL();
                 dsUsuariosCopia = dsUsuariosBD.Copy();
 
-
-                // Obtener la lista de roles
                 List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
 
                 AgregarNombresDeRol(dsUsuariosBD);
@@ -198,8 +211,7 @@ namespace UI
         }
 
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
-        {
-            
+        {            
             try
             {
                 UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
@@ -225,16 +237,9 @@ namespace UI
             {
                 if (dataGridView1.SelectedRows.Count > 0)
                 {
-                    // Obtener el DNI del usuario seleccionado en el DataGridView
                     string dniSeleccionado = dataGridView1.SelectedRows[0].Cells["DNI-013AL"].Value.ToString();
-
-                    // Acceder a la tabla del DataSet
                     DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
-
-                    // Buscar el DataRow correspondiente al DNI
-                    DataRow usuarioRow = dtUsuarios.AsEnumerable()
-                        .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
-
+                    DataRow usuarioRow = dtUsuarios.AsEnumerable().FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
                     if (usuarioRow != null)
                     {
                         bool estaBloqueado = Convert.ToBoolean(usuarioRow["Bloqueo-013AL"]);
@@ -243,10 +248,7 @@ namespace UI
                         {
                             usuarioRow["Bloqueo-013AL"] = false;
 
-
-                            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                            bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Desbloquear Usuario", 2);
+                            eventosPendientes.Add($"Usuario {usuarioRow["Login-013AL"]} desbloqueado");
 
                             MessageBox.Show("El usuario fue desbloqueado con éxito. Presione 'Guardar' para aplicar los cambios definitivamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             bool mostrarActivos = radioButton1.Checked;
@@ -277,6 +279,9 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 1);
+                
             }
         }
 
@@ -301,7 +306,6 @@ namespace UI
             var dgv = sender as DataGridView;
             if (dgv == null) return;
 
-            // Verificar que la columna "Activo-013AL" exista
             if (!dgv.Columns.Contains("Activo-013AL")) return;
 
             var row = dgv.Rows[e.RowIndex];
@@ -327,8 +331,6 @@ namespace UI
             dsUsuariosBD = usuarioBLL.ObtenerUsuarios_013AL();
             dsUsuariosCopia = dsUsuariosBD.Copy();
 
-
-            // Obtener la lista de roles
             List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
 
             AgregarNombresDeRol(dsUsuariosBD);
@@ -355,49 +357,31 @@ namespace UI
 
                 dataGridView1.EndEdit();
                 dataGridView1.BindingContext[dataGridView1.DataSource].EndCurrentEdit();
-                // Guardar los usuarios en la base de datos
+                
                 UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
-                // Antes de guardar, encriptar todas las contraseñas en el DataSet
-                /*foreach (DataRow row in dsUsuarios.Tables["Usuario"].Rows)
-                {
-                    string contraseñaEncriptada = HashHelper.CalcularSHA256(row["Contraseña"].ToString());
-                    row["Contraseña"] = contraseñaEncriptada;
-                }*/
-                // Llamar al método de la BLL para guardar
+                
                 bll.GuardarUsuarios_013AL("Usuario", dsUsuariosCopia);
 
-                /*if (mostrarActivos)
-                {
-                    radioButton1.Checked = true;
-                }
-                else
-                {
-                    radioButton2.Checked = true;
-                }*/
-
                 this.CargarUsuarios_013AL();
-                MessageBox.Show("Datos actualizados correctamente");
 
                 BLLBitacora_013AL bbll = new BLLBitacora_013AL();
                 Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Guardar Modificaciones", 2);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al guardar usuarios: " + ex.Message);
-            }
 
-            /*try
-            {
-                UsuarioBLL bll = new UsuarioBLL();
-                bll.GuardarUsuarios("Usuario", dsUsuarios);
-                this.CargarUsuarios();
+                foreach (var evento in eventosPendientes)
+                {
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", evento, 2);
+                }
+
+                eventosPendientes.Clear();
+
                 MessageBox.Show("Datos actualizados correctamente");
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al guardar usuarios: " + ex.Message);
-            }*/
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 2);
+
+            }
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -410,15 +394,16 @@ namespace UI
                     {
                         string dniSeleccionado = selectedRow.Cells["DNI-013AL"].Value.ToString();
 
-                        // Buscar la fila correspondiente en el DataSet de trabajo
                         DataTable dtUsuarios = dsUsuariosCopia.Tables["Usuario"];
                         DataRow fila = dtUsuarios.AsEnumerable()
                             .FirstOrDefault(row => row["DNI-013AL"].ToString() == dniSeleccionado);
 
                         if (fila != null)
                         {
-                            fila.Delete(); // Marca la fila como eliminada en el DataSet copia
+                            fila.Delete(); 
                         }
+                        var login = selectedRow.Cells["Login-013AL"].Value?.ToString();
+                        eventosPendientes.Add($"Usuario {login} fue eliminado");
                     }
 
                     MessageBox.Show("El usuario fue marcado para eliminación. Presione 'Guardar' para aplicar los cambios definitivamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -431,10 +416,7 @@ namespace UI
                     {
                         radioButton2.Checked = true;
                     }
-                    // Bitácora
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Eliminar Usuario", 2);
+
                 }
                 else
                 {
@@ -444,6 +426,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 2);
             }
         }
 
@@ -458,6 +442,8 @@ namespace UI
             cborol.DataSource = rol;
         }
 
+
+        //faltan entradas de la bitácora
         private void btnModificar_Click(object sender, EventArgs e)
         {
             try
@@ -479,7 +465,6 @@ namespace UI
 
                     string dniNuevo = textBox6.Text;
 
-                    // Verificar si se quiere cambiar el DNI a uno que ya existe
                     if (dniNuevo != dniSeleccionado)
                     {
                         bool dniExiste = dtUsuarios.AsEnumerable()
@@ -498,28 +483,16 @@ namespace UI
                         return;
                     }
 
-                    // Actualizar los valores en la fila del DataTable
                     rowToModify["Mail-013AL"] = textBox1.Text;
-
-                    /*string inputPassword = textBox2.Text;
-                    if (!string.IsNullOrWhiteSpace(inputPassword))
-                    {
-                        string hashedInputPassword = HashHelper_013AL.CalcularSHA256_013AL(inputPassword);
-                        rowToModify["Contraseña-013AL"] = hashedInputPassword;
-                    }*/
-
                     rowToModify["Nombres-013AL"] = textBox3.Text;
                     rowToModify["Apellidos-013AL"] = textBox4.Text;
-
                     Rol_013AL rolSeleccionado = (Rol_013AL)cborol.SelectedItem;
                     rowToModify["CodRol-013AL"] = rolSeleccionado.CodRol_013AL;
-
-                    //rowToModify["DNI-013AL"] = dniNuevo;
                     rowToModify["Login-013AL"] = textBox7.Text;
                     rowToModify["Bloqueo-013AL"] = checkBox1.Checked;
                     rowToModify["Activo-013AL"] = checkBox2.Checked;
 
-                    // Bitácora
+                    
                     BLLBitacora_013AL bbll = new BLLBitacora_013AL();
                     Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Modificar Usuario", 3);
@@ -543,6 +516,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 3);
             }
 
         }
@@ -564,7 +539,7 @@ namespace UI
                     row["NombreRol-013AL"] = rolEncontrado.Nombre_013AL;
                 }
             }
-            // Ocultar la columna IdRol y mostrar NombreRol
+            
             dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];
             if (dataGridView1.Columns["CodRol-013AL"] != null)
             {
@@ -574,16 +549,6 @@ namespace UI
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
-            /*bool mostrarActivos = radioButton1.Checked;
-                       
-            if (mostrarActivos)
-            {
-                radioButton1.Checked = true;
-            }
-            else
-            {
-                radioButton2.Checked = true;
-            }*/
             this.CargarUsuarios_013AL();
             BLLBitacora_013AL bbll = new BLLBitacora_013AL();
             Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
@@ -623,7 +588,6 @@ namespace UI
                         MessageBox.Show("Usuario activado exitosamente.Presione 'Guardar' para confirmar este cambio definitivamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
-                    // Bitácora
                     BLLBitacora_013AL bbll = new BLLBitacora_013AL();
                     Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Activar/Desactivar Usuario", 2);
@@ -657,7 +621,7 @@ namespace UI
                 DataGridViewRow row = dataGridView1.SelectedRows[0];
 
                 textBox1.Text = row.Cells["Mail-013AL"].Value?.ToString();
-                textBox2.Text = ""; // Contraseña nunca debe mostrarse
+                textBox2.Text = ""; 
                 textBox3.Text = row.Cells["Nombres-013AL"].Value?.ToString();
                 textBox4.Text = row.Cells["Apellidos-013AL"].Value?.ToString();
                 textBox6.Text = row.Cells["DNI-013AL"].Value?.ToString();
@@ -666,7 +630,6 @@ namespace UI
                 checkBox1.Checked = Convert.ToBoolean(row.Cells["Bloqueo-013AL"].Value);
                 checkBox2.Checked = Convert.ToBoolean(row.Cells["Activo-013AL"].Value);
 
-                // Asignar el rol en el ComboBox
                 int codRol = Convert.ToInt32(row.Cells["CodRol-013AL"].Value);
                 foreach (Rol_013AL item in cborol.Items)
                 {
@@ -676,8 +639,6 @@ namespace UI
                         break;
                     }
                 }
-
-                // Hacer que el campo DNI sea solo lectura
                 textBox2.ReadOnly = true;
                 textBox6.ReadOnly = true;
             }

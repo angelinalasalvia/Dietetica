@@ -1,23 +1,26 @@
 ﻿using BE_013AL;
 using BLL_013AL;
 using Servicios;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection.Emit;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Forms;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Reflection.Emit;
-using System.IO;
-using System.Xml.Serialization;
 using System.Windows.Controls;
-using Servicios_013AL;
-using System.Security.Cryptography;
+using System.Windows.Forms;
+using System.Xml.Serialization;
+using static System.Net.WebRequestMethods;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Button;
+using File = System.IO.File;
 
 namespace UI
 {
@@ -40,6 +43,11 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
+
+        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        Usuarios_013AL user;
+        private List<string> eventosPendientes = new List<string>();
+
         private void button1_Click(object sender, EventArgs e)
         {
             UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
@@ -47,13 +55,14 @@ namespace UI
 
             string cuilnuevo = txtcuil.Text;
 
-            // Verificar si el DNI ya existe en la tabla
+            
             bool cuilExiste = dtclientes.AsEnumerable().Any(row => row["CUILCliente-013AL"].ToString() == cuilnuevo);
 
             if (cuilExiste)
             {
                 MessageBox.Show("El CUIL ingresado ya pertenece a otro cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                return; // Detener la ejecución
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", "Error al crear cliente. CUIL ya existe.", 1);
+                return; 
             }
 
 
@@ -66,7 +75,6 @@ namespace UI
                 newRow["Apellido-013AL"] = txtapellido.Text;
                 newRow["CUILCliente-013AL"] = txtcuil.Text;
 
-                // Encriptar el domicilio antes de guardar
                 newRow["Domicilio-013AL"] = AESCrypto_013AL.Encriptar_013AL(txtdomicilio.Text);
 
                 newRow["Mail-013AL"] = txtmail.Text;
@@ -74,35 +82,22 @@ namespace UI
 
                 dtclientes.Rows.Add(newRow);
 
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Registrar Cliente", 2);
+                eventosPendientes.Add($"Cliente {Convert.ToString(newRow["Nombre-013AL"])} {Convert.ToString(newRow["Apellido-013AL"])} registrado");
 
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                eventosPendientes.Add(ex.Message);
             }
 
-
-
-
-            /*UsuarioBLL bll = new UsuarioBLL();
-            string respuesta = "";
-            respuesta = bll.AgregarCliente(txtnombre.Text, txtapellido.Text, Convert.ToInt32(txtcuil.Text), txtdomicilio.Text, txtmail.Text, Convert.ToInt32(txttel.Text));
-            try
-            {
-                string resultado;
-                BLLBitacora bbll = new BLLBitacora();
-                Usuarios user = SingletonSesion.Instance.GetUsuario();
-                resultado = bbll.AgregarEvento(user.NombreUsuario, "Ventas", "Registrar Cliente", 2);
-            }
-            catch (Exception ex) { }*/
         }
+
 
         private void RegistrarCliente_Load(object sender, EventArgs e)
         {
             CargarClientes_013AL();
+            eventosPendientes.Clear();
         }
 
         private void btnModificar_Click(object sender, EventArgs e)
@@ -116,14 +111,13 @@ namespace UI
                     string cuilNuevo = txtcuil.Text;
                     string cuilActual = row.Cells["CUILCliente-013AL"].Value.ToString();
 
-                    // Verificar si el nuevo DNI ya existe en otro usuario
                     bool cuilExiste = dsclientes.Tables["Cliente"].AsEnumerable()
                         .Any(r => r["CUILCliente-013AL"].ToString() == cuilNuevo && r != row.DataBoundItem);
 
                     if (cuilExiste)
                     {
                         MessageBox.Show("El CUIL ingresado ya pertenece a otro cliente.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                        return; // Detener la ejecución
+                        return; 
                     }
 
                     row.Cells["Nombre-013AL"].Value = txtnombre;
@@ -132,11 +126,9 @@ namespace UI
                     row.Cells["Domicilio-013AL"].Value = AESCrypto_013AL.Encriptar_013AL(txtdomicilio.Text);
                     row.Cells["Mail-013AL"].Value = txtmail.Text;
                     row.Cells["Telefono-013AL"].Value = txttel.Text;
-                    
-                   
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Modificar Cliente", 2);
+
+
+                    eventosPendientes.Add($"Cliente {row.Cells["Nombre-013AL"].Value} {row.Cells["Apellido-013AL"].Value} modificado");
                 }
                 else
                 {
@@ -146,6 +138,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                eventosPendientes.Add(ex.Message);
             }
         }
 
@@ -155,16 +148,16 @@ namespace UI
             {
                 foreach (DataGridViewRow row in dataGridView1.SelectedRows)
                 {
+                    eventosPendientes.Add($"Cliente {row.Cells["Nombre-013AL"].Value} {row.Cells["Apellido-013AL"].Value} eliminado");
+
                     dataGridView1.Rows.Remove(row);
                 }
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Eliminar Cliente", 2);
-            
-                }
+
+            }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                eventosPendientes.Add(ex.Message);
             }
         }
 
@@ -173,28 +166,28 @@ namespace UI
 
             try
             {
-                // Guardar los usuarios en la base de datos
                 UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
-                // Antes de guardar, encriptar todas las contraseñas en el DataSet
-                /*foreach (DataRow row in dsUsuarios.Tables["Usuario"].Rows)
-                {
-                    string contraseñaEncriptada = HashHelper.CalcularSHA256(row["Contraseña"].ToString());
-                    row["Contraseña"] = contraseñaEncriptada;
-                }*/
-                // Llamar al método de la BLL para guardar
+                
                 bll.GuardarClientes_013AL("Cliente", dsclientes);
 
                 this.CargarClientes_013AL();
                 MessageBox.Show("Datos actualizados correctamente");
 
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Guardar Modificaciones", 2);
-            
+
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+
+                foreach (var evento in eventosPendientes)
+                {
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", evento, 2);
                 }
+                eventosPendientes.Clear();
+
+            }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al guardar usuarios: " + ex.Message);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", ex.Message, 2);
             }
         }
 
@@ -202,36 +195,12 @@ namespace UI
         {
             UsuarioBLL_013AL usuarioBLL = new UsuarioBLL_013AL();
             dsclientes = usuarioBLL.ObtenerClientes_013AL();
-
-            
-            /*foreach (DataRow row in dsclientes.Tables["Cliente"].Rows)
-            {
-                if (!string.IsNullOrEmpty(row["Domicilio-013AL"].ToString()))
-                {
-                    row["Domicilio-013AL"] = AESCrypto_013AL.Desencriptar_013AL(row["Domicilio-013AL"].ToString());
-                }
-            }*/
-
-            dataGridView1.DataSource = dsclientes.Tables["Cliente"];
-
-            /*int contador = dataGridView1.Rows.Count - 1;
-            label11.Text = contador.ToString();*/
-
-            /*UsuarioBLL usuarioBLL = new UsuarioBLL();
-            //dsUsuarios = new DataSet();
-            dsUsuarios = usuarioBLL.ObtenerUsuarios();
-            dataGridView1.DataSource = dsUsuarios.Tables["Usuario"];
-            int contador;
-            contador = (dataGridView1.Rows.Count) - 1;
-            label11.Text = Convert.ToString(contador);*/
+            dataGridView1.DataSource = dsclientes.Tables["Cliente"];            
         }
 
         private void btnCancelar_Click(object sender, EventArgs e)
         {
             this.CargarClientes_013AL();
-            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-            bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Cancelar Cambios", 2);
         }
         private bool domicilioEncriptado = false;
         private void button2_Click(object sender, EventArgs e)
@@ -251,25 +220,26 @@ namespace UI
 
                     try
                     {
-                        // Intentamos desencriptar el domicilio. Si lo logramos, mostramos el dato desencriptado
                         string domicilioDesencriptado = AESCrypto_013AL.Desencriptar_013AL(domicilio);
                         MessageBox.Show("Domicilio desencriptado.");
                         fila.Cells["Domicilio-013AL"].Value = domicilioDesencriptado;
+
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", $"Domicilio del cliente {fila.Cells["Nombre-013AL"].Value} {fila.Cells["Apellido-013AL"].Value} desencriptado", 3);
                     }
                     catch (CryptographicException)
                     {
-                        // Si da error, probablemente ya esté desencriptado, así que lo encriptamos
                         string domicilioEncriptadoNuevo = AESCrypto_013AL.Encriptar_013AL(domicilio);
                         MessageBox.Show("Domicilio encriptado.");
                         fila.Cells["Domicilio-013AL"].Value = domicilioEncriptadoNuevo;
+
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", $"Domicilio del cliente {fila.Cells["Nombre-013AL"].Value} {fila.Cells["Apellido-013AL"].Value} encriptado", 3);
                     }
                     catch (Exception ex)
                     {
                         MessageBox.Show("Error inesperado: " + ex.Message);
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", ex.Message, 3);
                     }
 
-
-                    // Opción: actualizar también en el DataSet original si querés que quede persistido en memoria
                     if (fila.Cells["Domicilio-013AL"].Value == null)
                     {
                         fila.Cells["Domicilio-013AL"].Value = domicilio;
@@ -284,6 +254,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error en el proceso de encriptación/desencriptación: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", ex.Message, 3);
             }
         }
 
@@ -293,14 +264,11 @@ namespace UI
             {
                 if (dataGridView1.SelectedRows.Count > 0)
                 {
-                    // Limpiar ListBox de datos previos
                     listBox2.Items.Clear();
 
-                    // Crear el objeto Usuario a partir de la fila seleccionada
                     DataGridViewRow row = dataGridView1.SelectedRows[0];
                     Cliente_013AL cliente = new Cliente_013AL
                     {
-                        //IDCliente = Convert.ToInt32(row.Cells["IdCliente"].Value.ToString()),
                         Nombre_013AL = row.Cells["Nombre-013AL"].Value.ToString(),
                         Apellido_013AL = row.Cells["Apellido-013AL"].Value.ToString(),
                         CUIL_013AL = Convert.ToInt32(row.Cells["CUILCliente-013AL"].Value.ToString()),
@@ -320,9 +288,9 @@ namespace UI
                         MostrarArchivoSerializado_013AL(saveFileDialog1.FileName);
 
                         MessageBox.Show($"Usuario serializado en formato {formato} con éxito.");
-                        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                        Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                        bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Serialización", 3);
+                        
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", $"Cliente {cliente.Nombre_013AL} {cliente.Apellido_013AL} serializado a XML", 2);
                     }
                 }
                 else
@@ -333,6 +301,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error al serializar: " + ex.Message);
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", ex.Message, 2);
+
             }
         }
 
@@ -340,7 +310,6 @@ namespace UI
         {
             try
             {
-                //openFileDialog1.Filter = $"{cmbFormato.SelectedItem} Files|*.{cmbFormato.SelectedItem.ToString().ToLower()}";
                 if (openFileDialog1.ShowDialog() == DialogResult.OK)
                 {
                     string formato = "XML";
@@ -355,9 +324,9 @@ namespace UI
                     if (cliente != null)
                     {
                         MostrarDatosDeserializados_013AL(cliente);
-                        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                        Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                        bbll.AgregarEvento_013AL(user.Login_013AL, "Clientes", "Deserializar", 3);
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Cliente", $"Cliente {cliente.Nombre_013AL} {cliente.Apellido_013AL} deserializado desde XML", 2);
+
                     }
                 }
             }
@@ -396,7 +365,6 @@ namespace UI
         private void MostrarDatosDeserializados_013AL(Cliente_013AL cliente)
         {
             listBox2.Items.Clear();
-            //listBox2.Items.Add($"IdCliente: {cliente.IDCliente}");
             listBox2.Items.Add($"Nombre_013AL: {cliente.Nombre_013AL}");
             listBox2.Items.Add($"Apellido_013AL: {cliente.Apellido_013AL}");
             listBox2.Items.Add($"CUIL_013AL: {cliente.CUIL_013AL}");
@@ -410,8 +378,6 @@ namespace UI
             listBox1.Items.Clear();
             listBox2.Items.Clear();
         }
-       
-
-        
+               
     }
 }

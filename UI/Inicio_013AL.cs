@@ -21,8 +21,7 @@ namespace UI
     public partial class Inicio_013AL : Form, IObserver_013AL
     {
         private UsuarioBLL_013AL bllUsuarios = new UsuarioBLL_013AL();
-        //private PermisoBLL bllper = new PermisoBLL();
-
+        
         private Usuarios_013AL _usuario;
 
         public Inicio_013AL()
@@ -31,7 +30,7 @@ namespace UI
             
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             SingletonSession_013AL.Instance.IdiomaActual_013AL = "es";
-            //ActualizarIdioma();
+            
         }
 
         
@@ -53,12 +52,12 @@ namespace UI
 
             foreach (var permiso in permisosCompuestos)
             {
-                lista.Add(permiso); // agrega el permiso/familia actual
+                lista.Add(permiso); 
 
                 var hijos = permiso.ObtenerHijos_013AL();
                 if (hijos != null && hijos.Count > 0)
                 {
-                    lista.AddRange(ObtenerTodosLosPermisos(hijos)); // recursivamente agrega hijos
+                    lista.AddRange(ObtenerTodosLosPermisos(hijos));
                 }
             }
 
@@ -265,7 +264,7 @@ namespace UI
 
             if (form.SesionCerrada)
             {
-                UpdateSessionStatus(); // Actualiza el label y desactiva menús
+                UpdateSessionStatus(); 
             }
         }
 
@@ -334,7 +333,7 @@ namespace UI
                 }
                 catch (InvalidCastException)
                 {
-                    // No hacer nada si no es un MdiClient
+                    MessageBox.Show("Error al cambiar el color de fondo del MDI Client.");
                 }
 
             }

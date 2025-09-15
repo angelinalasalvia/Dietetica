@@ -73,8 +73,7 @@ namespace UI
                         MessageBox.Show("El usuario ya está marcado como eliminado.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                         try
                         {
-                            user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                            bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Usuario ya eliminado", 1);
+                            eventosPendientes.Add($"Usuario ya eliminado.");
                         }
                         catch (Exception ex) { Console.WriteLine(ex); }
                         return;
@@ -84,8 +83,7 @@ namespace UI
 
                     MessageBox.Show("Presione 'Guardar' para confirmar la eliminación lógica del usuario.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Eliminación lógica de usuario", 2);
+                    eventosPendientes.Add($"Usuario {Convert.ToString(rowToUpdate["Login-013AL"])} desbloqueado");
 
                     bool mostrarActivos = radioButton1.Checked;
                     if (mostrarActivos)
@@ -106,6 +104,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
+                eventosPendientes.Add(ex.Message);
             }
         }
 
@@ -123,8 +122,7 @@ namespace UI
                 MessageBox.Show("El DNI ingresado ya pertenece a otro usuario.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 try
                 {
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "DNI ya pertenece a un Usuario", 1);
+                    eventosPendientes.Add("DNI ya pertenece a un usuario");
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
                 return; 
@@ -134,8 +132,7 @@ namespace UI
                 MessageBox.Show("El correo electrónico debe tener el formato correcto y terminar en '.com'.", "Formato inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 try
                 {
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Formato incorrecto de DNI", 1);
+                    eventosPendientes.Add($"Formato incorrecto de DNI.");
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
                 return;
@@ -163,7 +160,7 @@ namespace UI
 
                 MessageBox.Show("El usuario se agregó con éxito. Presione 'Guardar' para guardar definitivamente los cambios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                eventosPendientes.Add($"Se agregó el usuario {textBox7.Text}");
+                eventosPendientes.Add($"Se agregó el usuario {Convert.ToString(newRow["Login-013AL"])}");
 
                 bool mostrarActivos = radioButton1.Checked;
                 if (mostrarActivos)
@@ -178,9 +175,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                eventosPendientes.Add($"{ex}");
+                eventosPendientes.Add(ex.Message);
             }
-
         }
 
 
@@ -248,7 +244,7 @@ namespace UI
                         {
                             usuarioRow["Bloqueo-013AL"] = false;
 
-                            eventosPendientes.Add($"Usuario {usuarioRow["Login-013AL"]} desbloqueado");
+                            eventosPendientes.Add($"Usuario {Convert.ToString(usuarioRow["Login-013AL"])} desbloqueado");
 
                             MessageBox.Show("El usuario fue desbloqueado con éxito. Presione 'Guardar' para aplicar los cambios definitivamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             bool mostrarActivos = radioButton1.Checked;
@@ -279,9 +275,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
-                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 1);
-                
+                eventosPendientes.Add(ex.Message);
+
             }
         }
 
@@ -298,6 +293,8 @@ namespace UI
             CargarUsuarios_013AL();
 
             dataGridView1.RowPrePaint += dataGridView1_RowPrePaint;
+
+            eventosPendientes.Clear();
 
         }
 
@@ -364,12 +361,11 @@ namespace UI
 
                 this.CargarUsuarios_013AL();
 
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
 
                 foreach (var evento in eventosPendientes)
                 {
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", evento, 2);
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", evento, 3);
                 }
 
                 eventosPendientes.Clear();
@@ -379,7 +375,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error al guardar usuarios: " + ex.Message);
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 2);
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", ex.Message, 3);
 
             }
         }
@@ -426,8 +422,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error: " + ex.Message);
-                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 2);
+                eventosPendientes.Add(ex.Message);
+
             }
         }
 
@@ -443,7 +439,7 @@ namespace UI
         }
 
 
-        //faltan entradas de la bitácora
+        
         private void btnModificar_Click(object sender, EventArgs e)
         {
             try
@@ -492,10 +488,8 @@ namespace UI
                     rowToModify["Bloqueo-013AL"] = checkBox1.Checked;
                     rowToModify["Activo-013AL"] = checkBox2.Checked;
 
-                    
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Modificar Usuario", 3);
+
+                    eventosPendientes.Add($"Usuario {Convert.ToString(rowToModify["Login-013AL"])} modificado.");
 
                     MessageBox.Show("El usuario se modificó con éxito. Presione 'Guardar' para guardar definitivamente los cambios.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     bool mostrarActivos = radioButton1.Checked;
@@ -516,8 +510,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", $"{ex}", 3);
+                eventosPendientes.Add(ex.Message);
+
             }
 
         }
@@ -550,10 +544,7 @@ namespace UI
         private void btnCancelar_Click(object sender, EventArgs e)
         {
             this.CargarUsuarios_013AL();
-            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-            bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Cancelar Cambios", 2);
-
+            eventosPendientes.Clear();
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -580,17 +571,16 @@ namespace UI
                     if (estaActivo)
                     {
                         rowToUpdate["Activo-013AL"] = false;
+                        eventosPendientes.Add($"Usuario {Convert.ToString(rowToUpdate["Login-013AL"])} desactivado.");
                         MessageBox.Show("Usuario desactivado exitosamente. Presione 'Guardar' para confirmar este cambio definitivamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
                     else
                     {
                         rowToUpdate["Activo-013AL"] = true;
+                        eventosPendientes.Add($"Usuario {Convert.ToString(rowToUpdate["Login-013AL"])} activado.");
                         MessageBox.Show("Usuario activado exitosamente.Presione 'Guardar' para confirmar este cambio definitivamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
 
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Gestión Usuarios", "Activar/Desactivar Usuario", 2);
 
                     bool mostrarActivos = radioButton1.Checked;
                     if (mostrarActivos)
@@ -610,6 +600,8 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+                eventosPendientes.Add(ex.Message);
+
             }
 
 

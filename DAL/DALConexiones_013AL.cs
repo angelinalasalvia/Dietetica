@@ -21,7 +21,7 @@ namespace DAL_013AL
 {
     public class DALConexiones_013AL
     {
-        SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietética;Integrated Security=True");
+        SqlConnection con = new SqlConnection(@"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dietética;Integrated Security=True");
         SqlCommand com;
 
        

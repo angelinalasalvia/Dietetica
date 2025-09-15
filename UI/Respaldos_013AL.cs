@@ -19,7 +19,6 @@ namespace UI
         {
             InitializeComponent();
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
-            //SingletonSesion.Instance.IdiomaActual = "es";
             ActualizarIdioma_013AL();
         }
         public void ActualizarIdioma_013AL()
@@ -33,25 +32,20 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
         private BLLBackupRestore_013AL backuprestorebll = new BLLBackupRestore_013AL();
+        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        Usuarios_013AL user;
 
         private void button3_Click(object sender, EventArgs e)
         {
-            /*using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
+           using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
             {
-                if (folderDialog.ShowDialog() == DialogResult.OK)
-                {
-                    textBox1.Text = folderDialog.SelectedPath;
-                }
-            }*/
-            using (FolderBrowserDialog folderDialog = new FolderBrowserDialog())
-            {
-                folderDialog.RootFolder = Environment.SpecialFolder.MyComputer;  // Esto muestra "Mi PC" como raíz, lo que incluye C: y otras unidades
-                folderDialog.Description = "Selecciona una carpeta para guardar el backup";  // Descripción del diálogo
-                folderDialog.SelectedPath = @"C:\";  // Establece el disco C: como la carpeta inicial seleccionada
+                folderDialog.RootFolder = Environment.SpecialFolder.MyComputer;  
+                folderDialog.Description = "Selecciona una carpeta para guardar el backup";  
+                folderDialog.SelectedPath = @"C:\"; 
 
                 if (folderDialog.ShowDialog() == DialogResult.OK)
                 {
-                    textBox1.Text = folderDialog.SelectedPath;  // Muestra la carpeta seleccionada en el TextBox
+                    textBox1.Text = folderDialog.SelectedPath;  
                 }
             }
         }
@@ -81,13 +75,14 @@ namespace UI
                     backuprestorebll.RealizarBackup_013AL(textBox1.Text);
                     MessageBox.Show("Backup realizado con éxito.");
                     textBox1.Text = "";
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldo", "Backup", 3);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", "Backup", 4);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al realizar el backup: {ex.Message}");
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", ex.Message, 4);
                 }
             }
             else
@@ -105,13 +100,14 @@ namespace UI
                     backuprestorebll.RealizarRestore_013AL(textBox2.Text);
                     MessageBox.Show("Restauración realizada con éxito.");
                     textBox2.Text = "";
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", "Restore", 3);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", "Restore", 4);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al restaurar la base de datos: {ex.Message}");
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", ex.Message, 4);
                 }
             }
             else

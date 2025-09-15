@@ -32,6 +32,9 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
+        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        Usuarios_013AL user;
+
         public bool SesionCerrada { get; private set; } = false;    
 
         private void button1_Click(object sender, EventArgs e)
@@ -42,8 +45,7 @@ namespace UI
                 textBox1.Focus();
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Intento Cambio Contraseña Fallido", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -55,8 +57,7 @@ namespace UI
                 textBox2.Focus();
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Intento Cambio Contraseña Fallido", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -68,8 +69,7 @@ namespace UI
                 textBox3.Focus();
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Intento Cambio Contraseña Fallido", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -81,8 +81,7 @@ namespace UI
                 textBox2.Focus();
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Intento Cambio Contraseña Fallido", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -100,8 +99,7 @@ namespace UI
                 MessageBox.Show("Error al obtener la contraseña actual", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Error al obtener la contraseña actual", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -118,8 +116,7 @@ namespace UI
                 textBox1.Focus();
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Error al verificar la contraseña actual", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -136,8 +133,7 @@ namespace UI
                 textBox2.Focus();
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Intento Cambio Contraseña Fallido", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
@@ -154,9 +150,8 @@ namespace UI
 
                 try
                 {
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Cambio Contraseña", "Contraseña actualizada", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Contraseña actualizada", 2);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
 
@@ -166,6 +161,8 @@ namespace UI
             else
             {
                 MessageBox.Show("Hubo un error al cambiar la contraseña", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Cambiar Contraseña", "Intento Cambio Contraseña Fallido", 1);
             }
            
         }

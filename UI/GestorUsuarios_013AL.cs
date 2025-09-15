@@ -42,8 +42,7 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
-
-        
+                
         BLLBitacora_013AL bbll = new BLLBitacora_013AL();
         Usuarios_013AL user;
         private List<string> eventosPendientes = new List<string>();
@@ -75,7 +74,7 @@ namespace UI
                         {
                             eventosPendientes.Add($"Usuario ya eliminado.");
                         }
-                        catch (Exception ex) { Console.WriteLine(ex); }
+                        catch (Exception ex) { Console.WriteLine(ex.Message); }
                         return;
                     }
 
@@ -132,7 +131,7 @@ namespace UI
                 MessageBox.Show("El correo electrónico debe tener el formato correcto y terminar en '.com'.", "Formato inválido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 try
                 {
-                    eventosPendientes.Add($"Formato incorrecto de DNI.");
+                    eventosPendientes.Add($"Formato incorrecto de mail.");
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
                 return;

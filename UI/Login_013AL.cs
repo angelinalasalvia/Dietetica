@@ -30,6 +30,8 @@ namespace UI
             ActualizarIdioma_013AL();
         }
 
+        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        Usuarios_013AL user;
 
         private void btnIngresar_Click_1(object sender, EventArgs e)
         {
@@ -43,12 +45,10 @@ namespace UI
                 MessageBox.Show("Ya hay un usuario logueado. Cierre la sesión actual antes de iniciar una nueva.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 try
                 {
-                    string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Ya hay una sesión iniciada", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Ya hay una sesión iniciada", 1);
                 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
                 return;
             }
 
@@ -60,10 +60,8 @@ namespace UI
                 MessageBox.Show("Usuario no encontrado.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 try
                 {
-                    string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado no existe", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado no existe", 1);
                 }
                 catch (Exception ex) { Console.WriteLine(ex); }
                 return;
@@ -74,12 +72,10 @@ namespace UI
                 MessageBox.Show("El usuario está bloqueado. No puede iniciar sesión.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 try
                 {
-                    string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado bloqueado", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado bloqueado", 1);
                 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
                 return;
             }
 
@@ -88,12 +84,10 @@ namespace UI
                 MessageBox.Show("El usuario está Desactivado. No puede iniciar sesión.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 try
                 {
-                    string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado desactivado", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado desactivado", 1);
                 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
                 return;
             }
             if (usuario.Eliminado_013AL)
@@ -101,12 +95,10 @@ namespace UI
                 MessageBox.Show("El usuario ha sido eliminado. No puede iniciar sesión.", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 try
                 {
-                    string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado eliminado", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario ingresado eliminado", 1);
                 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
                 return;
             }
 
@@ -123,12 +115,10 @@ namespace UI
                 this.DialogResult = DialogResult.OK;
                 try
                 {
-                    string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Inicio de Sesión Exitoso", 1);
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Inicio de Sesión Exitoso", 1);
 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+                catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
             else
             {
@@ -147,23 +137,20 @@ namespace UI
                     intentosFallidosPorUsuario.Remove(usuario.Login_013AL);
                     try
                     {
-                        string resultado;
-                        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                        Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                        resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario Bloqueado", 3);
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Usuario Bloqueado", 3);
                     }
-                    catch (Exception ex) { Console.WriteLine(ex); }
+                    catch (Exception ex) { Console.WriteLine(ex.Message); }
                 }
                 else
                 {
                     MessageBox.Show($"Usuario y/o Contraseña incorrectos. Intento {intentos} de {maxFailedAttempts}", "Mensaje", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     try
                     {
-                        string resultado;
-                        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                        resultado = bbll.AgregarEvento_013AL(usuario.Login_013AL, "Login", $"Intento {intentos} de Login Fallido ", 2);
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(usuario.Login_013AL, "Login", $"Intento {intentos} de Login Fallido ", 2);
                     }
-                    catch (Exception ex) { Console.WriteLine(ex); }
+                    catch (Exception ex) { Console.WriteLine(ex.Message); }
                 }
             }
 
@@ -199,16 +186,6 @@ namespace UI
         {
             this.DialogResult = DialogResult.Cancel;
             this.Close();
-        }
-
-        private void Login_Load(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtPassword_TextChanged(object sender, EventArgs e)
-        {
-
         }
 
         public void ActualizarIdioma_013AL()

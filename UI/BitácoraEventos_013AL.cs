@@ -36,7 +36,11 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
+
         BLLBitacora_013AL bll = new BLLBitacora_013AL();
+        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        Usuarios_013AL user;
+
         private void ListarEventos_013AL()
         {
             dataGridView1.DataSource = bll.ListarEventos_013AL();
@@ -120,18 +124,14 @@ namespace UI
             try
             {
                 GenerarEventosPDF_013AL(listaEventos);
-                string resultado;
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Bitácora", "Generación de PDF sobre bitácora", 1);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Bitácora", "Generación de PDF sobre bitácora", 1);
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al generar el PDF: " + ex.Message);
-                string resultado;
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Bitácora", "Error al generar PDF sobre bitácora", 1);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bbll.AgregarEvento_013AL(user.Login_013AL, "Bitácora", "Error al generar PDF sobre bitácora", 1);
             }
         }
 

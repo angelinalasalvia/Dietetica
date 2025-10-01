@@ -43,13 +43,11 @@ namespace Servicios_013AL
             return LoggedInUser_013AL != null;
         }
 
-        public void Login_013AL(Usuarios_013AL user/*, List<PermisoCompuesto> permisos*/)
+        public void Login_013AL(Usuarios_013AL user)
         {
             if (!IsLoggedIn_013AL())
             {
                 LoggedInUser_013AL = user;
-                //Permisos = permisos;
-                //Permisos = new UsuarioBLL().ObtenerPermisosPorRol(user.Rol);
             }
             else
             {
@@ -75,11 +73,7 @@ namespace Servicios_013AL
             }
         }
 
-        /*public bool TienePermiso(string nombrePermiso)
-        {
-            return Permisos.Any(p => p.Nombre == nombrePermiso);
-        }*/
-
+        
         public string IdiomaActual_013AL
         {
             get { return idiomaActual_013AL; }

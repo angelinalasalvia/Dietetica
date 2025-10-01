@@ -41,15 +41,14 @@
             this.textBox1 = new System.Windows.Forms.TextBox();
             this.textBox2 = new System.Windows.Forms.TextBox();
             this.textBox3 = new System.Windows.Forms.TextBox();
-            this.textBox7 = new System.Windows.Forms.TextBox();
             this.textBox8 = new System.Windows.Forms.TextBox();
             this.button1 = new System.Windows.Forms.Button();
             this.button2 = new System.Windows.Forms.Button();
             this.button3 = new System.Windows.Forms.Button();
             this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.dateTimePicker2 = new System.Windows.Forms.DateTimePicker();
-            this.comboBox1 = new System.Windows.Forms.ComboBox();
             this.comboBox2 = new System.Windows.Forms.ComboBox();
+            this.txtevento = new System.Windows.Forms.TextBox();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -172,13 +171,6 @@
             this.textBox3.Size = new System.Drawing.Size(82, 20);
             this.textBox3.TabIndex = 12;
             // 
-            // textBox7
-            // 
-            this.textBox7.Location = new System.Drawing.Point(71, 299);
-            this.textBox7.Name = "textBox7";
-            this.textBox7.Size = new System.Drawing.Size(82, 20);
-            this.textBox7.TabIndex = 16;
-            // 
             // textBox8
             // 
             this.textBox8.Location = new System.Drawing.Point(273, 299);
@@ -233,71 +225,40 @@
             this.dateTimePicker2.Size = new System.Drawing.Size(200, 20);
             this.dateTimePicker2.TabIndex = 22;
             // 
-            // comboBox1
-            // 
-            this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "Login",
-            "Logout",
-            "Cambio Contraseña",
-            "Usuario Bloqueado",
-            "Agregar Permiso a Familia",
-            "Eliminar Familia",
-            "Eliminar Rol",
-            "Modificar Familia",
-            "Eliminar Permiso de Familia",
-            "Registrar Rol",
-            "Modificar Rol",
-            "Registrar Familia",
-            "Agregar Familia a Rol",
-            "Eliminar Familia de Rol",
-            "Cobrar Venta",
-            "Generar Factura",
-            "Registrar Cliente",
-            "Agregar Usuario",
-            "Desbloquear Usuario",
-            "Guardar Modificaciones",
-            "Eliminar Usuario",
-            "Modificar Usuario",
-            "Cancelar Cambios",
-            "Activar/Desactivar Usuario"});
-            this.comboBox1.Location = new System.Drawing.Point(71, 299);
-            this.comboBox1.Name = "comboBox1";
-            this.comboBox1.Size = new System.Drawing.Size(121, 21);
-            this.comboBox1.TabIndex = 23;
-            // 
             // comboBox2
             // 
             this.comboBox2.FormattingEnabled = true;
             this.comboBox2.Items.AddRange(new object[] {
-            "Inicio de Sesión",
-            "Admin",
-            "Ventas",
-            "Cliente",
-            "Consulta",
-            "Reportes",
-            "Ayuda",
+            "Cambiar Contraseña",
             "Gestión Usuarios",
-            "Gestión Perfiles"});
+            "Login",
+            "Registrar Cliente",
+            "Respaldos"});
             this.comboBox2.Location = new System.Drawing.Point(355, 263);
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(121, 21);
             this.comboBox2.TabIndex = 24;
             // 
-            // BitácoraEventos
+            // txtevento
+            // 
+            this.txtevento.Location = new System.Drawing.Point(69, 297);
+            this.txtevento.Name = "txtevento";
+            this.txtevento.Size = new System.Drawing.Size(117, 20);
+            this.txtevento.TabIndex = 25;
+            // 
+            // BitácoraEventos_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(515, 384);
+            this.Controls.Add(this.txtevento);
             this.Controls.Add(this.comboBox2);
-            this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.dateTimePicker2);
             this.Controls.Add(this.dateTimePicker1);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.textBox8);
-            this.Controls.Add(this.textBox7);
             this.Controls.Add(this.textBox3);
             this.Controls.Add(this.textBox2);
             this.Controls.Add(this.textBox1);
@@ -311,7 +272,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.dataGridView1);
-            this.Name = "BitácoraEventos";
+            this.Name = "BitácoraEventos_013AL";
             this.Text = "BitácoraEventos";
             this.Load += new System.EventHandler(this.BitácoraEventos_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
@@ -335,14 +296,13 @@
         private System.Windows.Forms.TextBox textBox1;
         private System.Windows.Forms.TextBox textBox2;
         private System.Windows.Forms.TextBox textBox3;
-        private System.Windows.Forms.TextBox textBox7;
         private System.Windows.Forms.TextBox textBox8;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Button button2;
         private System.Windows.Forms.Button button3;
         private System.Windows.Forms.DateTimePicker dateTimePicker1;
         private System.Windows.Forms.DateTimePicker dateTimePicker2;
-        private System.Windows.Forms.ComboBox comboBox1;
         private System.Windows.Forms.ComboBox comboBox2;
+        private System.Windows.Forms.TextBox txtevento;
     }
 }

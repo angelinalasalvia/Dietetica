@@ -117,18 +117,18 @@
   "CambiarIdioma.label1": "Change Language:",
   "CambiarIdioma.idioma": "Change Language",
 
-  "BitácoraEventos.label1": "EVENT LOG",
-  "BitácoraEventos.label2": "Name:",
-  "BitácoraEventos.label3": "Surname:",
-  "BitácoraEventos.label4": "LOGIN:",
-  "BitácoraEventos.label5": "START DATE:",
-  "BitácoraEventos.label6": "END DATE:",
-  "BitácoraEventos.label7": "MODULE:",
-  "BitácoraEventos.label8": "EVENT:",
-  "BitácoraEventos.label9": "CRITICALITY:",
-  "BitácoraEventos.button1": "Clear",
-  "BitácoraEventos.button2": "Apply",
-  "BitácoraEventos.button3": "Print",
+  "BitácoraEventos_013AL.label1": "EVENT LOG",
+  "BitácoraEventos_013AL.label2": "Name:",
+  "BitácoraEventos_013AL.label3": "Surname:",
+  "BitácoraEventos_013AL.label4": "LOGIN:",
+  "BitácoraEventos_013AL.label5": "START DATE:",
+  "BitácoraEventos_013AL.label6": "END DATE:",
+  "BitácoraEventos_013AL.label7": "MODULE:",
+  "BitácoraEventos_013AL.label8": "EVENT:",
+  "BitácoraEventos_013AL.label9": "CRITICALITY:",
+  "BitácoraEventos_013AL.button1": "Clear",
+  "BitácoraEventos_013AL.button2": "Apply",
+  "BitácoraEventos_013AL.button3": "Print",
 
   "Cotizaciones.label1": "QUOTATIONS",
   "Cotizaciones.label2": "Select Supplier:",
@@ -191,5 +191,14 @@
 
   "SeleccionarProducto.label1": "Search:",
   "SeleccionarProducto.BtnBuscar": "Search",
-  "SeleccionarProducto.button1": "Clear"
+  "SeleccionarProducto.button1": "Clear",
+
+  "Respaldos.Text": "Backups",
+  "Respaldos.label1": "BACKUPS",
+  "Respaldos.label2": "Backup",
+  "Respaldos.button3": "",
+  "Respaldos.button1": "Apply",
+  "Respaldos.label3": "Restore",
+  "Respaldos.button4": "",
+  "Respaldos.button2": "Apply"
 }

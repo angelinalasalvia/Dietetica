@@ -57,7 +57,7 @@ namespace UI
             string.IsNullOrEmpty(dateTimePicker1.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker1.Text), 
             string.IsNullOrEmpty(dateTimePicker2.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker2.Text), 
             comboBox2.Text, 
-            comboBox1.Text, 
+            txtevento.Text, 
             string.IsNullOrEmpty(textBox8.Text) ? (int?)null : Convert.ToInt32(textBox8.Text) 
             );
 
@@ -69,7 +69,7 @@ namespace UI
             this.ListarEventos_013AL();
             textBox3.Text = "";
             comboBox2.Text = "";
-            comboBox1.Text = "";
+            txtevento.Text = "";
             textBox8.Text = "";
             dateTimePicker1.Text = "";
             dateTimePicker2.Text = "";

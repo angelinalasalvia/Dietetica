@@ -116,7 +116,6 @@ namespace DAL_013AL
                 con.Open();
                 resultado = com.ExecuteNonQuery() == 1 ? "OK" : "No se pudo cambiar la contraseña";
 
-                //con.Close();
 
             }
             catch (Exception ex)
@@ -125,52 +124,7 @@ namespace DAL_013AL
             }
             return resultado;
         }
-        /*
-        public string BloquearUsuario(Usuarios usuario)
-        {
-            string resultado;
-            try
-            {
-                com = new SqlCommand("BloquearUsuario", con);
-                com.CommandType = CommandType.StoredProcedure;
-                com.Parameters.Add("@NombreUsuario", SqlDbType.NVarChar, 50).Value = usuario.NombreUsuario;
-                com.Parameters.Add("@Bloqueo", SqlDbType.Bit).Value = usuario.Bloqueo;
-                con.Open();
-                resultado = com.ExecuteNonQuery() == 1 ? "OK" : "No se pudo cambiar la contraseña";
-
-                //con.Close();
-
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            return resultado;
-        }*/
-
-        /*public string EncriptarDatosProveedor_013AL(Proveedor_013AL obj)
-        {
-            string resultado;
-            try
-            {
-                com = new SqlCommand("EncriptarDatosProveedor-013AL", con);
-                com.CommandType = CommandType.StoredProcedure;
-                com.Parameters.Add("@cuit", SqlDbType.Int).Value = obj.CUIT_013AL;
-                com.Parameters.Add("@domicilio", SqlDbType.NVarChar).Value = obj.Domicilio_013AL;
-                con.Open();
-                resultado = com.ExecuteNonQuery() == 1 ? "OK" : "No se pudo encriptar";
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-            finally
-            {
-                con.Close();
-            }
-            return resultado;
-        }*/
-
+        
         public string BloquearUsuario_013AL(Usuarios_013AL usuario)
         {
             string resultado;
@@ -318,33 +272,7 @@ namespace DAL_013AL
             return resultado;
         }
 
-        /*public DataSet Leer (string Consulta)
-        {
-            DataSet Ds = new DataSet();
-            try
-            {
-                SqlDataAdapter Da = new SqlDataAdapter(Consulta, con);
-                Da.Fill(Ds);
-            }
-            catch(SqlException ex)
-            {
-                throw ex;
-            }
-            return Ds;
-        }*/
-
-        /*public DataSet ObtenerUsuarios_013AL()
-        {
-
-            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM [Usuario-013AL]", con);
-            DataSet ds = new DataSet();
-            da.Fill(ds, "Usuario");
-
-           
-
-            return ds;
-
-        }*/
+        
         public DataSet ObtenerUsuarios_013AL()
         {
             DataSet ds = new DataSet();
@@ -373,13 +301,6 @@ namespace DAL_013AL
             DataSet ds = new DataSet();
             da.Fill(ds, "Cliente");
 
-            /*DataTable dtUsuarios = ds.Tables["Usuarios"];
-            DataColumn idColumn = dtUsuarios.Columns["ID"];
-            idColumn.AutoIncrement = true;
-            idColumn.AutoIncrementSeed = -1;
-            idColumn.AutoIncrementStep = -1;
-            idColumn.ReadOnly = false;*/
-
             return ds;
 
         }
@@ -392,7 +313,7 @@ namespace DAL_013AL
             {
                 if (row.RowState == DataRowState.Added)
                 {
-                    // Verificar si el DNI ya existe
+                    
                     string verificarQuery = "SELECT COUNT(*) FROM [Usuario-013AL] WHERE [DNI-013AL] = @dni";
                     using (SqlCommand verificarCmd = new SqlCommand(verificarQuery, con))
                     {
@@ -404,12 +325,12 @@ namespace DAL_013AL
 
                         if (existe > 0)
                         {
-                            // Puedes lanzar excepción, loggear o manejarlo como desees
+                            
                             throw new Exception("El DNI ya está registrado.");
                         }
                     }
 
-                    // Insertar nuevo usuario
+                    
                     string insertQuery = @"
                 INSERT INTO [Usuario-013AL] 
                 ([Mail-013AL], [Contraseña-013AL], [Nombres-013AL], [Apellidos-013AL], [CodRol-013AL], [DNI-013AL], [Login-013AL], [Bloqueo-013AL], [Activo-013AL], [Eliminado-013AL])
@@ -628,8 +549,7 @@ namespace DAL_013AL
         public string ActualizarCantidadCompraProducto_013AL(int codCompra, int codProducto, int nuevaCantidad)
         {
             try {
-                /*using (SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietética;Integrated Security=True"))
-                {*/
+                
                     string query = "UPDATE [Detalle-013AL] SET [Cantidad-013AL] = @nuevaCantidad WHERE [CodCompra-013AL] = @codCompra AND [CodProducto-013AL] = @codProducto";
                     SqlCommand cmd = new SqlCommand(query, con);
                     cmd.Parameters.AddWithValue("@nuevaCantidad", nuevaCantidad);
@@ -639,7 +559,7 @@ namespace DAL_013AL
                     con.Open();
                     int rows = cmd.ExecuteNonQuery();
                     return rows > 0 ? "Actualizado" : "Error";
-               // }
+               
             }
             catch (Exception ex)
             {
@@ -664,7 +584,7 @@ namespace DAL_013AL
                 {
                     using (SqlCommand com = new SqlCommand(query, con))
                     {
-                        //com.CommandType = CommandType.StoredProcedure;
+                        
                         com.CommandType = CommandType.Text;
                         com.Parameters.AddWithValue("@id", idProducto);
                         com.Parameters.AddWithValue("@valor", nuevoStock);
@@ -736,14 +656,13 @@ namespace DAL_013AL
 
         public string RegistrarVentaCompleta_013AL(Factura_013AL factura, List<Detalle_013AL> detalles)
         {
-            /*using (SqlConnection conn = new SqlConnection(@"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietética;Integrated Security=True"))
-            {*/
+            
                 con.Open();
                 SqlTransaction transaction = con.BeginTransaction();
 
                 try
                 {
-                    // 1. Insertar Factura
+                    
                     SqlCommand cmdFactura = new SqlCommand("AgregarCompraCliente-013AL", con, transaction);
                     cmdFactura.CommandType = CommandType.StoredProcedure;
                     cmdFactura.Parameters.AddWithValue("@idc", factura.CodCompra_013AL);
@@ -751,7 +670,7 @@ namespace DAL_013AL
                     cmdFactura.Parameters.AddWithValue("@metpago", factura.MetPago_013AL);
                     cmdFactura.ExecuteNonQuery();
 
-                    // 2. Insertar Detalles y actualizar stock
+                    
                     foreach (var detalle in detalles)
                     {
                         SqlCommand cmdDetalle = new SqlCommand("AgregarCompraProducto-013AL", con, transaction);
@@ -762,7 +681,7 @@ namespace DAL_013AL
                         cmdDetalle.Parameters.AddWithValue("@pu", detalle.PrecioUnitario_013AL);
                         cmdDetalle.ExecuteNonQuery();
 
-                        // Actualizar stock
+                        
                         SqlCommand cmdStock = new SqlCommand(
                             "UPDATE [Producto-013AL] SET [Stock-013AL] = [Stock-013AL] - @cant WHERE [CodProducto-013AL] = @idp",
                             con, transaction);
@@ -779,7 +698,7 @@ namespace DAL_013AL
                     transaction.Rollback();
                     throw new Exception("Error al registrar la venta completa: ", ex);
                 }
-           // }
+          
         }
         public void DescontarStock_013AL(int idProducto, int cantidad)
         {

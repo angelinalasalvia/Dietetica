@@ -78,7 +78,7 @@
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
-            // SeleccionarProducto
+            // SeleccionarProducto_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -88,7 +88,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtBuscar);
             this.Controls.Add(this.panelitem);
-            this.Name = "SeleccionarProducto";
+            this.Name = "SeleccionarProducto_013AL";
             this.Text = "SeleccionarProducto";
             this.Load += new System.EventHandler(this.SeleccionarProducto_Load);
             this.ResumeLayout(false);

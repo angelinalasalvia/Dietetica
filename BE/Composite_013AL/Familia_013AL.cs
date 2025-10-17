@@ -9,24 +9,14 @@ namespace BE_013AL.Composite
 {
     public class Familia_013AL : Componente_013AL
     {
-        /*public override int Id { get; set; }
-        public override string Nombre { get; set; }
-        public override string Tipo { get; set; }
-     
-        public List<Permiso> Permisos { get; set; }
-
-        public Familia()
-        {
-            Permisos = new List<Permiso>();
-        }*/
+        
         private List<Componente_013AL> listaHijos = new List<Componente_013AL>();
 
         public override void AgregarHijo_013AL(Componente_013AL comp)
         {
-            // Evitar agregar un duplicado
+            
             if (!listaHijos.Any(p => p.Cod_013AL == comp.Cod_013AL))
             {
-                // Validar que no se genere un ciclo
                 if (comp is Familia_013AL familia)
                 {
                     if (EsCiclo_013AL(familia))
@@ -51,7 +41,7 @@ namespace BE_013AL.Composite
 
         private bool EsCiclo_013AL(Familia_013AL familia)
         {
-            if (familia.Cod_013AL == this.Cod_013AL) return true; // No se puede agregar a sí misma
+            if (familia.Cod_013AL == this.Cod_013AL) return true; 
 
             foreach (var hijo in listaHijos)
             {

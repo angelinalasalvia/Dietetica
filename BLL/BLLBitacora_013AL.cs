@@ -40,10 +40,20 @@ namespace BLL_013AL
         {
             return dal.ListarProductosC_013AL();
         }
-        public void ActivarProductoC_013AL(int idProductoC)
+        
+        public void RestaurarVersionProducto_013AL(int codProductoC)
         {
-            dal.ActivarProductoC_013AL(idProductoC);
+            try
+            {
+                dal.RestaurarVersionProducto_013AL(codProductoC);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error en la lógica de negocio al restaurar la versión del producto: " + ex.Message);
+            }
         }
+
+
         public DataTable ConsultaProductosC_013AL(int? id, string nombre, DateTime? fechaInicio, DateTime? fechaFin)
         {
             return dal.ConsultaProductosC_013AL(id, nombre, fechaInicio, fechaFin);

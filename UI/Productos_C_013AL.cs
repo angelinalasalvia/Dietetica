@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -58,7 +59,7 @@ namespace UI
         textBox2.Text, // nombre
         string.IsNullOrEmpty(dateTimePicker1.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker1.Text).Date, // fechaInicio
         string.IsNullOrEmpty(dateTimePicker2.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker2.Text).Date // fechaFin
-    );
+        );
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -74,23 +75,24 @@ namespace UI
         {
             if (dataGridView1.SelectedRows.Count > 0)
             {
-                // Obtener el IdProductoC del registro seleccionado
-                int idProductoC = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["IdProductoC"].Value);
+                int codProductoC = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["CodProductoC-013AL"].Value);
 
-                // Llamar al método para activar el registro
-                bll.ActivarProductoC_013AL(idProductoC);
+                try
+                {
+                    bll.RestaurarVersionProducto_013AL(codProductoC);
 
-                // Recargar el DataGridView para reflejar los cambios
-                ListarProductosC_013AL();
+                    MessageBox.Show("Versión restaurada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Productos_C", "Producto Activado", 3);
+                    ListarProductosC_013AL();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al restaurar la versión: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
             else
             {
-                MessageBox.Show("Por favor, selecciona un registro para activar.");
+                MessageBox.Show("Seleccioná una versión para restaurar.");
             }
         }
     }

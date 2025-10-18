@@ -176,5 +176,13 @@
   "Respaldos.button1": "Aplicar",
   "Respaldos.label3": "Restore",
   "Respaldos.button4": "",
-  "Respaldos.button2": "Aplicar"
+  "Respaldos.button2": "Aplicar",
+  "Productos_C_013AL.Text": "Productos_C",
+  "Productos_C_013AL.label2": "Codigo Producto:",
+  "Productos_C_013AL.label1": "Nombre:",
+  "Productos_C_013AL.label5": "FECHA INICIO",
+  "Productos_C_013AL.label6": "FECHA FIN",
+  "Productos_C_013AL.button1": "Limpiar",
+  "Productos_C_013AL.button2": "Aplicar",
+  "Productos_C_013AL.button4": "Activar"
 }

@@ -137,22 +137,19 @@ namespace BLL_013AL
             obj.Stock = stock;
             return dal.ModificarStock(obj);
         }*/
-        public void ActualizarStockProducto_013AL(Producto_013AL producto)
+       
+        
+        /*public void ActualizarStockProducto_013AL(Producto_013AL producto)
         {
-            /*if (producto == null)
-                throw new ArgumentNullException("El producto no puede ser nulo.");
-
-            if (producto.Stock < 0)
-                throw new ArgumentException("El stock no puede ser negativo.");*/
+            
 
             
                 dal.ActualizarStockProducto_013AL(producto.CodProducto_013AL, producto.Stock_013AL);
             
-            /*catch (Exception ex)
-            {
-                throw new Exception("Error al actualizar el stock del producto desde la capa BLL", ex);
-            }*/
-        }
+          
+        }*/
+
+
 
         public int ObtenerSiguienteIdCompra_013AL()
         {

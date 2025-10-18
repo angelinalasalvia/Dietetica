@@ -51,7 +51,6 @@ namespace DAL_013AL
                         {
                             Login_013AL = dr["Login-013AL"].ToString(),
                             Contraseña_013AL = dr["Contraseña-013AL"].ToString(),
-                            //ID = Convert.ToInt32(dr["Id"]),
                             DNI_013AL = dr["DNI-013AL"].ToString(),
                             Bloqueo_013AL = (bool)dr["Bloqueo-013AL"],
                             Rol_013AL = rol,
@@ -574,7 +573,7 @@ namespace DAL_013AL
             }
         }
 
-        public void ActualizarStockProducto_013AL(int idProducto, int nuevoStock)
+        /*public void ActualizarStockProducto_013AL(int idProducto, int nuevoStock)
         {
             try
             {
@@ -606,7 +605,8 @@ namespace DAL_013AL
                     con.Close();
                 }
             }
-        }
+        }*/
+
         public string EliminarDetalle_013AL(int id)
         {
             string respuesta = "";
@@ -682,12 +682,12 @@ namespace DAL_013AL
                         cmdDetalle.ExecuteNonQuery();
 
                         
-                        SqlCommand cmdStock = new SqlCommand(
+                        /*SqlCommand cmdStock = new SqlCommand(
                             "UPDATE [Producto-013AL] SET [Stock-013AL] = [Stock-013AL] - @cant WHERE [CodProducto-013AL] = @idp",
                             con, transaction);
                         cmdStock.Parameters.AddWithValue("@cant", detalle.Cantidad_013AL);
                         cmdStock.Parameters.AddWithValue("@idp", detalle.CodProducto_013AL);
-                        cmdStock.ExecuteNonQuery();
+                        cmdStock.ExecuteNonQuery();*/
                     }
 
                     transaction.Commit();
@@ -1998,24 +1998,24 @@ namespace DAL_013AL
             return dt;
         }
 
-        public void ActivarProductoC_013AL(int idProductoC)
+        
+        public void RestaurarVersionProducto_013AL(int codProductoC)
         {
             try
             {
-                SqlCommand cmd = new SqlCommand("[ActivarProductoC-013AL]", con);
-                cmd.CommandType = CommandType.StoredProcedure;
-                cmd.Parameters.Add("@IdProductoC", SqlDbType.Int).Value = idProductoC;
+                using (SqlConnection con = new SqlConnection(@"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietética;Integrated Security=True"))
+                using (SqlCommand cmd = new SqlCommand("RestaurarVersionProducto_013AL", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CodProductoC", codProductoC);
 
-                con.Open();
-                cmd.ExecuteNonQuery();
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al activar el producto", ex);
-            }
-            finally
-            {
-                con.Close();
+                throw new Exception("Error al restaurar la versión del producto en la base de datos: ", ex);
             }
         }
 

@@ -200,5 +200,15 @@
   "Respaldos.button1": "Apply",
   "Respaldos.label3": "Restore",
   "Respaldos.button4": "",
-  "Respaldos.button2": "Apply"
+  "Respaldos.button2": "Apply",
+
+  "Productos_C_013AL.Text": "Products_C",
+  "Productos_C_013AL.label2": "Product Code:",
+  "Productos_C_013AL.label1": "Name:",
+  "Productos_C_013AL.label5": "START DATE",
+  "Productos_C_013AL.label6": "END DATE",
+  "Productos_C_013AL.button1": "Clear",
+  "Productos_C_013AL.button2": "Apply",
+  "Productos_C_013AL.button4": "Activate"
+
 }

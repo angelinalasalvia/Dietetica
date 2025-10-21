@@ -24,10 +24,6 @@ namespace UI
         {
             ActualizarListBoxPermisos_013AL();
             ActualizarComboBox_013AL();
-            /*List<Componente> listaComponentes = ObtenerComponentes(); // Tu método para obtener la lista
-            listBoxFamilia.DataSource = listaComponentes;*/
-            listBoxFamilia.DisplayMember = "Nombre_013AL";
-            listBoxFamilia.ValueMember = "Cod_013AL";
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
 
@@ -44,29 +40,149 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        /*private void ActualizarListBoxFamilia()
+        private List<int> ObtenerPermisosDeFamilia(Familia_013AL familia)
         {
-            listBoxFamilia.Items.Clear();
-            foreach (Componente permiso in FamiliaConfigurada.ObtenerHijos())
+            List<int> listaPermisos = new List<int>();
+
+            foreach (var hijo in familia.ObtenerHijos_013AL())
             {
-                listBoxFamilia.Items.Add($"{permiso.Id} - {permiso.Nombre} - {permiso.Tipo}");
+                if (hijo is Permiso_013AL permiso)
+                {
+                    listaPermisos.Add(permiso.Cod_013AL);
+                }
+                else if (hijo is Familia_013AL subFamilia)
+                {
+                    
+                    listaPermisos.AddRange(ObtenerPermisosDeFamilia(subFamilia));
+                }
             }
-        }*/
+
+            return listaPermisos.Distinct().ToList(); 
+        }
+
+        private void MostrarFamiliaEnTreeView(Familia_013AL familia)
+        {
+            treeViewFamilia.Nodes.Clear();
+
+            TreeNode nodoRaiz = new TreeNode(familia.Nombre_013AL)
+            {
+                Tag = familia
+            };
+
+            treeViewFamilia.Nodes.Add(nodoRaiz);
+
+            AgregarHijosAlTreeNode(familia, nodoRaiz);
+
+            treeViewFamilia.ExpandAll();
+        }
+
+        private void AgregarHijosAlTreeNode(Familia_013AL familia, TreeNode nodoPadre)
+        {
+            foreach (var hijo in familia.ObtenerHijos_013AL())
+            {
+                TreeNode nodoHijo = new TreeNode($"{hijo.Nombre_013AL} ({hijo.Tipo_013AL})")
+                {
+                    Tag = hijo
+                };
+
+                nodoPadre.Nodes.Add(nodoHijo);
+
+                if (hijo is Familia_013AL subFamilia)
+                {
+                    AgregarHijosAlTreeNode(subFamilia, nodoHijo);
+                }
+            }
+        }
+
+
+        private void CargarHijosEnTreeNode(Familia_013AL familia, TreeNode nodoPadre)
+        {
+            foreach (var hijo in familia.ObtenerHijos_013AL())
+            {
+                TreeNode nuevoNodo = new TreeNode($"{hijo.Nombre_013AL} ({hijo.Tipo_013AL})")
+                {
+                    Tag = hijo
+                };
+
+                nodoPadre.Nodes.Add(nuevoNodo);
+
+                if (hijo is Familia_013AL subFamilia)
+                {
+                    CargarHijosEnTreeNode(subFamilia, nuevoNodo);
+                }
+            }
+        }
+
+
+        private void cmbFamilia_SelectedIndexChanged_1(object sender, EventArgs e)
+        {
+            if (cmbFamilia.SelectedItem is Familia_013AL familiaSeleccionada)
+            {
+                try
+                {
+                    familiaSeleccionada.ObtenerHijos_013AL().Clear();
+
+                    CargarHijosDesdeBDRecursivo(familiaSeleccionada);
+
+                    MostrarFamiliaEnTreeView(familiaSeleccionada);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al cargar la familia: " + ex.Message);
+                }
+            }
+        }
+
+        private void CargarHijosDesdeBDRecursivo(Familia_013AL familia)
+        {
+            List<Componente_013AL> hijos = bll.TraerListaHijos_013AL(familia.Cod_013AL);
+
+            foreach (var hijo in hijos)
+            {
+                familia.AgregarHijo_013AL(hijo);
+
+                if (hijo is Familia_013AL subFamilia)
+                {
+                    CargarHijosDesdeBDRecursivo(subFamilia);
+                }
+            }
+        }
+
+        private List<Familia_013AL> CargarTodasLasFamiliasDesdeBD()
+        {
+            List<Familia_013AL> familias = bll.TraerListaFamilias_013AL();
+
+            foreach (var fam in familias)
+            {
+                fam.ObtenerHijos_013AL().Clear();
+                CargarHijosDesdeBDRecursivo(fam);
+            }
+
+            return familias;
+        }
+
+        private bool ExisteEnJerarquia(Familia_013AL familiaRaiz, int idComponenteBuscado)
+        {
+            foreach (var hijo in familiaRaiz.ObtenerHijos_013AL())
+            {
+                if (hijo.Cod_013AL == idComponenteBuscado)
+                    return true;
+
+                if (hijo is Familia_013AL subFamilia)
+                {
+                    if (ExisteEnJerarquia(subFamilia, idComponenteBuscado))
+                        return true;
+                }
+            }
+
+            return false;
+        }
 
         private void ActualizarComboBox_013AL()
         {
-            /*cmbFamilia.Items.Clear();
-            List<Familia> listaFamilias = bll.TraerListaFamilias();
-            foreach (var familia in listaFamilias)
-            {
-                if (familia is Familia)
-                {
-                    cmbFamilia.Items.Add($"{familia.Id} - {familia.Nombre}");
-                }
-            }*/
             List<Familia_013AL> listaFamilias = bll.TraerListaFamilias_013AL();
 
-            cmbFamilia.DataSource = null; // Resetear el DataSource antes de asignarlo nuevamente
+            cmbFamilia.DataSource = null; 
             cmbFamilia.DataSource = listaFamilias;
             cmbFamilia.DisplayMember = "Nombre_013AL";
             cmbFamilia.ValueMember = "Cod_013AL";
@@ -75,7 +191,7 @@ namespace UI
         private void ActualizarListBoxPermisos_013AL()
         {
             listBoxPermisos.Items.Clear();
-            cmbFamilia.Items.Clear(); // Evita duplicados en el ComboBox
+            cmbFamilia.Items.Clear(); 
 
             List<Componente_013AL> listaPermisos = bll.TraerListaPermisos_013AL();
 
@@ -84,83 +200,164 @@ namespace UI
                 string tipo = (componente is Familia_013AL) ? "Familia" : "Permiso";
                 listBoxPermisos.Items.Add($"{componente.Cod_013AL} - {componente.Nombre_013AL} - {tipo}");
 
-                // Agregar solo familias al ComboBox (si es necesario)
+                
                 if (componente is Familia_013AL)
                 {
                     cmbFamilia.Items.Add(new KeyValuePair<int, string>(componente.Cod_013AL, componente.Nombre_013AL));
                 }
             }
 
-            // Configurar DisplayMember y ValueMember fuera del foreach
-            cmbFamilia.DisplayMember = "Value"; // Muestra el nombre
+            cmbFamilia.DisplayMember = "Value"; 
             cmbFamilia.ValueMember = "Key";
         }
 
         private void btnAgregarPermiso_Click(object sender, EventArgs e)
         {
-            if (listBoxPermisos.SelectedItems.Count > 0)
+            if (cmbFamilia.SelectedItem == null)
             {
-                Componente_013AL componenteSeleccionado = TraerComponenteDeListBox(listBoxPermisos);
+                MessageBox.Show("Seleccione una familia antes de agregar permisos.");
+                return;
+            }
 
-                if (componenteSeleccionado is Familia_013AL familiaSeleccionada)
+            if (listBoxPermisos.SelectedItem == null)
+            {
+                MessageBox.Show("Seleccione un permiso o familia para agregar.");
+                return;
+            }
+
+            Familia_013AL familiaSeleccionada = (Familia_013AL)cmbFamilia.SelectedItem;
+            Componente_013AL componenteSeleccionado = TraerComponenteDeListBox(listBoxPermisos);
+
+            if (componenteSeleccionado == null)
+                return;
+
+            if (componenteSeleccionado is Familia_013AL fam && fam.Cod_013AL == familiaSeleccionada.Cod_013AL)
+            {
+                MessageBox.Show("No puedes agregar una familia dentro de sí misma.");
+                return;
+            }
+
+            if (componenteSeleccionado is Familia_013AL familiaAAgregar)
+            {
+                List<int> permisosFamiliaNueva = ObtenerPermisosDeFamilia(familiaAAgregar);
+                List<int> permisosFamiliaDestino = ObtenerPermisosDeFamilia(familiaSeleccionada);
+
+                if (permisosFamiliaNueva.Intersect(permisosFamiliaDestino).Any())
                 {
-                    // Verificar que no haya recursión infinita (evitar agregar una familia dentro de sí misma)
-                    if (familiaSeleccionada.Cod_013AL == FamiliaConfigurada.Cod_013AL)
-                    {
-                        MessageBox.Show("No puedes agregar una familia dentro de sí misma.");
-                        return;
-                    }
+                    MessageBox.Show("No se puede agregar esta familia porque contiene permisos que ya existen en la familia destino o sus subfamilias.");
+                    return;
                 }
-
-                FamiliaConfigurada.AgregarHijo_013AL(componenteSeleccionado);
-                ActualizarListBoxFamilia_013AL();
             }
-            else
+
+            List<Familia_013AL> todasLasFamilias = CargarTodasLasFamiliasDesdeBD();
+            Familia_013AL familiaRaiz = todasLasFamilias
+                .FirstOrDefault(f => ExisteEnJerarquia(f, familiaSeleccionada.Cod_013AL)) ?? familiaSeleccionada;
+
+            if (ExisteEnJerarquia(familiaRaiz, componenteSeleccionado.Cod_013AL))
             {
-                MessageBox.Show("Seleccione un permiso o familia para agregar");
+                MessageBox.Show("Este componente ya existe en otra familia dentro de la jerarquía.");
+                return;
             }
-            /*if (listBoxPermisos.SelectedItems.Count > 0)
+
+            try
             {
-                Componente permisoSeleccionado = TraerComponeneteDeListBox(listBoxPermisos);
+                bool agregado = bll.AsignarHijosAFamilia_013AL(
+                    familiaSeleccionada.Cod_013AL,
+                    new List<int> { componenteSeleccionado.Cod_013AL });
 
-                FamiliaConfigurada.AgregarHijo(permisoSeleccionado);
-                ActualizarListBoxFamilia();
-
+                if (agregado)
+                {
+                    familiaSeleccionada.AgregarHijo_013AL(componenteSeleccionado);
+                    MostrarFamiliaEnTreeView(familiaSeleccionada);
+                    MessageBox.Show("Componente agregado correctamente a la familia.");
+                }
+                else
+                {
+                    MessageBox.Show("El componente ya estaba asignado a la familia.");
+                }
             }
-            else { MessageBox.Show("Seleccione un permiso para agregar"); }*/
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al agregar componente: " + ex.Message);
+            }
         }
 
         private void btnQuitarPermiso_Click(object sender, EventArgs e)
         {
-            if (listBoxFamilia.SelectedItems.Count > 0)
+            if (cmbFamilia.SelectedItem == null)
             {
-                Componente_013AL permisoSeleccionado = TraerComponenteDeListBox(listBoxFamilia);
-
-                FamiliaConfigurada.QuitarHijo_013AL(permisoSeleccionado);
-                ActualizarListBoxFamilia_013AL();
+                MessageBox.Show("Seleccione una familia antes de intentar quitar permisos o subfamilias.");
+                return;
             }
-            else { MessageBox.Show("Seleccione un permiso del Rol configurado para quitar"); }
+
+            if (treeViewFamilia.SelectedNode == null)
+            {
+                MessageBox.Show("Seleccione un permiso o familia del árbol para quitar.");
+                return;
+            }
+
+            Componente_013AL componenteSeleccionado = treeViewFamilia.SelectedNode.Tag as Componente_013AL;
+            if (componenteSeleccionado == null)
+            {
+                MessageBox.Show("El elemento seleccionado no es válido.");
+                return;
+            }
+
+            Familia_013AL familiaSeleccionada = (Familia_013AL)cmbFamilia.SelectedItem;
+
+            
+            DialogResult resultado = MessageBox.Show(
+                $"¿Está seguro de que desea quitar '{componenteSeleccionado.Nombre_013AL}' de la familia '{familiaSeleccionada.Nombre_013AL}'?",
+                "Confirmar eliminación",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (resultado != DialogResult.Yes)
+                return;
+
+            try
+            {
+                bool existeRelacion = bll.VerificarPermisoEnFamilia_013AL(componenteSeleccionado.Cod_013AL, familiaSeleccionada.Cod_013AL);
+                if (!existeRelacion)
+                {
+                    MessageBox.Show("Este componente no está asociado directamente a la familia seleccionada.");
+                    return;
+                }
+
+                string respuesta = bll.EliminarPermisoDeFamilia_013AL(componenteSeleccionado.Cod_013AL, familiaSeleccionada.Cod_013AL);
+                MessageBox.Show(respuesta);
+
+                
+                familiaSeleccionada.QuitarHijo_013AL(componenteSeleccionado);
+
+                
+                familiaSeleccionada.ObtenerHijos_013AL().Clear();
+                CargarHijosDesdeBDRecursivo(familiaSeleccionada);
+                MostrarFamiliaEnTreeView(familiaSeleccionada);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al quitar el componente: " + ex.Message);
+            }
         }
 
         private Componente_013AL TraerComponenteDeListBox(ListBox listbox)
         {
-            // Validar si hay un elemento seleccionado
+            
             if (listbox.SelectedItem == null)
             {
                 MessageBox.Show("Debe seleccionar un elemento de la lista.");
-                return null; // Retornar null si no hay selección
+                return null; 
             }
 
             string[] partes = listbox.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
 
-            // Validar que el formato esperado tenga al menos 3 partes
             if (partes.Length < 3)
             {
                 MessageBox.Show("Formato incorrecto del elemento seleccionado.");
                 return null;
             }
 
-            // Convertir el ID a entero de forma segura
             if (!int.TryParse(partes[0].Trim(), out int id))
             {
                 MessageBox.Show("Error al obtener el ID del elemento.");
@@ -178,7 +375,6 @@ namespace UI
             {
                 Familia_013AL nuevaFamilia = new Familia_013AL { Cod_013AL = id, Nombre_013AL = nombre, Tipo_013AL = "Familia" };
 
-                // Cargar hijos si es necesario
                 List<Componente_013AL> hijos = bll.TraerListaHijos_013AL(id);
                 foreach (var hijo in hijos)
                 {
@@ -189,71 +385,6 @@ namespace UI
             }
         }
 
-
-        private void ActualizarListBoxFamilia_013AL()
-        {
-            listBoxFamilia.Items.Clear();
-            foreach (Componente_013AL componente in FamiliaConfigurada.ObtenerHijos_013AL())
-            {
-                listBoxFamilia.Items.Add(componente); // Agregamos el objeto, no un string
-            }
-            listBoxFamilia.DisplayMember = "Nombre"; // Asegurar que se muestra el nombre
-            /*listBoxFamilia.Items.Clear();
-            foreach (Componente permiso in FamiliaConfigurada.ObtenerHijos())
-            {
-                listBoxFamilia.Items.Add($"{permiso.Id} - {permiso.Nombre} - {permiso.Tipo}");
-            }*/
-        }
-
-        private void BloquearBotones()
-        {
-            btnCrear.Enabled = false;
-            btnModificar.Enabled = false;
-            btnEliminar.Enabled = false;
-        }
-
-        private void cmbFamilia_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cmbFamilia.SelectedItem != null)
-            {
-                FamiliaConfigurada.ObtenerHijos_013AL().Clear();
-                listBoxFamilia.Items.Clear();
-
-                Familia_013AL familiaSeleccionada = (Familia_013AL)cmbFamilia.SelectedItem;
-                int id = familiaSeleccionada.Cod_013AL;
-
-                List<Componente_013AL> listaHijos = bll.TraerListaHijos_013AL(id);
-                foreach (var hijo in listaHijos)
-                {
-                    listBoxFamilia.Items.Add($"{hijo.Cod_013AL} - {hijo.Nombre_013AL} - {hijo.Tipo_013AL}");
-                    FamiliaConfigurada.AgregarHijo_013AL(hijo);
-                }
-            }
-            /*if (cmbFamilia.SelectedItem != null)
-            {
-                FamiliaConfigurada.ObtenerHijos().Clear();
-                listBoxFamilia.Items.Clear();
-                string[] partes = cmbFamilia.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                int id = int.Parse(partes[0].Trim());
-
-                List<Componente> listaHijos = bll.TraerListaHijos(id);
-                foreach (var hijo in listaHijos)
-                {
-                    listBoxFamilia.Items.Add($"{hijo.Id} - {hijo.Nombre} - {hijo.Tipo}");
-                    FamiliaConfigurada.AgregarHijo(hijo);
-                }
-            }*/
-
-        }
-
-        private void ResetearBotones()
-        {
-            btnCrear.Enabled = true;
-            btnModificar.Enabled = true;
-            btnEliminar.Enabled = true;
-            cmbFamilia.SelectedItem = null;
-
-        }
 
         private void btnCrear_Click(object sender, EventArgs e)
         {
@@ -309,7 +440,6 @@ namespace UI
             string[] partes = cmbFamilia.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             int idFamilia = int.Parse(partes[0].Trim());
 
-            // Verificar si el nuevo nombre ya existe en otra familia
             List<Familia_013AL> listaFamilias = bll.TraerListaFamilias_013AL();
             if (listaFamilias.Any(f => f.Cod_013AL != idFamilia && f.Nombre_013AL.Equals(nuevoNombre, StringComparison.OrdinalIgnoreCase)))
             {
@@ -324,124 +454,5 @@ namespace UI
             ActualizarComboBox_013AL();
         }
 
-        private void btnAplicar_Click(object sender, EventArgs e)
-        {
-            if (cmbFamilia.SelectedItem == null)
-            {
-                MessageBox.Show("Seleccione una familia para asignarle permisos.");
-                return;
-            }
-
-            if (listBoxFamilia.Items.Count == 0)
-            {
-                MessageBox.Show("No hay permisos o familias para asignar.");
-                return;
-            }
-
-            // Obtener la familia seleccionada
-            Familia_013AL familiaSeleccionada = cmbFamilia.SelectedItem as Familia_013AL;
-            if (familiaSeleccionada == null)
-            {
-                MessageBox.Show("Error al obtener la familia seleccionada.");
-                return;
-            }
-
-            int idFamilia = familiaSeleccionada.Cod_013AL;
-
-            // Obtener los permisos seleccionados en el ListBox
-            List<int> hijos = new List<int>();
-            foreach (Componente_013AL item in listBoxFamilia.Items)
-            {
-                hijos.Add(item.Cod_013AL);
-            }
-
-            try
-            {
-                bool permisosAsignados = bll.AsignarHijosAFamilia_013AL(idFamilia, hijos);
-
-                if (permisosAsignados)
-                {
-                    MessageBox.Show("Permisos asignados correctamente.");
-                }
-                else
-                {
-                    MessageBox.Show("Todos los permisos ya estaban asignados.");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Error al asignar permisos: " + ex.Message);
-            }
-        }
-
-        private void btnCancelar_Click(object sender, EventArgs e)
-        {
-            if (cmbFamilia.SelectedItem == null)
-            {
-                MessageBox.Show("Seleccione una familia antes de intentar eliminar permisos.");
-                return;
-            }
-
-            if (listBoxFamilia.Items.Count == 0)
-            {
-                MessageBox.Show("No hay permisos asignados a esta familia para eliminar.");
-                return;
-            }
-
-            // Obtener el ID de la familia correctamente
-            int idFamilia;
-            try
-            {
-                idFamilia = Convert.ToInt32(cmbFamilia.SelectedValue);
-            }
-            catch
-            {
-                MessageBox.Show("Error al obtener el ID de la familia. Verifique la configuración del ComboBox.");
-                return;
-            }
-
-            DialogResult resultado = MessageBox.Show("¿Está seguro de que desea eliminar todos los permisos de esta familia?",
-                                                     "Confirmación",
-                                                     MessageBoxButtons.YesNo,
-                                                     MessageBoxIcon.Warning);
-
-            if (resultado == DialogResult.Yes)
-            {
-                // Crear una lista temporal para evitar modificar la colección mientras se itera
-                List<Componente_013AL> permisosAEliminar = new List<Componente_013AL>();
-
-                // Recorrer TODOS los ítems del ListBox y agregarlos a la lista temporal
-                foreach (var item in listBoxFamilia.Items)
-                {
-                    if (item is Componente_013AL permiso) // Verifica que el item es un Componente válido
-                    {
-                        permisosAEliminar.Add(permiso);
-                    }
-                }
-
-                // Ahora eliminar cada permiso en la lista
-                foreach (Componente_013AL permiso in permisosAEliminar)
-                {
-                    if (bll.VerificarPermisoEnFamilia_013AL(permiso.Cod_013AL, idFamilia))
-                    {
-                        // Si la relación existe, eliminar el permiso
-                        FamiliaConfigurada.QuitarHijo_013AL(permiso);
-                        bll.VerificarPermisoEnFamilia_013AL(permiso.Cod_013AL, idFamilia);
-                        listBoxFamilia.Items.Remove(permiso);
-                    }
-                    else
-                    {
-                        // Si la relación NO existe, mostrar mensaje
-                        MessageBox.Show($"El permiso '{permiso.Nombre_013AL}' no está asociado a la familia y no puede eliminarse.",
-                                        "Información",
-                                        MessageBoxButtons.OK,
-                                        MessageBoxIcon.Information);
-                    }
-                }
-
-                MessageBox.Show("Proceso de eliminación finalizado.");
-                ActualizarListBoxFamilia_013AL();
-            }
-        }
     }
 }

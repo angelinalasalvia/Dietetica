@@ -43,7 +43,7 @@
             this.label5 = new System.Windows.Forms.Label();
             this.cmbFamilia = new System.Windows.Forms.ComboBox();
             this.label3 = new System.Windows.Forms.Label();
-            this.listBoxFamilia = new System.Windows.Forms.ListBox();
+            this.treeViewFamilia = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
             // label2
@@ -66,7 +66,6 @@
             this.btnCancelar.TabIndex = 93;
             this.btnCancelar.Text = "Cancelar";
             this.btnCancelar.UseVisualStyleBackColor = false;
-            this.btnCancelar.Click += new System.EventHandler(this.btnCancelar_Click);
             // 
             // btnCrear
             // 
@@ -90,7 +89,6 @@
             this.btnAplicar.TabIndex = 91;
             this.btnAplicar.Text = "Aplicar";
             this.btnAplicar.UseVisualStyleBackColor = false;
-            this.btnAplicar.Click += new System.EventHandler(this.btnAplicar_Click);
             // 
             // btnEliminar
             // 
@@ -191,6 +189,7 @@
             this.cmbFamilia.Name = "cmbFamilia";
             this.cmbFamilia.Size = new System.Drawing.Size(144, 21);
             this.cmbFamilia.TabIndex = 81;
+            this.cmbFamilia.SelectedIndexChanged += new System.EventHandler(this.cmbFamilia_SelectedIndexChanged_1);
             // 
             // label3
             // 
@@ -202,19 +201,19 @@
             this.label3.TabIndex = 80;
             this.label3.Text = "Configurar Familia";
             // 
-            // listBoxFamilia
+            // treeViewFamilia
             // 
-            this.listBoxFamilia.FormattingEnabled = true;
-            this.listBoxFamilia.Location = new System.Drawing.Point(353, 104);
-            this.listBoxFamilia.Name = "listBoxFamilia";
-            this.listBoxFamilia.Size = new System.Drawing.Size(228, 264);
-            this.listBoxFamilia.TabIndex = 79;
+            this.treeViewFamilia.Location = new System.Drawing.Point(353, 107);
+            this.treeViewFamilia.Name = "treeViewFamilia";
+            this.treeViewFamilia.Size = new System.Drawing.Size(296, 250);
+            this.treeViewFamilia.TabIndex = 95;
             // 
-            // GestionarFamilias
+            // GestionarFamilias_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(662, 426);
+            this.Controls.Add(this.treeViewFamilia);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.btnCancelar);
             this.Controls.Add(this.btnCrear);
@@ -230,8 +229,7 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.cmbFamilia);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.listBoxFamilia);
-            this.Name = "GestionarFamilias";
+            this.Name = "GestionarFamilias_013AL";
             this.Text = "GestionarFamilias";
             this.Load += new System.EventHandler(this.GestionarFamilias_Load);
             this.ResumeLayout(false);
@@ -256,6 +254,6 @@
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.ComboBox cmbFamilia;
         private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ListBox listBoxFamilia;
+        private System.Windows.Forms.TreeView treeViewFamilia;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using BE_013AL;
 using BE_013AL.Composite;
+using BLL;
 using BLL_013AL;
 using Servicios;
 using Servicios_013AL;
@@ -18,7 +19,7 @@ namespace UI
 {
     public partial class CobrarVenta_013AL : Form, IObserver_013AL
     {
-        NegocioBLL_013AL blln = new NegocioBLL_013AL();
+        FacturaBLL_013AL blln = new FacturaBLL_013AL();
         /*public int IdCompra;
         public SeleccionarProducto(int id)
         {
@@ -100,7 +101,7 @@ namespace UI
             try
             {
                 string resultadoevento;
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                EventoBLL_013AL bbll = new EventoBLL_013AL();
                 Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                 resultadoevento = bbll.AgregarEvento_013AL(user.Login_013AL, "Ventas", "Cobrar Venta", 3);
             }

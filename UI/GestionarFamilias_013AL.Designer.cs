@@ -29,9 +29,7 @@
         private void InitializeComponent()
         {
             this.label2 = new System.Windows.Forms.Label();
-            this.btnCancelar = new System.Windows.Forms.Button();
             this.btnCrear = new System.Windows.Forms.Button();
-            this.btnAplicar = new System.Windows.Forms.Button();
             this.btnEliminar = new System.Windows.Forms.Button();
             this.btnModificar = new System.Windows.Forms.Button();
             this.btnQuitarPermiso = new System.Windows.Forms.Button();
@@ -56,17 +54,6 @@
             this.label2.TabIndex = 94;
             this.label2.Text = "Gestionar Familias";
             // 
-            // btnCancelar
-            // 
-            this.btnCancelar.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.btnCancelar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnCancelar.Location = new System.Drawing.Point(472, 374);
-            this.btnCancelar.Name = "btnCancelar";
-            this.btnCancelar.Size = new System.Drawing.Size(109, 34);
-            this.btnCancelar.TabIndex = 93;
-            this.btnCancelar.Text = "Cancelar";
-            this.btnCancelar.UseVisualStyleBackColor = false;
-            // 
             // btnCrear
             // 
             this.btnCrear.BackColor = System.Drawing.SystemColors.ControlLightLight;
@@ -78,17 +65,6 @@
             this.btnCrear.Text = "Crear";
             this.btnCrear.UseVisualStyleBackColor = false;
             this.btnCrear.Click += new System.EventHandler(this.btnCrear_Click);
-            // 
-            // btnAplicar
-            // 
-            this.btnAplicar.BackColor = System.Drawing.SystemColors.ControlLightLight;
-            this.btnAplicar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAplicar.Location = new System.Drawing.Point(353, 374);
-            this.btnAplicar.Name = "btnAplicar";
-            this.btnAplicar.Size = new System.Drawing.Size(109, 34);
-            this.btnAplicar.TabIndex = 91;
-            this.btnAplicar.Text = "Aplicar";
-            this.btnAplicar.UseVisualStyleBackColor = false;
             // 
             // btnEliminar
             // 
@@ -130,7 +106,7 @@
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(12, 83);
+            this.label1.Location = new System.Drawing.Point(12, 72);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 20);
             this.label1.TabIndex = 87;
@@ -151,7 +127,7 @@
             // listBoxPermisos
             // 
             this.listBoxPermisos.FormattingEnabled = true;
-            this.listBoxPermisos.Location = new System.Drawing.Point(16, 106);
+            this.listBoxPermisos.Location = new System.Drawing.Point(16, 95);
             this.listBoxPermisos.Name = "listBoxPermisos";
             this.listBoxPermisos.Size = new System.Drawing.Size(228, 264);
             this.listBoxPermisos.TabIndex = 85;
@@ -212,12 +188,10 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(662, 426);
+            this.ClientSize = new System.Drawing.Size(662, 371);
             this.Controls.Add(this.treeViewFamilia);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.btnCancelar);
             this.Controls.Add(this.btnCrear);
-            this.Controls.Add(this.btnAplicar);
             this.Controls.Add(this.btnEliminar);
             this.Controls.Add(this.btnModificar);
             this.Controls.Add(this.btnQuitarPermiso);
@@ -240,9 +214,7 @@
         #endregion
 
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnCancelar;
         private System.Windows.Forms.Button btnCrear;
-        private System.Windows.Forms.Button btnAplicar;
         private System.Windows.Forms.Button btnEliminar;
         private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.Button btnQuitarPermiso;

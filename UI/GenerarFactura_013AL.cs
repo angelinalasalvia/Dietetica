@@ -1,4 +1,5 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
@@ -20,11 +21,17 @@ using System.Xml.Linq;
 
 
 
+
 namespace UI
 {
     public partial class GenerarFactura_013AL : Form, IObserver_013AL
     {
-        NegocioBLL_013AL blln = new NegocioBLL_013AL();
+        ProductoBLL_013AL prbll = new ProductoBLL_013AL();
+        FacturaBLL_013AL fbll = new FacturaBLL_013AL();
+        DetalleBLL_013AL dbll = new DetalleBLL_013AL();
+        ClienteBLL_013AL cbll = new ClienteBLL_013AL();
+
+
         public GenerarFactura_013AL()
         {
             InitializeComponent();            
@@ -52,7 +59,7 @@ namespace UI
             {
                 foreach (var item in carritoTemporal)
                 {
-                    blln.RevertirStock_013AL(item.CodProducto_013AL, item.Cantidad_013AL);
+                    prbll.RevertirStock_013AL(item.CodProducto_013AL, item.Cantidad_013AL);
                 }
             }
             //NUEVO
@@ -63,7 +70,7 @@ namespace UI
         {
             if (!compraId.HasValue)
             {
-                compraId = blln.ObtenerSiguienteIdCompra_013AL();
+                compraId = dbll.ObtenerSiguienteIdCompra_013AL();
             }
 
             SeleccionarProducto_013AL form = new SeleccionarProducto_013AL(compraId.Value, carritoTemporal);
@@ -81,7 +88,7 @@ namespace UI
             try
             {
                 int cuil = Convert.ToInt32(textBox1.Text);
-                var cliente = bll.BuscarClientePorCUIL_013AL(cuil); // nuevo método
+                var cliente = cbll.BuscarClientePorCUIL_013AL(cuil); // nuevo método
 
                 if (cliente == null)
                 {
@@ -232,8 +239,8 @@ namespace UI
         {
             
             
-                var comprasCliente = blln.ListarCompraCliente_013AL();
-                var comprasProducto = blln.ListarCompraProducto_013AL();
+                var comprasCliente = fbll.ListarFactura_013AL();
+                var comprasProducto = dbll.ListarDetalle_013AL();
 
                 var compraCliente = comprasCliente.FirstOrDefault(r => r.CodCompra_013AL == compraId.Value);
                 var compraProductos = comprasProducto.Where(r => r.CodCompra_013AL == compraId.Value).ToList();
@@ -256,7 +263,7 @@ namespace UI
             try
             {
                 string resultado;
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                EventoBLL_013AL bbll = new EventoBLL_013AL();
                 Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                 resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Ventas", "Generar Factura", 3);
             }
@@ -316,7 +323,7 @@ namespace UI
 
                     foreach (var item in compraProductos)
                     {
-                        string nombreProducto = blln.ObtenerNombreProducto_013AL(item.CodProducto_013AL);
+                        string nombreProducto = prbll.ObtenerNombreProducto_013AL(item.CodProducto_013AL);
                         table.AddCell(nombreProducto); 
                         table.AddCell(item.Cantidad_013AL.ToString());
                         table.AddCell(item.PrecioUnitario_013AL.ToString("C"));
@@ -356,7 +363,7 @@ namespace UI
                     try
                     {
                         // Revertir stock
-                        blln.RevertirStock_013AL(codProducto, cantidad);
+                        prbll.RevertirStock_013AL(codProducto, cantidad);
 
                         // Eliminar del carrito temporal
                         carritoTemporal.RemoveAll(p => p.CodProducto_013AL == codProducto && p.CodCompra_013AL == compraid);

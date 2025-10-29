@@ -46,9 +46,9 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        private List<Componente_013AL> ObtenerTodosLosPermisos(List<Componente_013AL> permisosCompuestos)
+        private List<Rol_013AL> ObtenerTodosLosPermisos(List<Rol_013AL> permisosCompuestos)
         {
-            List<Componente_013AL> lista = new List<Componente_013AL>();
+            List<Rol_013AL> lista = new List<Rol_013AL>();
 
             foreach (var permiso in permisosCompuestos)
             {
@@ -246,7 +246,7 @@ namespace UI
                 try
                 {
                     string resultado;
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    EventoBLL_013AL bbll = new EventoBLL_013AL();
                     Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     resultado = bbll.AgregarEvento_013AL(user.Login_013AL, "Inicio de Sesión", "Logout", 1);
                 }

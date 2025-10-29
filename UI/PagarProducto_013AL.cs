@@ -22,7 +22,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        OrdenCompraBLL_013AL bll = new OrdenCompraBLL_013AL();
 
         public void ActualizarIdioma_013AL()
         {
@@ -77,7 +77,7 @@ namespace UI
         {
             MessageBox.Show("Pago realizado con éxito");
 
-            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+            EventoBLL_013AL bbll = new EventoBLL_013AL();
             Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
             bbll.AgregarEvento_013AL(user.Login_013AL, "PagarProducto", "Compra Pagada", 2);
         }

@@ -1,4 +1,5 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -16,7 +17,7 @@ namespace UI
 {
     public partial class Proveedores_013AL : Form, IObserver_013AL
     {
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        ProveedorBLL_013AL bll = new ProveedorBLL_013AL();
 
         public Proveedores_013AL()
         {
@@ -87,7 +88,7 @@ namespace UI
                         MessageBox.Show("Proveedor eliminado correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         CargarProveedores_013AL(); // Recargar la lista después de eliminar
 
-                        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                        EventoBLL_013AL bbll = new EventoBLL_013AL();
                         Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                         bbll.AgregarEvento_013AL(user.Login_013AL, "Proveedores", "Eliminar Proveedor", 2);
                     }
@@ -137,13 +138,12 @@ namespace UI
 
               
 
-                string respuesta = bll.ModificarProveedor2_013AL(
+                string respuesta = bll.ModificarProveedor_013AL(
                     
                     Convert.ToInt32(txtcuit.Text),
-                    txtapellido.Text,
                     txtnombre.Text,
-                     txtdomicilio.Text,
-                    
+                    txtapellido.Text,                    
+                    txtdomicilio.Text,                    
                     txtmail.Text,
                     txtrazonsocial.Text,
                     Convert.ToInt32(txttel.Text)
@@ -170,19 +170,12 @@ namespace UI
 
                 DataGridViewRow filaSeleccionada = dataGridView1.SelectedRows[0];
 
-                
-
-
-                string respuesta = bll.ModificarProveedor_013AL(
+                string respuesta = bll.RegistrarProveedor_013AL(
                     Convert.ToInt32(txtcuit.Text),
                     txtapellido.Text,
-
-                     txtdomicilio.Text,
-                     
-                    txtmail.Text,
-                    
+                    txtdomicilio.Text,                     
+                    txtmail.Text,                    
                     Convert.ToInt32(txttel.Text)
-
                 );
 
                 MessageBox.Show("Exito");

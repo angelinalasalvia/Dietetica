@@ -1,4 +1,5 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
 using Servicios;
 using Servicios_013AL;
@@ -44,13 +45,14 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
+        ClienteBLL_013AL cbll = new ClienteBLL_013AL();
         Usuarios_013AL user;
         private List<string> eventosPendientes = new List<string>();
 
         private void button1_Click(object sender, EventArgs e)
         {
-            UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
+            
             DataTable dtclientes = dsclientes.Tables["Cliente"];
 
             string cuilnuevo = txtcuil.Text;
@@ -166,9 +168,8 @@ namespace UI
 
             try
             {
-                UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
                 
-                bll.GuardarClientes_013AL("Cliente", dsclientes);
+                cbll.GuardarClientes_013AL("Cliente", dsclientes);
 
                 this.CargarClientes_013AL();
                 MessageBox.Show("Datos actualizados correctamente");
@@ -193,8 +194,8 @@ namespace UI
 
         private void CargarClientes_013AL()
         {
-            UsuarioBLL_013AL usuarioBLL = new UsuarioBLL_013AL();
-            dsclientes = usuarioBLL.ObtenerClientes_013AL();
+            
+            dsclientes = cbll.ObtenerClientes_013AL();
             dataGridView1.DataSource = dsclientes.Tables["Cliente"];            
         }
 

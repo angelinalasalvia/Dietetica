@@ -1,5 +1,6 @@
 ﻿using BE_013AL;
 using BE_013AL.Composite;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -18,8 +19,8 @@ namespace UI
     public partial class Login_013AL : Form, IObserver_013AL
     {
         private UsuarioBLL_013AL bllUsuarios = new UsuarioBLL_013AL();
-        private BLLDigitoVerificador_013AL DigitoVerificadorBLL = new BLLDigitoVerificador_013AL();
-        private PermisoBLL_013AL per = new PermisoBLL_013AL();
+        private RolBLL_013AL rbll = new RolBLL_013AL();
+        private PermisoBLL_013AL pbll = new PermisoBLL_013AL();
         Usuarios_013AL usuario;
         private Dictionary<string, int> intentosFallidosPorUsuario = new Dictionary<string, int>();
         private const int maxFailedAttempts = 3;
@@ -30,7 +31,7 @@ namespace UI
             ActualizarIdioma_013AL();
         }
 
-        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         Usuarios_013AL user;
 
         private void btnIngresar_Click_1(object sender, EventArgs e)
@@ -161,12 +162,12 @@ namespace UI
                 string dni = SingletonSession_013AL.Instance.GetUsuario_013AL().DNI_013AL;
 
                 
-                List <Componente_013AL> permisos = per.ListarPermisos_013AL(dni);
+                List <Rol_013AL> permisos = rbll.ListarPermisos_013AL(dni);
 
                 
                 foreach (var permiso in permisos)
                 {
-                    string nombre = per.ObtenerNombrePermiso_013AL(permiso.Cod_013AL);
+                    string nombre = pbll.ObtenerNombrePermiso_013AL(permiso.Cod_013AL);
                     permiso.Nombre_013AL = nombre;
                 }
 

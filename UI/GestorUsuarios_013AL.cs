@@ -1,4 +1,6 @@
 ﻿using BE_013AL;
+using BE_013AL.Composite;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -43,7 +45,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
                 
-        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         Usuarios_013AL user;
         private List<string> eventosPendientes = new List<string>();
 
@@ -147,8 +149,7 @@ namespace UI
                 newRow["Contraseña-013AL"] = hashedInputPassword;
                 newRow["Nombres-013AL"] = textBox3.Text;
                 newRow["Apellidos-013AL"] = textBox4.Text;
-                Rol_013AL rolSeleccionado = (Rol_013AL)cborol.SelectedItem;
-                newRow["CodRol-013AL"] = rolSeleccionado.CodRol_013AL;
+                newRow["CodRol-013AL"] = ((KeyValuePair<int, string>)cborol.SelectedItem).Key;
                 newRow["DNI-013AL"] = dniNuevo;
                 newRow["Login-013AL"] = textBox7.Text;
 
@@ -187,9 +188,9 @@ namespace UI
                 dsUsuariosBD = usuarioBLL.ObtenerUsuarios_013AL();
                 dsUsuariosCopia = dsUsuariosBD.Copy();
 
-                List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
+                Dictionary<int, string> roles = rbll.ListarRoles_013AL();
+                AgregarNombresDeRol(dsUsuariosBD, roles);
 
-                AgregarNombresDeRol(dsUsuariosBD);
 
                 if (dataGridView1.Columns["Eliminado-013AL"] != null)
                 {
@@ -205,14 +206,17 @@ namespace UI
             }
         }
 
+
+        //REVISAR
         private void radioButton1_CheckedChanged(object sender, EventArgs e)
         {            
             try
             {
                 UsuarioBLL_013AL bll = new UsuarioBLL_013AL();
                 dsUsuariosBD = bll.ListarUsuariosActivos_013AL();
+                Dictionary<int, string> roles = rbll.ListarRoles_013AL();
+                AgregarNombresDeRol(dsUsuariosBD, roles);
 
-                AgregarNombresDeRol(dsUsuariosBD);
 
                 dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];      
             }
@@ -327,9 +331,9 @@ namespace UI
             dsUsuariosBD = usuarioBLL.ObtenerUsuarios_013AL();
             dsUsuariosCopia = dsUsuariosBD.Copy();
 
-            List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
+            Dictionary<int, string> roles = rbll.ListarRoles_013AL();
+            AgregarNombresDeRol(dsUsuariosBD, roles);
 
-            AgregarNombresDeRol(dsUsuariosBD);
 
             if (dataGridView1.Columns["Eliminado-013AL"] != null)
             {
@@ -426,19 +430,17 @@ namespace UI
             }
         }
 
-        PermisoBLL_013AL bllpermisos = new PermisoBLL_013AL();
+        RolBLL_013AL rbll = new RolBLL_013AL();
 
         public void CargarRolesCombo_013AL()
         {
-            List<Rol_013AL> rol = bllpermisos.ListarRoles_013AL();
+            var roles = rbll.ListarRoles_013AL();
 
-            cborol.DisplayMember = "Nombre_013AL";
-            cborol.ValueMember = "CodRol_013AL";
-            cborol.DataSource = rol;
+            cborol.DataSource = new BindingSource(roles, null);
+            cborol.DisplayMember = "Value"; 
+            cborol.ValueMember = "Key";     
         }
 
-
-        
         private void btnModificar_Click(object sender, EventArgs e)
         {
             try
@@ -481,8 +483,8 @@ namespace UI
                     rowToModify["Mail-013AL"] = textBox1.Text;
                     rowToModify["Nombres-013AL"] = textBox3.Text;
                     rowToModify["Apellidos-013AL"] = textBox4.Text;
-                    Rol_013AL rolSeleccionado = (Rol_013AL)cborol.SelectedItem;
-                    rowToModify["CodRol-013AL"] = rolSeleccionado.CodRol_013AL;
+                    int codRolSeleccionado = ((KeyValuePair<int, string>)cborol.SelectedItem).Key;
+                    rowToModify["CodRol-013AL"] = codRolSeleccionado;
                     rowToModify["Login-013AL"] = textBox7.Text;
                     rowToModify["Bloqueo-013AL"] = checkBox1.Checked;
                     rowToModify["Activo-013AL"] = checkBox2.Checked;
@@ -514,10 +516,8 @@ namespace UI
             }
 
         }
-        private void AgregarNombresDeRol(DataSet ds)
+        private void AgregarNombresDeRol(DataSet ds, Dictionary<int, string> roles)
         {
-            List<Rol_013AL> listaRoles = bllpermisos.ListarRoles_013AL();
-
             if (!ds.Tables["Usuario"].Columns.Contains("NombreRol-013AL"))
             {
                 ds.Tables["Usuario"].Columns.Add("NombreRol-013AL", typeof(string));
@@ -526,13 +526,12 @@ namespace UI
             foreach (DataRow row in ds.Tables["Usuario"].Rows)
             {
                 int idRol = Convert.ToInt32(row["CodRol-013AL"]);
-                Rol_013AL rolEncontrado = listaRoles.FirstOrDefault(r => r.CodRol_013AL == idRol);
-                if (rolEncontrado != null)
+                if (roles.ContainsKey(idRol))
                 {
-                    row["NombreRol-013AL"] = rolEncontrado.Nombre_013AL;
+                    row["NombreRol-013AL"] = roles[idRol];
                 }
             }
-            
+
             dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];
             if (dataGridView1.Columns["CodRol-013AL"] != null)
             {
@@ -622,9 +621,10 @@ namespace UI
                 checkBox2.Checked = Convert.ToBoolean(row.Cells["Activo-013AL"].Value);
 
                 int codRol = Convert.ToInt32(row.Cells["CodRol-013AL"].Value);
-                foreach (Rol_013AL item in cborol.Items)
+
+                foreach (KeyValuePair<int, string> item in (BindingSource)cborol.DataSource)
                 {
-                    if (item.CodRol_013AL == codRol)
+                    if (item.Key == codRol)
                     {
                         cborol.SelectedItem = item;
                         break;

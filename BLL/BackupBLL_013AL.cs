@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using DAL;
 using DAL_013AL;
 
 namespace BLL_013AL
 {
-    public class BLLBackupRestore_013AL
+    public class BackupBLL_013AL
     {
-        public DALConexiones_013AL dalbackup = new DALConexiones_013AL();
+        public DALBackUp_013AL dalbackup = new DALBackUp_013AL();
 
         public void RealizarBackup_013AL(string backupPath)
         {

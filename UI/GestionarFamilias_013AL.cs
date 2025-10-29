@@ -1,4 +1,5 @@
 ﻿using BE_013AL.Composite;
+using BLL;
 using BLL_013AL;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,10 @@ namespace UI
         {
             InitializeComponent();
         }
-        PermisoBLL_013AL bll = new PermisoBLL_013AL();
+        PermisoBLL_013AL pbll = new PermisoBLL_013AL();
+        FamiliaBLL_013AL fbll = new FamiliaBLL_013AL();
+        RolBLL_013AL rbll = new RolBLL_013AL();
+
         private Familia_013AL FamiliaConfigurada = new Familia_013AL();
         private void GestionarFamilias_Load(object sender, EventArgs e)
         {
@@ -135,7 +139,7 @@ namespace UI
 
         private void CargarHijosDesdeBDRecursivo(Familia_013AL familia)
         {
-            List<Componente_013AL> hijos = bll.TraerListaHijos_013AL(familia.Cod_013AL);
+            List<Rol_013AL> hijos = rbll.TraerListaHijos_013AL(familia.Cod_013AL);
 
             foreach (var hijo in hijos)
             {
@@ -150,7 +154,7 @@ namespace UI
 
         private List<Familia_013AL> CargarTodasLasFamiliasDesdeBD()
         {
-            List<Familia_013AL> familias = bll.TraerListaFamilias_013AL();
+            List<Familia_013AL> familias = fbll.TraerListaFamilias_013AL();
 
             foreach (var fam in familias)
             {
@@ -180,7 +184,7 @@ namespace UI
 
         private void ActualizarComboBox_013AL()
         {
-            List<Familia_013AL> listaFamilias = bll.TraerListaFamilias_013AL();
+            List<Familia_013AL> listaFamilias = fbll.TraerListaFamilias_013AL();
 
             cmbFamilia.DataSource = null; 
             cmbFamilia.DataSource = listaFamilias;
@@ -193,7 +197,7 @@ namespace UI
             listBoxPermisos.Items.Clear();
             cmbFamilia.Items.Clear(); 
 
-            List<Componente_013AL> listaPermisos = bll.TraerListaPermisos_013AL();
+            List<Rol_013AL> listaPermisos = pbll.TraerListaPermisos_013AL();
 
             foreach (var componente in listaPermisos)
             {
@@ -226,7 +230,7 @@ namespace UI
             }
 
             Familia_013AL familiaSeleccionada = (Familia_013AL)cmbFamilia.SelectedItem;
-            Componente_013AL componenteSeleccionado = TraerComponenteDeListBox(listBoxPermisos);
+            Rol_013AL componenteSeleccionado = TraerComponenteDeListBox(listBoxPermisos);
 
             if (componenteSeleccionado == null)
                 return;
@@ -261,7 +265,7 @@ namespace UI
 
             try
             {
-                bool agregado = bll.AsignarHijosAFamilia_013AL(
+                bool agregado = fbll.AsignarHijosAFamilia_013AL(
                     familiaSeleccionada.Cod_013AL,
                     new List<int> { componenteSeleccionado.Cod_013AL });
 
@@ -296,7 +300,7 @@ namespace UI
                 return;
             }
 
-            Componente_013AL componenteSeleccionado = treeViewFamilia.SelectedNode.Tag as Componente_013AL;
+            Rol_013AL componenteSeleccionado = treeViewFamilia.SelectedNode.Tag as Rol_013AL;
             if (componenteSeleccionado == null)
             {
                 MessageBox.Show("El elemento seleccionado no es válido.");
@@ -317,14 +321,14 @@ namespace UI
 
             try
             {
-                bool existeRelacion = bll.VerificarPermisoEnFamilia_013AL(componenteSeleccionado.Cod_013AL, familiaSeleccionada.Cod_013AL);
+                bool existeRelacion = fbll.VerificarPermisoEnFamilia_013AL(componenteSeleccionado.Cod_013AL, familiaSeleccionada.Cod_013AL);
                 if (!existeRelacion)
                 {
                     MessageBox.Show("Este componente no está asociado directamente a la familia seleccionada.");
                     return;
                 }
 
-                string respuesta = bll.EliminarPermisoDeFamilia_013AL(componenteSeleccionado.Cod_013AL, familiaSeleccionada.Cod_013AL);
+                string respuesta = fbll.EliminarPermisoDeFamilia_013AL(componenteSeleccionado.Cod_013AL, familiaSeleccionada.Cod_013AL);
                 MessageBox.Show(respuesta);
 
                 
@@ -341,7 +345,7 @@ namespace UI
             }
         }
 
-        private Componente_013AL TraerComponenteDeListBox(ListBox listbox)
+        private Rol_013AL TraerComponenteDeListBox(ListBox listbox)
         {
             
             if (listbox.SelectedItem == null)
@@ -375,7 +379,7 @@ namespace UI
             {
                 Familia_013AL nuevaFamilia = new Familia_013AL { Cod_013AL = id, Nombre_013AL = nombre, Tipo_013AL = "Familia" };
 
-                List<Componente_013AL> hijos = bll.TraerListaHijos_013AL(id);
+                List<Rol_013AL> hijos = rbll.TraerListaHijos_013AL(id);
                 foreach (var hijo in hijos)
                 {
                     nuevaFamilia.AgregarHijo_013AL(hijo);
@@ -396,13 +400,13 @@ namespace UI
                 return;
             }
 
-            if (bll.ExisteFamilia_013AL(nombreFamilia))
+            if (fbll.ExisteFamilia_013AL(nombreFamilia))
             {
                 MessageBox.Show("El nombre de la familia ya existe. Escriba un nombre diferente.");
                 return;
             }
 
-            int respuesta = bll.CrearFamilia_013AL(nombreFamilia);
+            int respuesta = fbll.CrearFamilia_013AL(nombreFamilia);
             MessageBox.Show("Familia creada con éxito.");
             ActualizarComboBox_013AL();
         }
@@ -414,7 +418,7 @@ namespace UI
                 string[] partes = cmbFamilia.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                 int idFamilia = int.Parse(partes[0].Trim());
 
-                string respuesta = bll.EliminarFamilia_013AL(idFamilia);
+                string respuesta = fbll.EliminarFamilia_013AL(idFamilia);
                 MessageBox.Show(respuesta);
 
                 if (!respuesta.Contains("No se puede eliminar"))
@@ -440,7 +444,7 @@ namespace UI
             string[] partes = cmbFamilia.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             int idFamilia = int.Parse(partes[0].Trim());
 
-            List<Familia_013AL> listaFamilias = bll.TraerListaFamilias_013AL();
+            List<Familia_013AL> listaFamilias = fbll.TraerListaFamilias_013AL();
             if (listaFamilias.Any(f => f.Cod_013AL != idFamilia && f.Nombre_013AL.Equals(nuevoNombre, StringComparison.OrdinalIgnoreCase)))
             {
                 MessageBox.Show("El nombre de la familia ya existe. Escriba un nombre diferente.");
@@ -448,7 +452,7 @@ namespace UI
             }
 
             Familia_013AL familiaModificada = new Familia_013AL { Cod_013AL = idFamilia, Nombre_013AL = nuevoNombre };
-            bll.ModificarFamilia_013AL(familiaModificada);
+            fbll.ModificarFamilia_013AL(familiaModificada);
 
             MessageBox.Show("Familia modificada con éxito.");
             ActualizarComboBox_013AL();

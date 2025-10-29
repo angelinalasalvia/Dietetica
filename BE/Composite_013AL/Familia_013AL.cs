@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 
 namespace BE_013AL.Composite
 {
-    public class Familia_013AL : Componente_013AL
+    public class Familia_013AL : Rol_013AL
     {
         
-        private List<Componente_013AL> listaHijos = new List<Componente_013AL>();
+        private List<Rol_013AL> listaHijos = new List<Rol_013AL>();
 
-        public override void AgregarHijo_013AL(Componente_013AL comp)
+        public override void AgregarHijo_013AL(Rol_013AL comp)
         {
             
             if (!listaHijos.Any(p => p.Cod_013AL == comp.Cod_013AL))
@@ -29,12 +29,12 @@ namespace BE_013AL.Composite
             }
         }
 
-        public override List<Componente_013AL> ObtenerHijos_013AL()
+        public override List<Rol_013AL> ObtenerHijos_013AL()
         {
             return listaHijos;
         }
 
-        public override void QuitarHijo_013AL(Componente_013AL comp)
+        public override void QuitarHijo_013AL(Rol_013AL comp)
         {
             listaHijos.RemoveAll(p => p.Cod_013AL == comp.Cod_013AL);
         }

@@ -1,4 +1,5 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -23,7 +24,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }
-        BLLBitacora_013AL bll = new BLLBitacora_013AL();
+        ProductoCBLL_013AL bll = new ProductoCBLL_013AL();
         public void ActualizarIdioma_013AL()
         {
             LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);

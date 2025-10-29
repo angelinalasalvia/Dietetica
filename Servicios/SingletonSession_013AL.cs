@@ -15,8 +15,8 @@ namespace Servicios_013AL
         private string idiomaActual_013AL;
         public Usuarios_013AL LoggedInUser_013AL { get; private set; }
 
-        public List<Componente_013AL> Permisos_013AL { get; set; }
-        private SingletonSession_013AL() { Permisos_013AL = new List<Componente_013AL>(); }
+        public List<Rol_013AL> Permisos_013AL { get; set; }
+        private SingletonSession_013AL() { Permisos_013AL = new List<Rol_013AL>(); }
 
         public void ClearPermisos()
         {

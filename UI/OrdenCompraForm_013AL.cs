@@ -14,6 +14,7 @@ using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.IO;
 using Servicios_013AL;
+using BLL;
 
 namespace UI
 {
@@ -35,7 +36,11 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        OrdenCompraBLL_013AL ocbll = new OrdenCompraBLL_013AL();
+        SolicitudCotizacionBLL_013AL sbll = new SolicitudCotizacionBLL_013AL();
+        ProductoBLL_013AL prbll = new ProductoBLL_013AL();
+        DetalleSolicitudBLL_013AL dbll = new DetalleSolicitudBLL_013AL();
+
         private void button1_Click(object sender, EventArgs e)
         {
             Proveedores_013AL proveedores = new Proveedores_013AL();
@@ -59,7 +64,7 @@ namespace UI
         }
         public void CargarCboCOD_013AL()
         {
-            var listacod = bll.ListarSCotizacion_013AL();
+            var listacod = sbll.ListarSCotizacion_013AL();
             comboBox1.Items.Clear();
 
             foreach (var cod in listacod)
@@ -123,11 +128,11 @@ namespace UI
                 var solicitudSeleccionada = (SolicitudCotizacion_013AL)selectedItem.Value;
                 int codsc = solicitudSeleccionada.CodSCotizacion_013AL;
 
-                var detalleSolicitud = bll.ListarProductosOC_013AL(codsc);
+                var detalleSolicitud = dbll.ListarProductosOC_013AL(codsc);
 
                 if (detalleSolicitud != null)
                 {
-                    var producto = bll.ObtenerProductoPorId_013AL(detalleSolicitud.CodProducto_013AL);
+                    var producto = prbll.ObtenerProductoPorId_013AL(detalleSolicitud.CodProducto_013AL);
 
                     if (producto != null)
                     {
@@ -168,7 +173,7 @@ namespace UI
             GuardarOrdenCompraEnBaseDeDatos_013AL();
 
 
-            BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+            EventoBLL_013AL bbll = new EventoBLL_013AL();
             Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
             bbll.AgregarEvento_013AL(user.Login_013AL, "OrdenCompra", "Generar Orden Compra", 2);
         }
@@ -210,9 +215,9 @@ namespace UI
                     };
 
                     
-                    bll.GuardarOrdenCompra_013AL(nuevaOrden); 
+                    ocbll.GuardarOrdenCompra_013AL(nuevaOrden); 
 
-                    int codOrdenCompra = bll.ObtenerCodOrdenCompra_013AL(nuevaOrden.CodSolicitud_013AL, nuevaOrden.CUITProveedor_013AL, DateTime.Now);
+                    int codOrdenCompra = ocbll.ObtenerCodOrdenCompra_013AL(nuevaOrden.CodSolicitud_013AL, nuevaOrden.CUITProveedor_013AL, DateTime.Now);
 
                     GenerarPDFOrdenCompra_013AL(codOrdenCompra, nuevaOrden, total);
                     
@@ -249,7 +254,7 @@ namespace UI
                 // Información del Proveedor
                 document.Add(new Paragraph("Datos del Proveedor:"));
                 document.Add(new Paragraph($"CUIT: {orden.CUITProveedor_013AL}"));
-                Proveedor_013AL proveedor = bll.ObtenerDatosProveedor_013AL(codOrdenCompra);
+                Proveedor_013AL proveedor = ocbll.ObtenerDatosProveedor_013AL(codOrdenCompra);
                 document.Add(new Paragraph($"Razón Social: {proveedor.RazonSocial_013AL}"));
                 document.Add(new Paragraph($"Nombre Completo: {proveedor.ApellidoProveedor_013AL} {proveedor.NombreProveedor_013AL}"));
                 document.Add(new Paragraph($"Telefono: {proveedor.Telefono_013AL}"));

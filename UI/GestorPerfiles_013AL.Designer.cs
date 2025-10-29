@@ -38,7 +38,6 @@
             this.btnAgregarFamilia = new System.Windows.Forms.Button();
             this.btnQuitarPermiso = new System.Windows.Forms.Button();
             this.btnAgregarPermiso = new System.Windows.Forms.Button();
-            this.listBoxRol = new System.Windows.Forms.ListBox();
             this.listBoxFamilias = new System.Windows.Forms.ListBox();
             this.listBoxPermisos = new System.Windows.Forms.ListBox();
             this.label4 = new System.Windows.Forms.Label();
@@ -47,8 +46,7 @@
             this.btnEliminar = new System.Windows.Forms.Button();
             this.btnModificar = new System.Windows.Forms.Button();
             this.listBoxPermisoFamilia = new System.Windows.Forms.ListBox();
-            this.btnAplicar = new System.Windows.Forms.Button();
-            this.btnEliminarRelacion = new System.Windows.Forms.Button();
+            this.treeViewRol = new System.Windows.Forms.TreeView();
             this.SuspendLayout();
             // 
             // label9
@@ -84,6 +82,7 @@
             this.cmbRoles.Name = "cmbRoles";
             this.cmbRoles.Size = new System.Drawing.Size(144, 21);
             this.cmbRoles.TabIndex = 72;
+            this.cmbRoles.SelectedIndexChanged += new System.EventHandler(this.cmbRoles_SelectedIndexChanged_1);
             // 
             // label3
             // 
@@ -150,14 +149,6 @@
             this.btnAgregarPermiso.Text = "Agregar >>";
             this.btnAgregarPermiso.UseVisualStyleBackColor = false;
             this.btnAgregarPermiso.Click += new System.EventHandler(this.btnAgregarPermiso_Click);
-            // 
-            // listBoxRol
-            // 
-            this.listBoxRol.FormattingEnabled = true;
-            this.listBoxRol.Location = new System.Drawing.Point(404, 131);
-            this.listBoxRol.Name = "listBoxRol";
-            this.listBoxRol.Size = new System.Drawing.Size(228, 264);
-            this.listBoxRol.TabIndex = 65;
             // 
             // listBoxFamilias
             // 
@@ -241,39 +232,19 @@
             this.listBoxPermisoFamilia.Size = new System.Drawing.Size(228, 95);
             this.listBoxPermisoFamilia.TabIndex = 76;
             // 
-            // btnAplicar
+            // treeViewRol
             // 
-            this.btnAplicar.BackColor = System.Drawing.Color.MediumSeaGreen;
-            this.btnAplicar.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnAplicar.ForeColor = System.Drawing.Color.White;
-            this.btnAplicar.Location = new System.Drawing.Point(404, 411);
-            this.btnAplicar.Name = "btnAplicar";
-            this.btnAplicar.Size = new System.Drawing.Size(109, 34);
-            this.btnAplicar.TabIndex = 85;
-            this.btnAplicar.Text = "Aplicar";
-            this.btnAplicar.UseVisualStyleBackColor = false;
-            this.btnAplicar.Click += new System.EventHandler(this.btnAplicar_Click);
+            this.treeViewRol.Location = new System.Drawing.Point(404, 131);
+            this.treeViewRol.Name = "treeViewRol";
+            this.treeViewRol.Size = new System.Drawing.Size(294, 265);
+            this.treeViewRol.TabIndex = 87;
             // 
-            // btnEliminarRelacion
-            // 
-            this.btnEliminarRelacion.BackColor = System.Drawing.Color.Brown;
-            this.btnEliminarRelacion.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
-            this.btnEliminarRelacion.ForeColor = System.Drawing.Color.White;
-            this.btnEliminarRelacion.Location = new System.Drawing.Point(523, 411);
-            this.btnEliminarRelacion.Name = "btnEliminarRelacion";
-            this.btnEliminarRelacion.Size = new System.Drawing.Size(109, 34);
-            this.btnEliminarRelacion.TabIndex = 86;
-            this.btnEliminarRelacion.Text = "Eliminar";
-            this.btnEliminarRelacion.UseVisualStyleBackColor = false;
-            this.btnEliminarRelacion.Click += new System.EventHandler(this.btnEliminarRelacion_Click);
-            // 
-            // GestorPerfiles
+            // GestorPerfiles_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(710, 648);
-            this.Controls.Add(this.btnEliminarRelacion);
-            this.Controls.Add(this.btnAplicar);
+            this.Controls.Add(this.treeViewRol);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.btnGestionarFamilias);
             this.Controls.Add(this.btnCrear);
@@ -290,10 +261,9 @@
             this.Controls.Add(this.btnAgregarFamilia);
             this.Controls.Add(this.btnQuitarPermiso);
             this.Controls.Add(this.btnAgregarPermiso);
-            this.Controls.Add(this.listBoxRol);
             this.Controls.Add(this.listBoxFamilias);
             this.Controls.Add(this.listBoxPermisos);
-            this.Name = "GestorPerfiles";
+            this.Name = "GestorPerfiles_013AL";
             this.Text = "Gestor de Perfiles";
             this.Load += new System.EventHandler(this.GestorPerfiles_Load);
             this.ResumeLayout(false);
@@ -313,7 +283,6 @@
         private System.Windows.Forms.Button btnAgregarFamilia;
         private System.Windows.Forms.Button btnQuitarPermiso;
         private System.Windows.Forms.Button btnAgregarPermiso;
-        private System.Windows.Forms.ListBox listBoxRol;
         private System.Windows.Forms.ListBox listBoxFamilias;
         private System.Windows.Forms.ListBox listBoxPermisos;
         private System.Windows.Forms.Label label4;
@@ -322,7 +291,6 @@
         private System.Windows.Forms.Button btnEliminar;
         private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.ListBox listBoxPermisoFamilia;
-        private System.Windows.Forms.Button btnAplicar;
-        private System.Windows.Forms.Button btnEliminarRelacion;
+        private System.Windows.Forms.TreeView treeViewRol;
     }
 }

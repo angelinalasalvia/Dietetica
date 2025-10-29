@@ -31,7 +31,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        OrdenCompraBLL_013AL bll = new OrdenCompraBLL_013AL();
         private DataTable dtOrdenesCompra;
 
         private void dataGridViewProductos_CellValueChanged(object sender, DataGridViewCellEventArgs e)

@@ -1,4 +1,5 @@
-﻿using BLL_013AL;
+﻿using BLL;
+using BLL_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -30,10 +31,11 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        ProductoBLL_013AL prbll = new ProductoBLL_013AL();
+        OrdenCompraBLL_013AL ocbll = new OrdenCompraBLL_013AL();
         private void CargarProductos()
         {
-            DataTable dtProductos = bll.ListarProductosConImagen_013AL();
+            DataTable dtProductos = prbll.ListarProductosConImagen_013AL();
             dataGridView1.AllowUserToAddRows = false;
 
             if (dtProductos.Rows.Count > 0)
@@ -96,7 +98,7 @@ namespace UI
                     int nuevoStock = stockActual + cantidadIngresada;
 
                     // Llamar al método RegistrarCompra para actualizar el stock en la base de datos
-                    string resultado = bll.RegistrarCompra_013AL(idProducto, nuevoStock);
+                    string resultado = ocbll.RegistrarCompra_013AL(idProducto, nuevoStock);
 
                     if (resultado == "OK")
                     {

@@ -11,12 +11,13 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
+using BLL;
 
 namespace UI
 {
     public partial class SeleccionarProducto_013AL : Form, IObserver_013AL
     {
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        ProductoBLL_013AL prbll = new ProductoBLL_013AL();
         public int IdCompra;
         private List<Detalle_013AL> carritoTemporal;
         public SeleccionarProducto_013AL(int id, List<Detalle_013AL> carrito)
@@ -57,8 +58,8 @@ namespace UI
             panelitem.Controls.Clear();
 
             var productos = string.IsNullOrEmpty(filtro)
-                ? bll.Devolver_Lista_Productos_013AL()
-                : bll.BuscarProductoxNombre_013AL(filtro);
+                ? prbll.Devolver_Lista_Productos_013AL()
+                : prbll.BuscarProductoxNombre_013AL(filtro);
 
             foreach (Producto_013AL producto in productos)
             {
@@ -122,7 +123,7 @@ namespace UI
             {
                 int Cantidad = Convert.ToInt32(Interaction.InputBox("Ingrese la cantidad que desea comprar: "));
                 string str = ((PictureBox)sender).Tag.ToString();
-                Producto_013AL producto = bll.Devolver_Producto_Buscado_x_Id_013AL(Convert.ToInt32(str));
+                Producto_013AL producto = prbll.Devolver_Producto_Buscado_x_Id_013AL(Convert.ToInt32(str));
 
                 if (Cantidad <= 0)
                 {
@@ -158,7 +159,7 @@ namespace UI
                 }
 
                 // Descontar stock real
-                bll.DescontarStock_013AL(producto.CodProducto_013AL, Cantidad);
+                prbll.DescontarStock_013AL(producto.CodProducto_013AL, Cantidad);
 
                 MessageBox.Show($"Producto '{producto.Nombre_013AL}' agregado.\nCantidad: {Cantidad}\nSubtotal: {(producto.Precio_013AL * Cantidad)}",
                     "Producto Agregado", MessageBoxButtons.OK, MessageBoxIcon.Information);

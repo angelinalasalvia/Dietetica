@@ -17,6 +17,7 @@ using System.Windows.Forms;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 using System.Xml.Linq;
 using Servicios_013AL;
+using BLL;
 
 namespace UI
 {
@@ -29,7 +30,12 @@ namespace UI
             ActualizarIdioma_013AL();
         }
 
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        OrdenCompraBLL_013AL ocbll = new OrdenCompraBLL_013AL();
+        ProveedorBLL_013AL pbll = new ProveedorBLL_013AL();
+        ProductoBLL_013AL prbll = new ProductoBLL_013AL();
+        SolicitudCotizacionBLL_013AL scbll = new SolicitudCotizacionBLL_013AL();
+        DetalleSolicitudBLL_013AL dsbll = new DetalleSolicitudBLL_013AL();
+
         private int idSolicitudCotizacion;
         private List<DetalleSolicitudC_013AL> detallesCotizacion = new List<DetalleSolicitudC_013AL>();
 
@@ -70,7 +76,7 @@ namespace UI
         }
         private void CargarProveedores_013AL()
         {
-            var listaProveedores = bll.ListarProveedores_013AL();
+            var listaProveedores = pbll.ListarProveedores_013AL();
             cboproveedor.Items.Clear();
 
             foreach (var proveedor in listaProveedores)
@@ -110,7 +116,7 @@ namespace UI
         private void CargarProductos_013AL()
         {
 
-            var listaProductos = bll.ListarProductosPocoStock_013AL();
+            var listaProductos = prbll.ListarProductosPocoStock_013AL();
             comboBox1.Items.Clear();
 
             foreach (var productos in listaProductos)
@@ -141,7 +147,7 @@ namespace UI
                 int cuitProveedor = proveedorSeleccionado.CUIT_013AL;
 
                 
-                idSolicitudCotizacion = bll.AgregarSCotizacion_013AL(cuitProveedor);
+                idSolicitudCotizacion = scbll.AgregarSCotizacion_013AL(cuitProveedor);
                 MessageBox.Show("Solicitud de cotización creada con ID: " + idSolicitudCotizacion);
             }
             else
@@ -201,7 +207,7 @@ namespace UI
             // Agregar los detalles a las filas del DataGridView
             foreach (var detalle in detallesCotizacion)
             {
-                var producto = bll.ObtenerProductoPorId_013AL(detalle.CodProducto_013AL);
+                var producto = prbll.ObtenerProductoPorId_013AL(detalle.CodProducto_013AL);
                 string nombreProducto = producto != null ? producto.Nombre_013AL : "Desconocido";
 
                 dataGridView1.Rows.Add(detalle.CodProducto_013AL, nombreProducto, detalle.Cantidad_013AL);
@@ -221,7 +227,7 @@ namespace UI
                     GenerarSolicitudCotizacionPDF_013AL(proveedorSeleccionado, detallesProductos);
 
 
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    EventoBLL_013AL bbll = new EventoBLL_013AL();
                     Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Cotizaciones", "Generar Solicitud Cotizacion", 2);
                 }
@@ -268,7 +274,7 @@ namespace UI
 
                 foreach (var detalle in detallesProductos)
                 {
-                    var producto = bll.ObtenerProductoPorId_013AL(detalle.CodProducto_013AL);
+                    var producto = prbll.ObtenerProductoPorId_013AL(detalle.CodProducto_013AL);
                     string nombreProducto = producto != null ? producto.Nombre_013AL : "Desconocido";
 
                     table.AddCell(detalle.CodProducto_013AL.ToString());
@@ -308,7 +314,7 @@ namespace UI
                     if (resultado == DialogResult.Yes)
                     {
                         // Llamar al método de la capa BLL para eliminar el detalle
-                        string respuesta = bll.EliminarDetalleSC_013AL(idProducto, codSCotizacion);
+                        string respuesta = dsbll.EliminarDetalleSC_013AL(idProducto, codSCotizacion);
 
                         // Verificar la respuesta y mostrar un mensaje al usuario
                         if (respuesta == "OK")
@@ -350,7 +356,7 @@ namespace UI
                 if (int.TryParse(textBox1.Text, out cantidad) && cantidad > 0)
                 {
                     // Agregar el detalle a la solicitud de cotización
-                    string resultado = bll.AgregarDetalleSC_013AL(idSolicitudCotizacion, idProducto, cantidad);
+                    string resultado = dsbll.AgregarDetalleSC_013AL(idSolicitudCotizacion, idProducto, cantidad);
                     MessageBox.Show(resultado);
 
                     // Crear un nuevo detalle y agregarlo a la lista de detalles

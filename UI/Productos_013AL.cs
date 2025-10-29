@@ -1,4 +1,5 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -22,7 +23,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        ProductoBLL_013AL bll = new ProductoBLL_013AL();
         private byte[] imagenBytes;
         public void ActualizarIdioma_013AL()
         {
@@ -55,7 +56,7 @@ namespace UI
                 CargarProductos_013AL();
 
 
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                EventoBLL_013AL bbll = new EventoBLL_013AL();
                 Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                 bbll.AgregarEvento_013AL(user.Login_013AL, "Productos", "Registrar Producto", 2);
             }
@@ -179,7 +180,7 @@ namespace UI
                     // Recargar la lista de productos para reflejar los cambios
                     CargarProductos_013AL();
 
-                    BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                    EventoBLL_013AL bbll = new EventoBLL_013AL();
                     Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Productos", "Modificar Producto", 2);
                 }
@@ -219,7 +220,7 @@ namespace UI
                 // Recargar la lista de productos para reflejar los cambios
                 CargarProductos_013AL();
 
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                EventoBLL_013AL bbll = new EventoBLL_013AL();
                 Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                 bbll.AgregarEvento_013AL(user.Login_013AL, "Productos", "Eliminar Producto", 2);
 

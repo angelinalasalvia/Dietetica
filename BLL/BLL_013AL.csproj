@@ -61,12 +61,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BLLBackupRestore_013AL.cs" />
-    <Compile Include="BLLBitacora_013AL.cs" />
-    <Compile Include="BLLDigitoVerificador_013AL.cs" />
-    <Compile Include="NegocioBLL_013AL.cs" />
+    <Compile Include="BackupBLL_013AL.cs" />
+    <Compile Include="EventoBLL_013AL.cs" />
+    <Compile Include="ClienteBLL_013AL.cs" />
+    <Compile Include="DetalleBLL_013AL.cs" />
+    <Compile Include="DetalleSolicitudBLL_013AL.cs" />
+    <Compile Include="FacturaBLL_013AL.cs" />
+    <Compile Include="FamiliaBLL_013AL.cs" />
+    <Compile Include="OrdenCompraBLL_013AL.cs" />
     <Compile Include="PermisoBLL_013AL.cs" />
+    <Compile Include="ProductoBLL_013AL.cs" />
+    <Compile Include="ProductoCBLL_013AL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ProveedorBLL_013AL.cs" />
+    <Compile Include="RolBLL_013AL.cs" />
+    <Compile Include="SolicitudCotizacionBLL_013AL.cs" />
     <Compile Include="UsuarioBLL_013AL.cs" />
   </ItemGroup>
   <ItemGroup>

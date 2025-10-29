@@ -1,5 +1,6 @@
 ﻿using BE_013AL;
 using BE_013AL.Composite;
+using BLL;
 using BLL_013AL;
 using Servicios;
 using System;
@@ -17,7 +18,9 @@ namespace UI
 {
     public partial class GestorPerfiles_013AL : Form, IObserver_013AL
     {
-        PermisoBLL_013AL bll = new PermisoBLL_013AL();
+        PermisoBLL_013AL pbll = new PermisoBLL_013AL();
+        RolBLL_013AL rbll = new RolBLL_013AL();
+        FamiliaBLL_013AL fbll = new FamiliaBLL_013AL();
         public GestorPerfiles_013AL()
         {
             InitializeComponent();
@@ -38,81 +41,155 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
-       
-        private Familia_013AL RolConfigurado = new Familia_013AL();
 
+        private void GestorPerfiles_Load(object sender, EventArgs e) 
+        { 
+            ActualizarListBoxPermisosYFamilias_013AL(); 
+            ActualizarComboBox_013AL();
+            listBoxFamilias.SelectedIndexChanged += listBoxFamilias_SelectedIndexChanged;
+
+        }
+
+        private Familia_013AL RolConfigurado = new Familia_013AL();
 
         private Familia_013AL rolAModifcarOEliminar = new Familia_013AL();
 
         private void btnAgregarPermiso_Click(object sender, EventArgs e)
         {
-            if (listBoxPermisos.SelectedItems.Count > 0)
+            if (cmbRoles.SelectedItem == null)
             {
-                Componente_013AL permisoSeleccionado = TraerComponeneteDeListBox_013AL(listBoxPermisos);
-                if (!ExisteConflicto_013AL(permisoSeleccionado))
-                {
-                    RolConfigurado.AgregarHijo_013AL(permisoSeleccionado);
-                    ActualizarListBoxRol_013AL();
-                }
+                MessageBox.Show("Seleccione un rol antes de agregar permisos.");
+                return;
             }
-            else { MessageBox.Show("Seleccione un permiso para agregar"); }
+
+            // obtener id de rol
+            string[] partesRol = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            int idRol = int.Parse(partesRol[0].Trim());
+
+            // comprobar si seleccionó en listBoxPermisos
+            if (listBoxPermisos.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Seleccione un permiso para agregar");
+                return;
+            }
+
+            Rol_013AL permisoSeleccionado = TraerComponeneteDeListBox_013AL(listBoxPermisos);
+            if (permisoSeleccionado == null) return;
+
+            if (ExisteConflicto_013AL(permisoSeleccionado))
+            {
+                // Los mensajes de conflicto los maneja ExisteConflicto_
+                return;
+            }
+
+            // Intentar insertar en BD: usá el método BLL que tengas (en tu código principal usabas InsertarFamiliaRol_013AL en btnAplicar)
+            string insertado = fbll.InsertarFamiliaRol_013AL(idRol, permisoSeleccionado.Cod_013AL); // si no existe, crear wrapper en BLL
+
+            if (insertado == "OK")
+            {
+                // Guardar en memoria y refrescar vista
+                RolConfigurado.AgregarHijo_013AL(permisoSeleccionado);
+                MostrarRolEnTreeView(RolConfigurado);
+                MessageBox.Show("Permiso/familia agregado al rol correctamente.");
+            }
+            else
+            {
+                MessageBox.Show("No se pudo agregar el permiso/familia. Puede que ya exista la relación.");
+            }
         }
 
-        private void GestorPerfiles_Load(object sender, EventArgs e)
-        {
-            ActualizarListBoxPermisosYFamilias_013AL();
-            ActualizarComboBox_013AL();
 
-            listBoxFamilias.SelectedIndexChanged += listBoxFamilias_SelectedIndexChanged;
+
+
+
+
+        private void MostrarRolEnTreeView(Familia_013AL rol)
+        {
+            treeViewRol.Nodes.Clear();
+
+            // Asegurarse de que el rol tenga toda su estructura cargada antes de mostrar
+            CargarHijosDesdeBDRecursivoParaRol(rol);
+
+            TreeNode nodoRaiz = new TreeNode($"{rol.Nombre_013AL} ({rol.Cod_013AL})")
+            {
+                Tag = rol
+            };
+
+            treeViewRol.Nodes.Add(nodoRaiz);
+            AgregarHijosAlTreeNodeRol(rol, nodoRaiz);
+            treeViewRol.ExpandAll();
         }
 
-        
-
-        private bool ExisteConflicto_013AL(Componente_013AL permisoSeleccionado)
+        private void AgregarHijosAlTreeNodeRol(Familia_013AL familia, TreeNode nodoPadre)
         {
-            if (permisoSeleccionado is Permiso_013AL) 
+            foreach (var hijo in familia.ObtenerHijos_013AL())
             {
-               
-                if (EstaEnFamiliaDelRol_013AL(permisoSeleccionado.Cod_013AL, RolConfigurado))
-                {
-                    
-                    return true;
-                }
+                string tipo = hijo is Familia_013AL ? "Familia" : "Permiso";
 
-               
-                Componente_013AL comp = bll.VerificarSiEstaEnFamilia_013AL(permisoSeleccionado.Cod_013AL);
-                if (comp != null)
+                TreeNode nodoHijo = new TreeNode($"{hijo.Nombre_013AL} ({tipo}) - ID: {hijo.Cod_013AL}")
                 {
-                    Componente_013AL yaEstaEnElRol = RolConfigurado.ObtenerHijos_013AL().FirstOrDefault(p => p.Cod_013AL == comp.Cod_013AL);
-                    if (yaEstaEnElRol != null)
-                    {
-                        MessageBox.Show($"El permiso ya está en la familia {comp.Cod_013AL} dentro del rol.");
-                        return true;
-                    }
+                    Tag = hijo
+                };
+
+                nodoPadre.Nodes.Add(nodoHijo);
+
+                if (hijo is Familia_013AL subFamilia)
+                {
+                    CargarHijosDesdeBDRecursivoParaRol(subFamilia);
+                    AgregarHijosAlTreeNodeRol(subFamilia, nodoHijo);
                 }
             }
-            else 
+        }
+
+
+
+        // --- Cargar hijos del rol desde BD recursivamente (como en GestionarFamilias) ---
+        private void CargarHijosDesdeBDRecursivoParaRol(Familia_013AL familia)
+        {
+            List<Rol_013AL> hijos = rbll.TraerListaHijos_013AL(familia.Cod_013AL);
+            foreach (var hijo in hijos)
             {
-                
-                List<Componente_013AL> listaHijos = bll.TraerListaHijos_013AL(permisoSeleccionado.Cod_013AL);
-                foreach (var hijo in listaHijos)
+                // Evitar duplicados en memoria
+                if (!familia.ObtenerHijos_013AL().Any(h => h.Cod_013AL == hijo.Cod_013AL))
+                    familia.AgregarHijo_013AL(hijo);
+
+                if (hijo is Familia_013AL subFamilia)
+                {
+                    CargarHijosDesdeBDRecursivoParaRol(subFamilia);
+                }
+            }
+        }
+
+
+
+
+
+        private bool ExisteConflicto_013AL(Rol_013AL permisoSeleccionado)
+        {
+            // Verificar si el componente ya está dentro del rol (en cualquier nivel)
+            if (EstaEnFamiliaDelRol_013AL(permisoSeleccionado.Cod_013AL, RolConfigurado))
+            {
+                MessageBox.Show($"El componente {permisoSeleccionado.Nombre_013AL} ya existe dentro del rol (en otra familia).");
+                return true;
+            }
+
+            // Si el seleccionado es una familia, verificar sus hijos también
+            if (permisoSeleccionado is Familia_013AL familiaSeleccionada)
+            {
+                List<Rol_013AL> hijos = rbll.TraerListaHijos_013AL(familiaSeleccionada.Cod_013AL);
+                foreach (var hijo in hijos)
                 {
                     if (EstaEnFamiliaDelRol_013AL(hijo.Cod_013AL, RolConfigurado))
                     {
-                        MessageBox.Show($"La familia seleccionada contiene el permiso {hijo.Cod_013AL}, que ya está dentro de otra familia en el rol.");
-                        return true;
-                    }
-
-                    Componente_013AL yaEstaEnElRol = RolConfigurado.ObtenerHijos_013AL().FirstOrDefault(p => p.Cod_013AL == hijo.Cod_013AL);
-                    if (yaEstaEnElRol != null)
-                    {
-                        MessageBox.Show($"La familia seleccionada tiene al permiso {hijo.Cod_013AL} ya seleccionado directamente en el rol.");
+                        MessageBox.Show($"No se puede agregar '{familiaSeleccionada.Nombre_013AL}' porque contiene '{hijo.Nombre_013AL}', que ya existe dentro del rol.");
                         return true;
                     }
                 }
             }
+
             return false;
         }
+
         private bool EstaEnFamiliaDelRol_013AL(int idPermiso, Familia_013AL familia)
         {
             foreach (var componente in familia.ObtenerHijos_013AL())
@@ -128,27 +205,11 @@ namespace UI
             }
             return false;
         }
-        private void ActualizarListBoxRol_013AL()
-        {
-            listBoxRol.Items.Clear();
-            foreach (Componente_013AL permiso in RolConfigurado.ObtenerHijos_013AL())
-            {
-                listBoxRol.Items.Add($"{permiso.Cod_013AL} - {permiso.Nombre_013AL} - {permiso.Tipo_013AL}");
-            }
-        }
-        private void ResetearBotones_013AL()
-        {
-            btnCrear.Enabled = true;
-            btnModificar.Enabled = true;
-            btnEliminar.Enabled = true;
-
-            cmbRoles.SelectedItem = null;
-            
-        }
+        
         private void ActualizarListBoxPermisosYFamilias_013AL()
         {
             listBoxPermisos.Items.Clear();
-            List<Componente_013AL> listaPermisos = bll.TraerListaPermisosHijo_013AL();
+            List<Rol_013AL> listaPermisos = pbll.TraerListaPermisosHijo_013AL();
             foreach (var permiso in listaPermisos)
             {
                 if (permiso is Permiso_013AL)
@@ -159,7 +220,7 @@ namespace UI
 
 
             listBoxFamilias.Items.Clear();
-            List<Familia_013AL> listaFamilias = bll.TraerListaFamilias_013AL();
+            List<Familia_013AL> listaFamilias = fbll.TraerListaFamilias_013AL();
             foreach (var permiso in listaFamilias)
             {
                 if (permiso is Familia_013AL)
@@ -172,7 +233,7 @@ namespace UI
         private void ActualizarComboBox_013AL()
         {
             cmbRoles.Items.Clear();
-            List<Familia_013AL> listaRoles = bll.TraerListaRoles_013AL();
+            List<Familia_013AL> listaRoles = rbll.TraerListaRoles_013AL();
             foreach (var rol in listaRoles)
             {
                 cmbRoles.Items.Add($"{rol.Cod_013AL} - {rol.Nombre_013AL}");
@@ -184,17 +245,18 @@ namespace UI
             listBoxPermisoFamilia.Items.Clear();
             if (listBoxFamilias.SelectedItems.Count > 0)
             {
-                Componente_013AL familiaSeleccionada = TraerComponeneteDeListBox_013AL(listBoxFamilias);
-                List<Componente_013AL> lista = bll.TraerListaHijos_013AL(familiaSeleccionada.Cod_013AL);
+                Rol_013AL familiaSeleccionada = TraerComponeneteDeListBox_013AL(listBoxFamilias);
+                List<Rol_013AL> lista = rbll.TraerListaHijos_013AL(familiaSeleccionada.Cod_013AL);
 
-                foreach (Componente_013AL permiso in lista)
+                foreach (Rol_013AL permiso in lista)
                 {
                     listBoxPermisoFamilia.Items.Add($"{permiso.Cod_013AL} - {permiso.Nombre_013AL} - {permiso.Tipo_013AL}");
                 }
             }
         }
 
-        private Componente_013AL TraerComponeneteDeListBox_013AL(ListBox listbox)
+        
+        private Rol_013AL TraerComponeneteDeListBox_013AL(ListBox listbox)
         {
             string[] partes = listbox.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             if (partes.Length < 3)
@@ -211,7 +273,7 @@ namespace UI
             //int id = int.Parse(partes[0].Trim());
             string nombre = partes[1].Trim();
             string tipo = partes[2].Trim();
-            Componente_013AL componenteSeleccionado;
+            Rol_013AL componenteSeleccionado;
             if (tipo == "Simple")
             {
                 componenteSeleccionado = new Permiso_013AL { Cod_013AL = id, Nombre_013AL = nombre, Tipo_013AL = "Simple" };
@@ -221,162 +283,93 @@ namespace UI
         }
 
        
-        private void BloquearBotones()
-        {
-            btnCrear.Enabled = false;
-            btnModificar.Enabled = false;
-            btnEliminar.Enabled = false;
-
-        }
-
-        private void cmbRoles_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (cmbRoles.SelectedItem != null)
-            {
-                RolConfigurado.ObtenerHijos_013AL().Clear();
-                listBoxRol.Items.Clear();
-                string[] partes = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                int id = int.Parse(partes[0].Trim());
-                string nombre = partes[1].Trim();
-                Familia_013AL rol = new Familia_013AL() { Cod_013AL = id, Nombre_013AL = nombre };
-                List<Componente_013AL> lista = bll.TraerListaPermisosRol_013AL(rol.Cod_013AL);
-
-                foreach (Componente_013AL permiso in lista)
-                {
-                    listBoxRol.Items.Add($"{permiso.Cod_013AL} - {permiso.Nombre_013AL} - {permiso.Tipo_013AL}");
-                    RolConfigurado.AgregarHijo_013AL(permiso);
-                }
-            }
-        }
-
         private void btnAgregarFamilia_Click(object sender, EventArgs e)
         {
-            if (listBoxFamilias.SelectedItems.Count > 0)
+            if (cmbRoles.SelectedItem == null)
             {
-                Componente_013AL permisoSeleccionado = TraerComponeneteDeListBox_013AL(listBoxFamilias);
-                if (!ExisteConflicto_013AL(permisoSeleccionado))
-                {
-                    RolConfigurado.AgregarHijo_013AL(permisoSeleccionado);
-                    ActualizarListBoxRol_013AL();
-                }
+                MessageBox.Show("Seleccione un rol antes de agregar permisos.");
+                return;
             }
-            else { MessageBox.Show("Seleccione una familia para agregar"); }
+
+            // obtener id de rol
+            string[] partesRol = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            int idRol = int.Parse(partesRol[0].Trim());
+
+            // comprobar si seleccionó en listBoxPermisos
+            if (listBoxFamilias.SelectedItems.Count == 0)
+            {
+                MessageBox.Show("Seleccione una familia para agregar");
+                return;
+            }
+
+            Rol_013AL permisoSeleccionado = TraerComponeneteDeListBox_013AL(listBoxFamilias);
+            if (permisoSeleccionado == null) return;
+
+            if (ExisteConflicto_013AL(permisoSeleccionado))
+            {
+                // Los mensajes de conflicto los maneja ExisteConflicto_
+                return;
+            }
+
+            // Intentar insertar en BD: usá el método BLL que tengas (en tu código principal usabas InsertarFamiliaRol_013AL en btnAplicar)
+            string insertado = fbll.InsertarFamiliaRol_013AL(idRol, permisoSeleccionado.Cod_013AL); // si no existe, crear wrapper en BLL
+
+            if (insertado == "OK")
+            {
+                RolConfigurado.AgregarHijo_013AL(permisoSeleccionado);
+                MostrarRolEnTreeView(RolConfigurado);
+                MessageBox.Show("Permiso/familia agregado al rol correctamente.");
+            }
+            else
+            {
+                MessageBox.Show("No se pudo agregar el permiso/familia. Puede que ya exista la relación.");
+            }
         }
 
         private void btnQuitarPermiso_Click(object sender, EventArgs e)
         {
-            if (listBoxRol.SelectedItems.Count > 0)
-            {
-                Componente_013AL permisoSeleccionado = TraerComponeneteDeListBox_013AL(listBoxRol);
-
-                RolConfigurado.QuitarHijo_013AL(permisoSeleccionado);
-                ActualizarListBoxRol_013AL();
-            }
-            else { MessageBox.Show("Seleccione un permiso del Rol configurado para quitar"); }
-        }
-
-        private void btnAplicar_Click(object sender, EventArgs e)
-        {
-            if (cmbRoles.SelectedItem != null)
-            {
-                string[] partes = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-                int idRol = int.Parse(partes[0].Trim());
-
-                foreach (var permiso in RolConfigurado.ObtenerHijos_013AL())
-                {
-                    
-                    if (ExisteConflicto_013AL(permiso))
-                    {
-                        MessageBox.Show($"El permiso '{permiso.Nombre_013AL}' ya está contenido dentro de una familia del rol.");
-                        continue; 
-                    }
-
-                    
-                    bool existeEnPermisosFamilia = bll.VerificarPermisosRol_013AL(idRol, permiso.Cod_013AL);
-                    if (existeEnPermisosFamilia)
-                    {
-                        MessageBox.Show($"El permiso '{permiso.Nombre_013AL}' ya está asignado al rol.");
-                        continue; 
-                    }
-
-                   
-                    bll.InsertarFamiliaRol_013AL(idRol, permiso.Cod_013AL);
-                    MessageBox.Show("Permisos asignados a Rol correctamente");
-                }
-
-                
-            }
-            else
-            {
-                MessageBox.Show("Seleccione un rol antes de aplicar.");
-            }
-        }
-
-        private void btnEliminarRelacion_Click(object sender, EventArgs e)
-        {
             if (cmbRoles.SelectedItem == null)
             {
-                MessageBox.Show("Seleccione un rol antes de intentar eliminar un permiso o familia.");
+                MessageBox.Show("Seleccione un rol antes de intentar quitar permisos.");
                 return;
             }
 
-            if (listBoxRol.Items.Count == 0)
+            if (treeViewRol.SelectedNode == null)
             {
-                MessageBox.Show("Seleccione al menos un permiso o familia del rol configurado para eliminar.");
+                MessageBox.Show("Seleccione un permiso o familia del rol configurado para quitar.");
                 return;
             }
 
-            
-            string[] partes = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
-            int idRol = int.Parse(partes[0].Trim());
+            string[] partesRol = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+            int idRol = int.Parse(partesRol[0].Trim());
 
-            
-            List<Componente_013AL> permisosAEliminar = new List<Componente_013AL>();
-
-            foreach (var item in listBoxRol.Items)
+            Rol_013AL permisoSeleccionado = treeViewRol.SelectedNode.Tag as Rol_013AL;
+            if (permisoSeleccionado == null)
             {
-                
-                Console.WriteLine($"Tipo de item: {item.GetType().FullName}"); 
-                if (item is Componente_013AL permiso)
-                {
-                    permisosAEliminar.Add(permiso);
-                }
-            }
-
-            if (permisosAEliminar.Count == 0)
-            {
-                MessageBox.Show("No se pudo obtener la información de los permisos o familias seleccionados.");
+                MessageBox.Show("Elemento seleccionado inválido.");
                 return;
             }
 
-            
-            bool algunEliminado = false;
+            // Pregunta confirmación
+            DialogResult dr = MessageBox.Show($"¿Eliminar {permisoSeleccionado.Nombre_013AL} del rol?", "Confirmar", MessageBoxButtons.YesNo);
+            if (dr != DialogResult.Yes) return;
 
-            foreach (Componente_013AL permiso in permisosAEliminar)
+            bool eliminado = rbll.EliminarPermisoRol_013AL(idRol, permisoSeleccionado.Cod_013AL); // ya existe en BLL/DAL
+            if (eliminado)
             {
-                
-                if (bll.VerificarPermisosRol_013AL(idRol, permiso.Cod_013AL))
-                {
-                    bool eliminado = bll.VerificarPermisosRol_013AL(idRol, permiso.Cod_013AL);
-                    if (eliminado)
-                    {
-                        RolConfigurado.QuitarHijo_013AL(permiso);
-                        algunEliminado = true;
-                    }
-                }
-            }
-
-            
-            if (algunEliminado)
-            {
-                ActualizarListBoxRol_013AL();
-                MessageBox.Show("Permiso(s) o familia(s) eliminados correctamente.");
+                RolConfigurado.QuitarHijo_013AL(permisoSeleccionado);
+                MostrarRolEnTreeView(RolConfigurado);
+                MessageBox.Show("Eliminado correctamente del rol.");
             }
             else
             {
-                MessageBox.Show("No se pudo eliminar ningún permiso o familia. Verifique las relaciones.");
+                MessageBox.Show("No se pudo eliminar la relación en la BD.");
             }
         }
+
+        
+
+
 
         private void btnGestionarFamilias_Click(object sender, EventArgs e)
         {
@@ -395,16 +388,15 @@ namespace UI
                 return;
             }
 
-            if (bll.ExisteRol_013AL(nombreRol))
+            if (rbll.ExisteRol_013AL(nombreRol))
             {
                 MessageBox.Show("El nombre del rol ya existe. Escriba un nombre diferente.");
                 return;
             }
 
-            int respuesta = bll.CrearRol_013AL(nombreRol);
+            int respuesta = rbll.CrearRol_013AL(nombreRol);
             MessageBox.Show("Rol creado con éxito.");
             ActualizarComboBox_013AL();
-            //int respuesta = bll.CrearRol(txtNombreRol.Text);
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -415,7 +407,7 @@ namespace UI
                 int idRol = int.Parse(partes[0].Trim());
 
                 
-                if (bll.RolTieneRelaciones_013AL(idRol))
+                if (rbll.RolTieneRelaciones_013AL(idRol))
                 {
                     MessageBox.Show("No se puede eliminar el rol porque tiene permisos o familias asociadas.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
@@ -424,7 +416,7 @@ namespace UI
                 DialogResult resultado = MessageBox.Show("¿Está seguro de que desea eliminar este rol?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (resultado == DialogResult.Yes)
                 {
-                    bll.EliminarRol_013AL(idRol);
+                    rbll.EliminarRol_013AL(idRol);
                     MessageBox.Show("Rol eliminado correctamente.");
                     ActualizarComboBox_013AL();
                 }
@@ -450,7 +442,7 @@ namespace UI
                     return;
                 }
 
-                string resultado = bll.ModificarRol_013AL(id, nuevoNombre);
+                string resultado = rbll.ModificarRol_013AL(id, nuevoNombre);
 
                 MessageBox.Show(resultado);
 
@@ -461,813 +453,38 @@ namespace UI
                 MessageBox.Show("Seleccione un rol para modificar.");
             }
         }
-    }
-}
 
-
-
-
-
-
-
-
-/*private void btnGuardarPatente_Click(object sender, EventArgs e)
+        private void cmbRoles_SelectedIndexChanged_1(object sender, EventArgs e)
         {
-            /*try
+            if (cmbRoles.SelectedItem != null)
             {
-            string respuesta = "";
-            respuesta = bll.AgregarPatenteHijo(txtpatente.Text);
-            CargarPatentesCombo();
-            }
-
-            catch (Exception ex)
-            {
-                MessageBox.Show(ex.Message);
-            }*/
-
-
-
-
-
-/*
- public void CargarFamiliasCombo()
- {
-     try 
-     {
-         List<Familia> fam = bll.ListarFamilias();
-         cboFamilias.DisplayMember = "Nombre";
-         cboFamilias.ValueMember = "Id";
-         cboFamilias.DataSource = fam;
-
-     }
-     catch (Exception ex)
-     {
-         MessageBox.Show(ex.Message);
-     }
- }
-
- public void CargarPatentesCombo()
- {
-     try
-     {
-     List<Permiso> permisos = bll.ListarPermisos();
-     cboPatentes.DisplayMember = "Nombre";
-     cboPatentes.ValueMember = "Id";
-     cboPatentes.DataSource = permisos;
-     }
-     catch (Exception ex)
-     {
-         MessageBox.Show(ex.Message);
-     }
-
- }
-
- public void CargarRolesCombo()
- {
-     try
-     {
-         List<Rol> rol = bll.ListarRoles();
-
-         cborol.DisplayMember = "Nombre";
-         cborol.ValueMember = "Id";
-         cborol.DataSource = rol;
-     }
-     catch (Exception ex)
-     {
-         MessageBox.Show(ex.Message);
-     }
- }
-
- private void cmdAgregarPatente_Click(object sender, EventArgs e)
- {
-     try
-     {
-     TreeNode nodoPatentes = treeConfigurarFamilia.Nodes["Permiso"] ?? treeConfigurarFamilia.Nodes.Add("Permiso", "Permiso");
-     Permiso patenteSeleccionada = (Permiso)cboPatentes.SelectedItem;
-
-     if (cboPatentes.SelectedItem != null)
-     {
-         TreeNode nodoPatente = new TreeNode(patenteSeleccionada.Nombre)
-         {
-             Tag = patenteSeleccionada.Id // Guardar el Id en la propiedad Tag
-         };
-         if (!nodoPatentes.Nodes.Cast<TreeNode>().Any(n => (int)n.Tag == patenteSeleccionada.Id))
-         {
-             nodoPatentes.Nodes.Add(nodoPatente);
-         }
-     }
-     }
-     catch (Exception ex)
-     {
-         MessageBox.Show(ex.Message);
-     }
-
-
-
- }
-
- private void cmdAgregarFamilia_Click(object sender, EventArgs e)
- {
-     /*try
-     {
-     TreeNode nodoFamilias = treeConfigurarFamilia.Nodes["Familias"] ?? treeConfigurarFamilia.Nodes.Add("Familias", "Familias");
-     Permiso patenteSeleccionada = (Permiso)cboFamilias.SelectedItem;
-     treeConfigurarFamilia.Nodes.Add(patenteSeleccionada.Nombre);
-
-     if (cboFamilias.SelectedItem != null)
-     {
-
-         TreeNode nodoFamilia = new TreeNode(patenteSeleccionada.Nombre)
-         {
-             Tag = patenteSeleccionada.Id // Guardar el Id en la propiedad Tag
-         };
-         if (!nodoFamilias.Nodes.Cast<TreeNode>().Any(n => (int)n.Tag == patenteSeleccionada.Id))
-         {
-             nodoFamilias.Nodes.Add(nodoFamilia);
-         }
-     }
-     }
-     catch (Exception ex)
-     {
-         MessageBox.Show(ex.Message);
-     }
-
-     /*TreeNode nodoFamilias = treeConfigurarFamilia.Nodes["Familias"] ?? treeConfigurarFamilia.Nodes.Add("Familias", "Familias");
-     Permiso familiaSeleccionada = (Permiso)cboFamilias.SelectedItem;
-
-     if (familiaSeleccionada != null)
-     {
-         TreeNode nodoFamilia = new TreeNode(familiaSeleccionada.Nombre)
-         {
-             Tag = familiaSeleccionada.Id // Guardar el Id en la propiedad Tag
-         };
-
-         if (!nodoFamilias.Nodes.Cast<TreeNode>().Any(n => (int)n.Tag == familiaSeleccionada.Id))
-         {
-             nodoFamilias.Nodes.Add(nodoFamilia);
-
-             // Cargar los hijos (permisos) de la familia
-             List<Permiso> hijos = bll.ListarHijos(familiaSeleccionada.Id);
-             foreach (var hijo in hijos)
-             {
-                 TreeNode nodoHijo = new TreeNode(hijo.Nombre)
-                 {
-                     Tag = hijo.Id
-                 };
-                 nodoFamilia.Nodes.Add(nodoHijo);
-             }
-         }
-     }
-}
-
-private void InitializeTreeView()
-{
-/*treeConfigurarFamilia.Nodes.Clear();
-
-List<Permiso> familias = bll.ListarFamilias();
-foreach (var familia in familias)
-{
-    TreeNode nodoFamilia = new TreeNode(familia.Nombre)
-    {
-        Tag = familia.Id
-    };
-    treeConfigurarFamilia.Nodes.Add(nodoFamilia);
-
-    // Cargar los hijos (permisos) de la familia
-    List<Permiso> hijos = bll.ListarHijos(familia.Id);
-    foreach (var hijo in hijos)
-    {
-        TreeNode nodoHijo = new TreeNode(hijo.Nombre)
-        {
-            Tag = hijo.Id
-        };
-        nodoFamilia.Nodes.Add(nodoHijo);
-    }
-}
-}
-
-private void cmdGuardarFamilia_Click(object sender, EventArgs e)
-{
-string respuesta = "";
-int idHijo = 0;
-int idPadre = 0;
-
-try
-{
-foreach (TreeNode node in treeConfigurarFamilia.Nodes)
-{
-    if (node.Text == "Permiso")
-    {
-        foreach (TreeNode childNode in node.Nodes)
-        {
-            idHijo = bll.BuscarId(childNode.Text);
-
-        }
-    }
-    if (node.Text == "Familia")
-    {
-        foreach (TreeNode childNode in node.Nodes)
-        {
-            idPadre = bll.BuscarId(childNode.Text);
-
-        }
-    }
-    /*if (node.Text == "Rol")
-    {
-        foreach (TreeNode childNode in node.Nodes)
-        {
-            idRol = bll.BuscarIdRol(childNode.Text);
-
-        }
-    }
-}
-
-
-    bool existeEnPermisosFamilia = bll.VerificarPermisosFamilia(idPadre, idHijo);
-
-    if (existeEnPermisosFamilia)
-    {
-    MessageBox.Show("No se puede agregar porque ya existe esta relación.");
-    }
- else   {
-
-    Familia familia = new Familia();
-            familia.Id = idPadre;
-    Permiso permiso = new Permiso();
-            permiso.Id = idHijo;
-    respuesta = bll.InsertarFamiliaPatente(familia, permiso);
-            string resultado;
-            BLLBitacora bbll = new BLLBitacora();
-            Usuarios user = SingletonSesion.Instance.GetUsuario();
-            resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Agregar Permiso a Familia", 4);
-
-     if (respuesta == "OK")
-     {
-     MessageBox.Show("Datos guardados correctamente.");
-     }
-     else
-     {
-     MessageBox.Show("Error al guardar: " + respuesta);
-     }
-        }            
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-}
-
-
-
-private void button3_Click_1(object sender, EventArgs e)
-{
-    try
-    {
-    string respuesta = "";
-    Familia familiaSeleccionada = (Familia)cboFamilias.SelectedItem;
-    bool existeEnPermisosComponente = bll.VerificarFamiliaEnPermisosComponente(familiaSeleccionada.Id);
-    bool existeEnRolPermiso = bll.VerificarPermisosEnRolPermisos(Convert.ToInt32(familiaSeleccionada.Id));
-
-    if (existeEnRolPermiso)
-    {
-        MessageBox.Show("No se puede eliminar el permiso porque está asociado con un rol.");
-    }
-    if (existeEnPermisosComponente)
-    {
-        MessageBox.Show("No se puede eliminar porque está asociado con un permiso.");
-    }
-    else
-    {
-        respuesta = bll.EliminarFamilia(Convert.ToInt32(familiaSeleccionada.Id));
-            string resultado;
-            BLLBitacora bbll = new BLLBitacora();
-            Usuarios user = SingletonSesion.Instance.GetUsuario();
-            resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Eliminar Familia", 4);
-            MessageBox.Show("Exito");
-        CargarFamiliasCombo();
-    }
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show(ex.Message);
-    }
-
-}
-
-private void button2_Click_1(object sender, EventArgs e)
-{
-try
-{
-TreeNode nodorol = treeView1.Nodes["Rol"] ?? treeView1.Nodes.Add("Rol", "Rol");
-Rol rolseleccionado = (Rol)cborol.SelectedItem;
-//treeConfigurarFamilia.Nodes.Add(rolseleccionado.Nombre);
-
-if (cboPatentes.SelectedItem != null)
-{
-
-    TreeNode nodoPatente = new TreeNode(rolseleccionado.Nombre)
-    {
-        Tag = rolseleccionado.Id_Rol 
-    };
-    if (!nodorol.Nodes.Cast<TreeNode>().Any(n => (int)n.Tag == rolseleccionado.Id_Rol))
-    {
-        nodorol.Nodes.Add(nodoPatente);
-    }
-}
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-}
-
-private void button7_Click_1(object sender, EventArgs e)
-{
-     string respuesta = "";
-     Rol rolSeleccionado = (Rol)cborol.SelectedItem;
-
-
-     try
-     {
-     bool existeEnRolPermiso = bll.VerificarRolEnRolPermisos(Convert.ToInt32(rolSeleccionado.Id_Rol));
-     bool existeEnUsuario = bll.VerificarRolEnUsuario(Convert.ToInt32(rolSeleccionado.Id_Rol));
-     if (existeEnRolPermiso)
-     {
-         MessageBox.Show("No se puede eliminar el rol porque está asociado con una familia.");
-     }
-     if (existeEnUsuario)
-     {
-         MessageBox.Show("No se puede eliminar el rol porque está asociado con un usuario.");
-     }
-     else
-     {
-         respuesta = bll.EliminarRol(Convert.ToInt32(rolSeleccionado.Id_Rol));
-            string resultado;
-            BLLBitacora bbll = new BLLBitacora();
-            Usuarios user = SingletonSesion.Instance.GetUsuario();
-            resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Eliminar Rol", 4);
-            MessageBox.Show("Rol eliminado con éxito.");
-         CargarRolesCombo();
-     }
-     }
-     catch (Exception ex)
-     {
-         MessageBox.Show(ex.Message);
-     }
-}
-
-private void button4_Click_1(object sender, EventArgs e)
-{
-/*   try
-{
-string respuesta = "";
-Componente patenteSeleccionada = (Componente)cboPatentes.SelectedItem;
-bool existeEnPermisosFamilia = bll.VerificarPatenteEnPermisosFamilia(patenteSeleccionada.Id);
-if (existeEnPermisosFamilia)
-{
-    MessageBox.Show("No se puede eliminar porque está asociado con una familia o patente.");
-}
-else
-{
-    respuesta = bll.EliminarFamilia(Convert.ToInt32(patenteSeleccionada.Id));
-    MessageBox.Show("Exito");
-    CargarPatentesCombo();
-}
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-}
-
-private void button6_Click_1(object sender, EventArgs e)
-{
-/*  try
-{
-string respuesta = "";
-Componente patenteSeleccionada = (Componente)cboPatentes.SelectedItem;
-respuesta = bll.ModificarPatentes(Convert.ToInt32(patenteSeleccionada.Id), txtpatente.Text);
-MessageBox.Show("Exito");
-CargarPatentesCombo();
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-}
-
-private void cmdAgregarFamilia_Click_2(object sender, EventArgs e)
-{
-try
-{
-TreeNode nodoFamilias = treeConfigurarFamilia.Nodes["Familia"] ?? treeConfigurarFamilia.Nodes.Add("Familia", "Familia");
-Familia familiaSeleccionada = (Familia)cboFamilias.SelectedItem;
-
-if (cboFamilias.SelectedItem != null)
-{
-    TreeNode nodoFamilia = new TreeNode(familiaSeleccionada.Nombre)
-    {
-        Tag = familiaSeleccionada.Id // Guardar el Id en la propiedad Tag
-    };
-    if (!nodoFamilias.Nodes.Cast<TreeNode>().Any(n => (int)n.Tag == familiaSeleccionada.Id))
-    {
-        nodoFamilias.Nodes.Add(nodoFamilia);
-    }
-}
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-
-}
-
-private void button5_Click_1(object sender, EventArgs e)
-{
-try
-{
-string respuesta = "";
-Familia familiaSeleccionada = (Familia)cboFamilias.SelectedItem;
-respuesta = bll.ModificarPermisos(Convert.ToInt32(familiaSeleccionada.Id), txtNombreFamilia.Text);
-        string resultado;
-        BLLBitacora bbll = new BLLBitacora();
-        Usuarios user = SingletonSesion.Instance.GetUsuario();
-        resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Modificar Familia", 4);
-        MessageBox.Show("Exito");
-CargarFamiliasCombo();
-
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-}
-
-private void button9_Click_1(object sender, EventArgs e)
-{
-string respuesta = "";
-int idHijo = 0;
-int idPadre = 0;
-//int idRol = 0;
-try {
-foreach (TreeNode node in treeConfigurarFamilia.Nodes)
-{
-    if (node.Text == "Permiso")
-    {
-        foreach (TreeNode childNode in node.Nodes)
-        {
-            idHijo = bll.BuscarId(childNode.Text);
-
-
-
-        }
-    }
-    if (node.Text == "Familia")
-    {
-        foreach (TreeNode childNode in node.Nodes)
-        {
-            idPadre = bll.BuscarId(childNode.Text);
-
-        }
-    }
-    /*if (node.Text == "Rol")
-    {
-        foreach (TreeNode childNode in node.Nodes)
-        {
-            idRol = bll.BuscarIdRol(childNode.Text);
-
-        }
-    }
-
-
-} }
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-respuesta = bll.Eliminarpermisosfamilia(idPadre, idHijo);
-    string resultado;
-    BLLBitacora bbll = new BLLBitacora();
-    Usuarios user = SingletonSesion.Instance.GetUsuario();
-    resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Eliminar Permiso de Familia", 4);
-
-    if (respuesta == "OK")
-{
-    MessageBox.Show("Datos eliminados correctamente.");
-}
-else
-{
-    MessageBox.Show("Error al eliminar: " + respuesta);
-}
-}
-
-private void button1_Click_2(object sender, EventArgs e)
-{
-try
-{
-string respuesta = "";
-respuesta = bll.AgregarRol(textBox1.Text);
-        string resultado;
-        BLLBitacora bbll = new BLLBitacora();
-        Usuarios user = SingletonSesion.Instance.GetUsuario();
-        resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Registrar Rol", 4);
-        CargarRolesCombo();
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-
-
-}
-
-private void button8_Click_1(object sender, EventArgs e)
-{
-try
-{
-string respuesta = "";
-Rol rolSeleccionado = (Rol)cborol.SelectedItem;
-respuesta = bll.ModificarRol(Convert.ToInt32(rolSeleccionado.Id_Rol), textBox1.Text);
-        string resultado;
-        BLLBitacora bbll = new BLLBitacora();
-        Usuarios user = SingletonSesion.Instance.GetUsuario();
-        resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Modificar Rol", 4);
-        MessageBox.Show("Exito");
-CargarRolesCombo();
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-}
-
-private void btnguardarfamilia_Click(object sender, EventArgs e)
-{
-try
-{
-string respuesta = "";
-respuesta = bll.AgregarFamiliaPadre(txtNombreFamilia.Text);
-
-            string resultado;
-            BLLBitacora bbll = new BLLBitacora();
-            Usuarios user = SingletonSesion.Instance.GetUsuario();
-            resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Registrar Familia", 4);
-
-CargarFamiliasCombo();
-}
-catch (Exception ex)
-{
-    MessageBox.Show(ex.Message);
-}
-
-}
-
-private void button10_Click(object sender, EventArgs e)
-{
-treeConfigurarFamilia.Nodes.Clear();
-}
-
-private void button12_Click(object sender, EventArgs e)
-{
-    try
-    {
-        TreeNode nodoFamilias = treeView1.Nodes["Familia"] ?? treeView1.Nodes.Add("Familia", "Familia");
-        Familia familiaSeleccionada = (Familia)cboFamilias.SelectedItem;
-
-        if (cboFamilias.SelectedItem != null)
-        {
-            TreeNode nodoFamilia = new TreeNode(familiaSeleccionada.Nombre)
-            {
-                Tag = familiaSeleccionada.Id // Guardar el Id en la propiedad Tag
-            };
-            if (!nodoFamilias.Nodes.Cast<TreeNode>().Any(n => (int)n.Tag == familiaSeleccionada.Id))
-            {
-                nodoFamilias.Nodes.Add(nodoFamilia);
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show(ex.Message);
-    }
-
-}
-
-private void button11_Click(object sender, EventArgs e)
-{
-    string respuesta = "";
-
-    int idFamilia = 0;
-    int idRol = 0;
-    try
-    {
-        foreach (TreeNode node in treeView1.Nodes)
-        {
-            if (node.Text == "Rol")
-            {
-                foreach (TreeNode childNode in node.Nodes)
+                RolConfigurado = new Familia_013AL(); // reset
+                string[] partes = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
+                int id = int.Parse(partes[0].Trim());
+                string nombre = partes[1].Trim();
+
+                RolConfigurado.Cod_013AL = id;
+                RolConfigurado.Nombre_013AL = nombre;
+
+                // Traer los permisos/familias raíz asignados al rol (solo primer nivel)
+                List<Rol_013AL> lista = rbll.TraerListaPermisosRol_013AL(RolConfigurado.Cod_013AL);
+
+                // Limpiar y poblar la estructura en memoria recursivamente
+                RolConfigurado.ObtenerHijos_013AL().Clear();
+                foreach (var permiso in lista)
                 {
-                    idRol = bll.BuscarIdRol(childNode.Text);
-
-                }
-            }
-            if (node.Text == "Familia")
-            {
-                foreach (TreeNode childNode in node.Nodes)
-                {
-                    idFamilia = bll.BuscarId(childNode.Text);
-
-                }
-            }
-
-        }
-
-
-        bool existeEnPermisosFamilia = bll.VerificarPermisosRol(idRol, idFamilia);
-
-        if (existeEnPermisosFamilia)
-        {
-            MessageBox.Show("No se puede agregar porque ya existe esta relación.");
-        }
-        else
-        {
-            Rol rol = new Rol();
-            rol.Id_Rol = idRol;
-            Familia familia = new Familia();
-            familia.Id = idFamilia;
-
-            respuesta = bll.InsertarFamiliaRol(rol, familia);
-            string resultado;
-            BLLBitacora bbll = new BLLBitacora();
-            Usuarios user = SingletonSesion.Instance.GetUsuario();
-            resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Agregar Familia a Rol", 4);
-            if (respuesta == "OK")
-            {
-                MessageBox.Show("Datos guardados correctamente.");
-            }
-            else
-            {
-                MessageBox.Show("Error al guardar: " + respuesta);
-            }
-        }
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show(ex.Message);
-    }
-}
-
-private void button6_Click(object sender, EventArgs e)
-{
-    string respuesta = "";
-
-    int idFamilia = 0;
-    int idRol = 0;
-    try
-    {
-        foreach (TreeNode node in treeView1.Nodes)
-        {
-            if (node.Text == "Rol")
-            {
-                foreach (TreeNode childNode in node.Nodes)
-                {
-                    idRol = bll.BuscarIdRol(childNode.Text);
-
-                }
-            }
-            if (node.Text == "Familia")
-            {
-                foreach (TreeNode childNode in node.Nodes)
-                {
-                    idFamilia = bll.BuscarId(childNode.Text);
-
-                }
-            }
-
-
-
-        }
-    }
-    catch (Exception ex)
-    {
-        MessageBox.Show(ex.Message);
-    }
-
-    respuesta = bll.Eliminarfamiliarol(idRol, idFamilia);
-    string resultado;
-    BLLBitacora bbll = new BLLBitacora();
-    Usuarios user = SingletonSesion.Instance.GetUsuario();
-    resultado = bbll.AgregarEvento(user.NombreUsuario, "Gestión Perfiles", "Eliminar Familia de Rol", 4);
-
-    if (respuesta == "OK")
-    {
-        MessageBox.Show("Datos eliminados correctamente.");
-    }
-    else
-    {
-        MessageBox.Show("Error al eliminar: " + respuesta);
-    }
-}
-
-private void button4_Click(object sender, EventArgs e)
-{
-    treeView1.Nodes.Clear();
-}*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*PermisosFamilia obj = new PermisosFamilia();
-foreach (TreeNode nodoPrincipal in treeConfigurarFamilia.Nodes)
-{
-obj.IdFam = nodoPrincipal.Text; // "Patentes" o "Familias"
-
-foreach (TreeNode nodoSecundario in nodoPrincipal.Nodes)
-{
-
-    obj.IdPat = nodoSecundario.Text;*/
-
-/*List<Permiso> familias = bll.ListarFamilias();
-List<Permiso> patentes = bll.ListarPatentes();
-string respuesta = "";
-
-foreach (TreeNode nodoPrincipal in treeConfigurarFamilia.Nodes)
-{
-    string tipo = nodoPrincipal.Text; // "Patentes" o "Familias"
-
-    foreach (TreeNode nodoSecundario in nodoPrincipal.Nodes)
-    {
-        PermisosFamilia permisoFamilia = new PermisosFamilia();
-        permisoFamilia.IdPat = (int)nodoSecundario.Tag; // Obtener el Id del nodo
-
-        if (tipo == "Patentes")
-        {
-            // Guardar patente con una familia específica
-            foreach (TreeNode nodoFamilia in treeConfigurarFamilia.Nodes["Familias"].Nodes)
-            {
-                int familiaId = (int)nodoFamilia.Tag;
-                Familia familia = (Familia)familias.FirstOrDefault(f => f.Id == familiaId);
-                Patente patente = (Patente)patentes.FirstOrDefault(p => p.Id == permisoFamilia.IdPat);
-
-                if (familia != null && patente != null)
-                {
-                    permisoFamilia.IdFam = familia.Id;
-                    respuesta = bll.AgregarPermisosFamilia(permisoFamilia);
-
-                    if (respuesta != "OK")
+                    RolConfigurado.AgregarHijo_013AL(permiso);
+                    // si es familia, cargar sus hijos recursivamente desde BD
+                    if (permiso is Familia_013AL fam)
                     {
-                        MessageBox.Show("Error al guardar: " + respuesta);
-                        return; // Detener si hay un error
+                        CargarHijosDesdeBDRecursivoParaRol(fam);
                     }
                 }
-            }
-        }
-        else if (tipo == "Familias")
-        {
-            // Guardar familia con una patente específica
-            foreach (TreeNode nodoPatente in treeConfigurarFamilia.Nodes["Patentes"].Nodes)
-            {
-                int patenteId = (int)nodoPatente.Tag;
-                Familia familia = (Familia)familias.FirstOrDefault(f => f.Id == permisoFamilia.IdFam);
-                Patente patente = (Patente)patentes.FirstOrDefault(p => p.Id == patenteId);
 
-                if (familia != null && patente != null)
-                {
-                    permisoFamilia.IdPat = patente.Id;
-                    respuesta = bll.AgregarPermisosFamilia(permisoFamilia);
-
-                    if (respuesta != "OK")
-                    {
-                        MessageBox.Show("Error al guardar: " + respuesta);
-                        return; // Detener si hay un error
-                    }
-                }
+                // Mostrar el rol completo en treeView
+                MostrarRolEnTreeView(RolConfigurado);
             }
+        
         }
     }
 }
-
-MessageBox.Show("Datos guardados correctamente.");
-}*/
-
-
-
-
-

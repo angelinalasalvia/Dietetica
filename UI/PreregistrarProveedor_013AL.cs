@@ -1,4 +1,5 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -21,7 +22,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }
-        NegocioBLL_013AL bll = new NegocioBLL_013AL();
+        ProveedorBLL_013AL bll = new ProveedorBLL_013AL();
         private void button1_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text) || string.IsNullOrWhiteSpace(textBox3.Text))
@@ -48,7 +49,7 @@ namespace UI
 
             if (respuesta == "Proveedor preregistrado correctamente.")
             {
-                BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+                EventoBLL_013AL bbll = new EventoBLL_013AL();
                 Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                 bbll.AgregarEvento_013AL(user.Login_013AL, "Preregistrar Proveedores", "Preregistrar Proveedor", 2);
             }

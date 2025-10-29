@@ -31,8 +31,8 @@ namespace UI
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
-        private BLLBackupRestore_013AL backuprestorebll = new BLLBackupRestore_013AL();
-        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        private BackupBLL_013AL backuprestorebll = new BackupBLL_013AL();
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         Usuarios_013AL user;
 
         private void button3_Click(object sender, EventArgs e)

@@ -63,7 +63,8 @@
     <Compile Include="Cliente_013AL.cs" />
     <Compile Include="Composite_013AL\Permiso_013AL.cs" />
     <Compile Include="Composite_013AL\Familia_013AL.cs" />
-    <Compile Include="Composite_013AL\Componente_013AL.cs" />
+    <Compile Include="Composite_013AL\Rol_013AL.cs" />
+    <Compile Include="ErrorIntegridad_013AL.cs" />
     <Compile Include="Factura_013AL.cs" />
     <Compile Include="Detalle_013AL.cs" />
     <Compile Include="DetalleSolicitudC_013AL.cs" />
@@ -72,7 +73,6 @@
     <Compile Include="Producto_013AL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proveedor_013AL.cs" />
-    <Compile Include="Rol_013AL.cs" />
     <Compile Include="SolicitudCotizacion_013AL.cs" />
     <Compile Include="Usuarios_013AL.cs" />
   </ItemGroup>

@@ -32,7 +32,7 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        BLLBitacora_013AL bbll = new BLLBitacora_013AL();
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         Usuarios_013AL user;
 
         public bool SesionCerrada { get; private set; } = false;    

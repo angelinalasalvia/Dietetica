@@ -128,7 +128,7 @@ namespace DAL
             }
         }
 
-        public bool ActualizarDVH(string tabla)
+        /*public bool ActualizarDVH(string tabla)
         {
             try
             {
@@ -152,15 +152,7 @@ namespace DAL
                 // 3️⃣ Si no hay registros, salgo
                 if (dt.Rows.Count == 0) return false;
 
-                /*
-                var columnasIgnorar = new List<string>
-        {
-            "DigitoHorizontal_597DG",
-            "IntentosFallidos_597DG",
-            "Bloqueado_597DG",
-            "Activo_597DG",
-            "IdiomaPreferido_597DG"
-        };*/
+                
 
                 // 5️⃣ Tomo la clave primaria (suponiendo que es la primera columna)
                 string clavePrimaria = dt.Columns[0].ColumnName;
@@ -171,9 +163,6 @@ namespace DAL
                     string cadena = "";
                     foreach (DataColumn col in dt.Columns)
                     {
-                        /*if (columnasIgnorar.Contains(col.ColumnName))
-                            continue;*/
-
                         cadena += row[col].ToString();
                     }
 
@@ -200,7 +189,71 @@ namespace DAL
             {
                 throw new Exception("Error al actualizar los dígitos verificadores.", ex);
             }
+        }*/
+
+        public bool ActualizarDVH(string tabla)
+        {
+            try
+            {
+                string consulta = $"SELECT * FROM [{tabla}]";
+                DataTable dt = new DataTable();
+
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    using (SqlCommand com = new SqlCommand(consulta, con))
+                    {
+                        com.CommandType = CommandType.Text;
+                        using (SqlDataAdapter da = new SqlDataAdapter(com))
+                        {
+                            da.Fill(dt);
+                        }
+                    }
+                }
+
+                // Si no hay registros, salir sin error
+                if (dt.Rows.Count == 0) return true;
+
+                string clavePrimaria = dt.Columns[0].ColumnName;
+
+                foreach (DataRow row in dt.Rows)
+                {
+                    StringBuilder cadena = new StringBuilder();
+
+                    foreach (DataColumn col in dt.Columns)
+                    {
+                        // Evitar columnas DVH o columnas nulas
+                        if (col.ColumnName.Equals("DigitoHorizontal-013AL", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        if (row[col] != DBNull.Value)
+                            cadena.Append(row[col].ToString());
+                    }
+
+                    // Si la fila tiene datos, calcular el DVH
+                    string dvh = HashHelper_013AL.CalcularSHA256_013AL(cadena.ToString());
+
+                    string update = $"UPDATE {tabla} SET [DigitoHorizontal-013AL] = @DVH WHERE {clavePrimaria} = @Id";
+
+                    using (SqlConnection con = conexion.ObtenerConexion())
+                    {
+                        using (SqlCommand com = new SqlCommand(update, con))
+                        {
+                            com.Parameters.AddWithValue("@DVH", dvh);
+                            com.Parameters.AddWithValue("@Id", row[clavePrimaria]);
+                            con.Open();
+                            com.ExecuteNonQuery();
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al actualizar DVH de {tabla}.", ex);
+            }
         }
+
         public bool VerificarDVV(string tabla)
         {
             try
@@ -208,7 +261,7 @@ namespace DAL
                 DataTable dt1 = new DataTable();
 
                 // 1️⃣ Traigo los DVH de la tabla indicada
-                string consulta1 = $"SELECT [DigitoHorizontal-013AL] FROM {tabla}";
+                string consulta1 = $"SELECT [DigitoHorizontal-013AL] FROM [{tabla}]";
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
                     using (SqlCommand com = new SqlCommand(consulta1, con))
@@ -228,7 +281,7 @@ namespace DAL
                 StringBuilder sb = new StringBuilder();
                 foreach (DataRow row in dt1.Rows)
                 {
-                    sb.Append(row["DigitoHorizontal_013AL"].ToString());
+                    sb.Append(row["DigitoHorizontal-013AL"].ToString());
                 }
 
                 string dvvCalculado = HashHelper_013AL.CalcularSHA256_013AL(sb.ToString());
@@ -264,7 +317,7 @@ namespace DAL
                 throw new Exception("Error al verificar el DVV.", ex);
             }
         }
-        public bool ActualizarDVV(string tabla)
+        /*public bool ActualizarDVV(string tabla)
         {
             try
             {
@@ -335,7 +388,78 @@ namespace DAL
             {
                 throw new Exception("Error al actualizar el DVV.", ex);
             }
+        }*/
+
+        public bool ActualizarDVV(string tabla)
+        {
+            try
+            {
+                DataTable dt = new DataTable();
+                string consulta = $"SELECT [DigitoHorizontal-013AL] FROM [{tabla}]";
+
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    using (SqlCommand com = new SqlCommand(consulta, con))
+                    {
+                        com.CommandType = CommandType.Text;
+                        using (SqlDataAdapter da = new SqlDataAdapter(com))
+                        {
+                            da.Fill(dt);
+                        }
+                    }
+                }
+
+                // Si la tabla no tiene registros, crear DVV en 0 (para que no falle)
+                if (dt.Rows.Count == 0)
+                {
+                    using (SqlConnection con = conexion.ObtenerConexion())
+                    {
+                        string insert = "IF NOT EXISTS (SELECT 1 FROM [DVV-013AL] WHERE [Tabla-013AL] = @Tabla) " +
+                                        "INSERT INTO [DVV-013AL] ([Tabla-013AL], [DVV-013AL]) VALUES (@Tabla, '0')";
+                        using (SqlCommand com = new SqlCommand(insert, con))
+                        {
+                            com.Parameters.AddWithValue("@Tabla", tabla);
+                            con.Open();
+                            com.ExecuteNonQuery();
+                        }
+                    }
+                    return true;
+                }
+
+                // Concatenar DVH existentes
+                StringBuilder sb = new StringBuilder();
+                foreach (DataRow row in dt.Rows)
+                {
+                    if (row["DigitoHorizontal-013AL"] != DBNull.Value)
+                        sb.Append(row["DigitoHorizontal-013AL"].ToString());
+                }
+
+                string dvvCalculado = HashHelper_013AL.CalcularSHA256_013AL(sb.ToString());
+                string upsert = @"
+            IF EXISTS (SELECT 1 FROM [DVV-013AL] WHERE [Tabla-013AL] = @Tabla)
+                UPDATE [DVV-013AL] SET [DVV-013AL] = @DVV WHERE [Tabla-013AL] = @Tabla
+            ELSE
+                INSERT INTO [DVV-013AL] ([Tabla-013AL], [DVV-013AL]) VALUES (@Tabla, @DVV)";
+
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    using (SqlCommand com = new SqlCommand(upsert, con))
+                    {
+                        com.Parameters.AddWithValue("@Tabla", tabla);
+                        com.Parameters.AddWithValue("@DVV", dvvCalculado);
+                        con.Open();
+                        com.ExecuteNonQuery();
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al actualizar DVV de {tabla}.", ex);
+            }
         }
+
 
         public List<ErrorIntegridad_013AL> VerificarIntegridadCompleta(List<string> tablas)
         {
@@ -347,7 +471,7 @@ namespace DAL
                 {
                     // 1️⃣ Traigo todos los registros de la tabla
                     DataTable dt = new DataTable();
-                    string consulta = $"SELECT * FROM {tabla}";
+                    string consulta = $"SELECT * FROM [{tabla}]";
 
                     using (SqlConnection con = conexion.ObtenerConexion())
                     {

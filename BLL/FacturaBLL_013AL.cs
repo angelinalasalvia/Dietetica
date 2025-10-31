@@ -42,6 +42,13 @@ namespace BLL
 
         public List<ErrorIntegridad_013AL> VerificarIntegridadCompleta(List<string> tablas) => dal.VerificarIntegridadCompleta(tablas);
 
+        public void InicializarDVH_DVV(string tabla)
+        {
+            dal.ActualizarDVH(tabla);
+            dal.ActualizarDVV(tabla);
+        }
+
+
     }
 
 }

@@ -1,4 +1,5 @@
-﻿using BE_013AL;
+﻿using BE;
+using BE_013AL;
 using BE_013AL.Composite;
 using BLL;
 using BLL_013AL;
@@ -21,6 +22,7 @@ namespace UI
         private UsuarioBLL_013AL bllUsuarios = new UsuarioBLL_013AL();
         private RolBLL_013AL rbll = new RolBLL_013AL();
         private PermisoBLL_013AL pbll = new PermisoBLL_013AL();
+        private FacturaBLL_013AL fbll = new FacturaBLL_013AL();
         Usuarios_013AL usuario;
         private Dictionary<string, int> intentosFallidosPorUsuario = new Dictionary<string, int>();
         private const int maxFailedAttempts = 3;
@@ -111,14 +113,41 @@ namespace UI
                 if (intentosFallidosPorUsuario.ContainsKey(usuario.Login_013AL))
                     intentosFallidosPorUsuario.Remove(usuario.Login_013AL);
 
+                fbll.InicializarDVH_DVV("Factura-013AL");
 
-                MessageBox.Show("Login exitoso", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                this.DialogResult = DialogResult.OK;
+                List<string> tablas = new List<string> { "Factura-fbll.InicializarDVH_DVV(\"[Factura-013AL]\");013AL" };
+                List<ErrorIntegridad_013AL> errores = fbll.VerificarIntegridadCompleta(tablas);
+
+                if (errores.Count > 0)
+                {
+
+                    try
+                    {
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Inicio de Sesión fallido por errores de integridad", 1);
+                    }
+                    catch (Exception ex) { Console.WriteLine(ex.Message); }
+
+                    if (usuario.CodRol_013AL == 1)
+                    {
+                        ErroresIntegridad frmerrores = new ErroresIntegridad(errores);
+                        frmerrores.Show();
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("No es posible ingresar al sistema en este momento. Contactarse con un administrador.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+
+                    return;
+                }
+                    MessageBox.Show("Login exitoso", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    this.DialogResult = DialogResult.OK;
                 try
                 {
                     user = SingletonSession_013AL.Instance.GetUsuario_013AL();
                     bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Inicio de Sesión Exitoso", 1);
-}
+                }
                 catch (Exception ex) { Console.WriteLine(ex.Message); }
             }
             else

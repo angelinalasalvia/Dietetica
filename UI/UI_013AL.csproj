@@ -120,6 +120,12 @@
     <Compile Include="Cotizaciones_013AL.Designer.cs">
       <DependentUpon>Cotizaciones_013AL.cs</DependentUpon>
     </Compile>
+    <Compile Include="ErroresIntegridad.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="ErroresIntegridad.Designer.cs">
+      <DependentUpon>ErroresIntegridad.cs</DependentUpon>
+    </Compile>
     <Compile Include="GestionarFamilias_013AL.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -239,6 +245,9 @@
     <EmbeddedResource Include="Cotizaciones_013AL.resx">
       <DependentUpon>Cotizaciones_013AL.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ErroresIntegridad.resx">
+      <DependentUpon>ErroresIntegridad.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="GestionarFamilias_013AL.resx">
       <DependentUpon>GestionarFamilias_013AL.cs</DependentUpon>
     </EmbeddedResource>
@@ -343,7 +352,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
+      <UserProperties es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets')" />

@@ -106,43 +106,37 @@ namespace UI
             }
 
             if (usuario.Contraseña_013AL == passwordHash)
-            {
-
-                SingletonSession_013AL.Instance.Login_013AL(usuario);
+            {               
 
                 if (intentosFallidosPorUsuario.ContainsKey(usuario.Login_013AL))
                     intentosFallidosPorUsuario.Remove(usuario.Login_013AL);
 
-                fbll.InicializarDVH_DVV("Factura-013AL");
-
-                List<string> tablas = new List<string> { "Factura-fbll.InicializarDVH_DVV(\"[Factura-013AL]\");013AL" };
+                List<string> tablas = new List<string> { "Factura-013AL" };
                 List<ErrorIntegridad_013AL> errores = fbll.VerificarIntegridadCompleta(tablas);
 
                 if (errores.Count > 0)
                 {
-
-                    try
-                    {
-                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                        bbll.AgregarEvento_013AL(user.Login_013AL, "Login", "Inicio de Sesión fallido por errores de integridad", 1);
-                    }
-                    catch (Exception ex) { Console.WriteLine(ex.Message); }
-
+                    // si hay errores, mostrar
                     if (usuario.CodRol_013AL == 1)
                     {
                         ErroresIntegridad frmerrores = new ErroresIntegridad(errores);
                         frmerrores.Show();
-
                     }
                     else
                     {
-                        MessageBox.Show("No es posible ingresar al sistema en este momento. Contactarse con un administrador.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        MessageBox.Show("No es posible ingresar al sistema. Contacte con un administrador.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
 
                     return;
                 }
-                    MessageBox.Show("Login exitoso", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    this.DialogResult = DialogResult.OK;
+
+                // si no hay errores, inicializar (recalcular) los DVH/DVV
+                fbll.InicializarDVH_DVV("Factura-013AL");
+
+
+                SingletonSession_013AL.Instance.Login_013AL(usuario);
+                MessageBox.Show("Login exitoso", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.DialogResult = DialogResult.OK;
                 try
                 {
                     user = SingletonSession_013AL.Instance.GetUsuario_013AL();

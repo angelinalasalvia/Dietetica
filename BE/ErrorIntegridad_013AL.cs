@@ -8,8 +8,8 @@ namespace BE
 {
     public class ErrorIntegridad_013AL
     {
-        public string Tabla_597DG { get; set; }
-        public string Descripcion_597DG { get; set; }
-        public string IdRegistro_597DG { get; set; }
+        public string Tabla_013AL { get; set; }
+        public string Descripcion_013AL { get; set; }
+        public string IdRegistro_013AL { get; set; }
     }
 }

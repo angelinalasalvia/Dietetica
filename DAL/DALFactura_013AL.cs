@@ -26,7 +26,7 @@ namespace DAL
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    string query = "Select [CodCompra-013AL], [CUILCliente-013AL], [Fecha-013AL], [IVA-013AL], [MetodoPago-013AL] from [Factura-013AL]";
+                    string query = "Select [CodCompra-013AL], [CUILCliente-013AL], [Fecha-013AL], [Total-013AL], [IVA-013AL], [MetodoPago-013AL] from [Factura-013AL]";
                     com = new SqlCommand(query, con);
                     com.CommandType = CommandType.Text;
                     con.Open();
@@ -40,6 +40,7 @@ namespace DAL
                                 CodCompra_013AL = Convert.ToInt32(dr["CodCompra-013AL"]),
                                 CUIL_013AL = Convert.ToInt32(dr["CUILCliente-013AL"]),
                                 Fecha_013AL = Convert.ToDateTime(dr["Fecha-013AL"]),
+                                Total_013AL = Convert.ToInt32(dr["Total-013AL"]),
                                 IVA_013AL = Convert.ToInt32(dr["IVA-013AL"]),
                                 MetPago_013AL = Convert.ToString(dr["MetodoPago-013AL"])
                             });
@@ -77,7 +78,7 @@ namespace DAL
             return respuesta;
         }*/
 
-        public string RegistrarVentaCompleta_013AL(Factura_013AL factura, List<Detalle_013AL> detalles)
+        /*public string RegistrarVentaCompleta_013AL(Factura_013AL factura, List<Detalle_013AL> detalles)
         {
             try
             {
@@ -94,6 +95,7 @@ namespace DAL
                                 cmdFactura.CommandType = CommandType.StoredProcedure;
                                 cmdFactura.Parameters.AddWithValue("@idc", factura.CodCompra_013AL);
                                 cmdFactura.Parameters.AddWithValue("@cuil", factura.CUIL_013AL);
+                                cmdFactura.Parameters.AddWithValue("@tot", factura.Total_013AL);
                                 cmdFactura.Parameters.AddWithValue("@metpago", factura.MetPago_013AL);
                                 cmdFactura.ExecuteNonQuery();
                             }
@@ -126,7 +128,117 @@ namespace DAL
             {
                 throw new Exception("Error general al registrar la venta completa.", ex);
             }
+        }*/
+
+
+        public string RegistrarVentaCompleta_013AL(Factura_013AL factura, List<Detalle_013AL> detalles)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    con.Open();
+
+                    using (SqlTransaction transaction = con.BeginTransaction())
+                    {
+                        try
+                        {
+                            // 1) Inserto la factura (tu SP)
+                            using (SqlCommand cmdFactura = new SqlCommand("AgregarCompraCliente-013AL", con, transaction))
+                            {
+                                cmdFactura.CommandType = CommandType.StoredProcedure;
+                                cmdFactura.Parameters.AddWithValue("@idc", factura.CodCompra_013AL);
+                                cmdFactura.Parameters.AddWithValue("@cuil", factura.CUIL_013AL);
+                                cmdFactura.Parameters.AddWithValue("@tot", factura.Total_013AL);
+                                cmdFactura.Parameters.AddWithValue("@metpago", factura.MetPago_013AL);
+                                cmdFactura.ExecuteNonQuery();
+                            }
+
+                            // 2) Inserto cada detalle
+                            foreach (var detalle in detalles)
+                            {
+                                using (SqlCommand cmdDetalle = new SqlCommand("AgregarCompraProducto-013AL", con, transaction))
+                                {
+                                    cmdDetalle.CommandType = CommandType.StoredProcedure;
+                                    cmdDetalle.Parameters.AddWithValue("@idc", detalle.CodCompra_013AL);
+                                    cmdDetalle.Parameters.AddWithValue("@idp", detalle.CodProducto_013AL);
+                                    cmdDetalle.Parameters.AddWithValue("@cant", detalle.Cantidad_013AL);
+                                    cmdDetalle.Parameters.AddWithValue("@pu", detalle.PrecioUnitario_013AL);
+                                    cmdDetalle.ExecuteNonQuery();
+                                }
+                            }
+
+                            // 3) LEER la fila insertada de la tabla Factura-013AL para calcular el DVH sobre los valores exactos guardados
+                            //    (Evita discrepancias si la DB agregó Fecha u otros defaults)
+                            DataTable dtFactura = new DataTable();
+                            string selectFactura = "SELECT * FROM [Factura-013AL] WHERE [CodCompra-013AL] = @Id";
+                            using (SqlCommand cmdSelect = new SqlCommand(selectFactura, con, transaction))
+                            {
+                                cmdSelect.Parameters.AddWithValue("@Id", factura.CodCompra_013AL);
+                                using (SqlDataAdapter da = new SqlDataAdapter(cmdSelect))
+                                {
+                                    da.Fill(dtFactura);
+                                }
+                            }
+
+                            if (dtFactura.Rows.Count == 1)
+                            {
+                                DataRow row = dtFactura.Rows[0];
+                                StringBuilder cadena = new StringBuilder();
+
+                                foreach (DataColumn col in dtFactura.Columns)
+                                {
+                                    // ignorar la columna DVH si existe en la tabla
+                                    if (col.ColumnName.Equals("DigitoHorizontal-013AL", StringComparison.OrdinalIgnoreCase))
+                                        continue;
+
+                                    // evitar nulls
+                                    if (row[col] != DBNull.Value)
+                                        cadena.Append(row[col].ToString());
+                                }
+
+                                string dvh = HashHelper_013AL.CalcularSHA256_013AL(cadena.ToString());
+
+                                // 4) Actualizar la columna DigitoHorizontal-013AL de la factura dentro de la misma transacción
+                                string update = "UPDATE [Factura-013AL] SET [DigitoHorizontal-013AL] = @DVH WHERE [CodCompra-013AL] = @Id";
+                                using (SqlCommand cmdUpdateDVH = new SqlCommand(update, con, transaction))
+                                {
+                                    cmdUpdateDVH.Parameters.AddWithValue("@DVH", dvh);
+                                    cmdUpdateDVH.Parameters.AddWithValue("@Id", factura.CodCompra_013AL);
+                                    cmdUpdateDVH.ExecuteNonQuery();
+                                }
+                            }
+                            else
+                            {
+                                // Si por alguna razón no se encuentra la fila, podemos optar por rollback y lanzar excepción
+                                throw new Exception("No se pudo leer la factura recién insertada para calcular el DVH.");
+                            }
+
+                            // 5) Commit de la transacción
+                            transaction.Commit();
+
+                            // 6) Actualizar el DVV de la tabla Factura-013AL (fuera de la transacción)
+                            //    Esto recalcula el DVV global concatenando todos los DVH y lo guarda/actualiza.
+                            ActualizarDVV("Factura-013AL");
+
+                            return "OK";
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw new Exception("Error al registrar los detalles de la venta: ", ex);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error general al registrar la venta completa.", ex);
+            }
         }
+
+
+
 
         /*public bool ActualizarDVH(string tabla)
         {
@@ -232,7 +344,7 @@ namespace DAL
                     // Si la fila tiene datos, calcular el DVH
                     string dvh = HashHelper_013AL.CalcularSHA256_013AL(cadena.ToString());
 
-                    string update = $"UPDATE {tabla} SET [DigitoHorizontal-013AL] = @DVH WHERE {clavePrimaria} = @Id";
+                    string update = $"UPDATE [{tabla}] SET [DigitoHorizontal-013AL] = @DVH WHERE [{clavePrimaria}] = @Id";
 
                     using (SqlConnection con = conexion.ObtenerConexion())
                     {
@@ -307,7 +419,7 @@ namespace DAL
                 if (dt2.Rows.Count == 0)
                     return false;
 
-                string dvvGuardado = dt2.Rows[0]["DVV_013AL"].ToString();
+                string dvvGuardado = dt2.Rows[0]["DVV-013AL"].ToString();
 
                 // 4️⃣ Comparo el DVV calculado con el guardado
                 return dvvGuardado == dvvCalculado;
@@ -469,7 +581,6 @@ namespace DAL
             {
                 foreach (var tabla in tablas)
                 {
-                    // 1️⃣ Traigo todos los registros de la tabla
                     DataTable dt = new DataTable();
                     string consulta = $"SELECT * FROM [{tabla}]";
 
@@ -488,56 +599,45 @@ namespace DAL
                     if (dt.Rows.Count == 0)
                         continue;
 
-                    // 2️⃣ Tomo la clave primaria (primera columna)
                     string clavePrimaria = dt.Columns[0].ColumnName;
 
-                    // 3️⃣ Columnas que no se usan para el cálculo del DVH
-                    /*var columnasIgnorar = new List<string>
-            {
-                "DigitoHorizontal_597DG",
-                "IntentosFallidos_597DG",
-                "Bloqueado_597DG",
-                "Activo_597DG",
-                "IdiomaPreferido_597DG"
-            };*/
-
-                    // 4️⃣ Recorro los registros para verificar DVH
                     foreach (DataRow row in dt.Rows)
                     {
-                        string cadena = "";
+                        StringBuilder cadena = new StringBuilder();
 
                         foreach (DataColumn col in dt.Columns)
                         {
-                            /*if (columnasIgnorar.Contains(col.ColumnName))
-                                continue;*/
+                            // ❌ NO incluir el DVH en el cálculo
+                            if (col.ColumnName.Equals("DigitoHorizontal-013AL", StringComparison.OrdinalIgnoreCase))
+                                continue;
 
-                            cadena += row[col].ToString();
+                            if (row[col] != DBNull.Value)
+                                cadena.Append(row[col].ToString());
                         }
 
-                        string dvhCalculado = HashHelper_013AL.CalcularSHA256_013AL(cadena);
+                        string dvhCalculado = HashHelper_013AL.CalcularSHA256_013AL(cadena.ToString());
                         string dvhGuardado = row["DigitoHorizontal-013AL"].ToString();
 
                         if (dvhCalculado != dvhGuardado)
                         {
                             errores.Add(new ErrorIntegridad_013AL
                             {
-                                Tabla_597DG = tabla,
-                                Descripcion_597DG = $"Registro modificado en tabla {tabla}.",
-                                IdRegistro_597DG = row[clavePrimaria].ToString()
+                                Tabla_013AL = tabla,
+                                Descripcion_013AL = $"Registro modificado en tabla {tabla}.",
+                                IdRegistro_013AL = row[clavePrimaria].ToString()
                             });
                         }
                     }
 
-                    // 5️⃣ Verifico el DVV de la tabla (usa tu método adaptado anterior)
                     bool dvvOk = VerificarDVV(tabla);
 
                     if (!dvvOk)
                     {
                         errores.Add(new ErrorIntegridad_013AL
                         {
-                            Tabla_597DG = tabla,
-                            Descripcion_597DG = $"Se detectaron registros eliminados o alteración masiva en tabla {tabla} (DVV).",
-                            IdRegistro_597DG = "-"
+                            Tabla_013AL = tabla,
+                            Descripcion_013AL = $"Se detectaron registros eliminados o alteración masiva en tabla {tabla} (DVV).",
+                            IdRegistro_013AL = "-"
                         });
                     }
                 }
@@ -549,6 +649,7 @@ namespace DAL
 
             return errores;
         }
+
 
     }
 }

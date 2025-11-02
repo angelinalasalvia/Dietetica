@@ -75,14 +75,18 @@ namespace UI
                     backuprestorebll.RealizarBackup_013AL(textBox1.Text);
                     MessageBox.Show("Backup realizado con éxito.");
                     textBox1.Text = "";
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", "Backup", 4);
+                    string usuarioLog = SingletonSession_013AL.Instance.IsLoggedIn_013AL()
+                    ? SingletonSession_013AL.Instance.GetUsuario_013AL().Login_013AL
+                    : "Administrador";
+                    bbll.AgregarEvento_013AL(usuarioLog, "Respaldos", "Backup", 4);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al realizar el backup: {ex.Message}");
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", ex.Message, 4);
+                    string usuarioLog = SingletonSession_013AL.Instance.IsLoggedIn_013AL()
+                    ? SingletonSession_013AL.Instance.GetUsuario_013AL().Login_013AL
+                    : "Administrador";
+                    bbll.AgregarEvento_013AL(usuarioLog, "Respaldos", ex.Message, 4);
                 }
             }
             else
@@ -100,14 +104,18 @@ namespace UI
                     backuprestorebll.RealizarRestore_013AL(textBox2.Text);
                     MessageBox.Show("Restauración realizada con éxito.");
                     textBox2.Text = "";
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", "Restore", 4);
+                    string usuarioLog = SingletonSession_013AL.Instance.IsLoggedIn_013AL()
+                    ? SingletonSession_013AL.Instance.GetUsuario_013AL().Login_013AL
+                    : "Administrador";
+                    bbll.AgregarEvento_013AL(usuarioLog, "Respaldos", "Restore", 4);
                 }
                 catch (Exception ex)
                 {
                     MessageBox.Show($"Error al restaurar la base de datos: {ex.Message}");
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Respaldos", ex.Message, 4);
+                    string usuarioLog = SingletonSession_013AL.Instance.IsLoggedIn_013AL()
+                    ? SingletonSession_013AL.Instance.GetUsuario_013AL().Login_013AL
+                    : "Administrador";
+                    bbll.AgregarEvento_013AL(usuarioLog, "Respaldos", ex.Message, 4);
                 }
             }
             else

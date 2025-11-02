@@ -30,16 +30,25 @@ namespace UI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var tablas = new List<string> { "Usuario_597DG" };
+            var tablas = new List<string> { "Factura-013AL" };
             foreach (string tabla in tablas)
             {
                 fbll.ActualizarDVH(tabla);
                 fbll.ActualizarDVV(tabla);
             }
 
-            MessageBox.Show("Digitos Verificadores Actualizados.", "Exito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            List<ErrorIntegridad_013AL> nuevosErrores = fbll.VerificarIntegridadCompleta(tablas);
 
-            this.Close();
+            if (nuevosErrores.Count == 0)
+            {
+                MessageBox.Show("Integridad restaurada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close();
+            }
+            else
+            {
+                MessageBox.Show("Persisten errores de integridad. Revise los datos manualmente.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                dataGridView1.DataSource = nuevosErrores;
+            }
         }
 
         private void ErroresIntegridad_Load(object sender, EventArgs e)

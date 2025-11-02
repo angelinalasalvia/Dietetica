@@ -34,7 +34,7 @@ namespace UI
         public CobrarVenta_013AL(int tot, int cuil, int idc, List<Detalle_013AL> detalles)
         {
             InitializeComponent();
-            total_013AL = tot;
+            total_013AL = (int)(tot + (tot * 0.21m));
             CUIL_013AL = cuil;
             IdC_013AL = idc;
             detallesVenta = detalles;
@@ -87,6 +87,7 @@ namespace UI
             {
                 CodCompra_013AL = IdC_013AL,
                 CUIL_013AL = CUIL_013AL,
+                Total_013AL = total_013AL,
                 MetPago_013AL = comboBox1.Text
             };
 

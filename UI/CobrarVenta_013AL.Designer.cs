@@ -63,9 +63,9 @@
             this.label1.AutoSize = true;
             this.label1.Location = new System.Drawing.Point(12, 52);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(34, 13);
+            this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 10;
-            this.label1.Text = "Total:";
+            this.label1.Text = "Total (Con IVA):";
             // 
             // btnCobrar
             // 
@@ -102,15 +102,15 @@
             this.txtcuil.Location = new System.Drawing.Point(60, 25);
             this.txtcuil.Name = "txtcuil";
             this.txtcuil.ReadOnly = true;
-            this.txtcuil.Size = new System.Drawing.Size(100, 20);
+            this.txtcuil.Size = new System.Drawing.Size(168, 20);
             this.txtcuil.TabIndex = 21;
             // 
             // txttotal
             // 
-            this.txttotal.Location = new System.Drawing.Point(60, 49);
+            this.txttotal.Location = new System.Drawing.Point(107, 49);
             this.txttotal.Name = "txttotal";
             this.txttotal.ReadOnly = true;
-            this.txttotal.Size = new System.Drawing.Size(100, 20);
+            this.txttotal.Size = new System.Drawing.Size(120, 20);
             this.txttotal.TabIndex = 22;
             // 
             // label3
@@ -129,11 +129,11 @@
             this.txtTarjeta.Size = new System.Drawing.Size(121, 20);
             this.txtTarjeta.TabIndex = 24;
             // 
-            // CobrarVenta
+            // CobrarVenta_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(239, 187);
+            this.ClientSize = new System.Drawing.Size(239, 178);
             this.Controls.Add(this.txtTarjeta);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txttotal);
@@ -144,7 +144,7 @@
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Name = "CobrarVenta";
+            this.Name = "CobrarVenta_013AL";
             this.Text = "CobrarVenta";
             this.Load += new System.EventHandler(this.CobrarVenta_Load);
             this.ResumeLayout(false);

@@ -55,8 +55,8 @@ namespace UI
                 return;
             }
 
-            var usuarios = bllUsuarios.Listar_013AL();
-            usuario = usuarios.FirstOrDefault(u => u.Login_013AL == txtUsuario.Text);
+            var usuario = bllUsuarios.Listar_013AL(txtUsuario.Text);
+            //usuario = usuarios.FirstOrDefault(u => u.Login_013AL == txtUsuario.Text);
 
             if (usuario == null)
             {

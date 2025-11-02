@@ -12,9 +12,9 @@ namespace BLL
     {
         public DALProductoC_013AL dal = new DALProductoC_013AL();
 
-        public DataTable ListarProductosC_013AL()
+        public DataTable ListarProductosC_013AL(int? idProducto = null)
         {
-            return dal.ListarProductosC_013AL();
+            return dal.ListarProductosC_013AL(idProducto);
         }
 
         public void RestaurarVersionProducto_013AL(int codProductoC)
@@ -29,9 +29,9 @@ namespace BLL
             }
         }
 
-        public DataTable ConsultaProductosC_013AL(int? id, string nombre, DateTime? fechaInicio, DateTime? fechaFin)
+        public DataTable ConsultaProductosC_013AL(int idProducto, DateTime? fechaInicio, DateTime? fechaFin)
         {
-            return dal.ConsultaProductosC_013AL(id, nombre, fechaInicio, fechaFin);
+            return dal.ConsultaProductosC_013AL(idProducto, fechaInicio, fechaFin);
         }
 
     }

@@ -17,9 +17,12 @@ namespace UI
 {
     public partial class Productos_C_013AL : Form, IObserver_013AL
     {
-        public Productos_C_013AL()
+        private int? productoId = null;
+        public Productos_C_013AL(int? idProducto = null)
         {
             InitializeComponent();
+            productoId = idProducto;
+
             dateTimePicker1.ValueChanged += new EventHandler(dateTimePicker1_ValueChanged);
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
@@ -40,27 +43,38 @@ namespace UI
             dataGridView1.DataSource = bll.ListarProductosC_013AL();
         }
 
+        private void CargarHistorial()
+        {
+            if (productoId.HasValue)
+                dataGridView1.DataSource = bll.ListarProductosC_013AL(productoId);
+            else
+                ListarProductosC_013AL();
+        }
+
         private void Productos_C_Load(object sender, EventArgs e)
         {
-            ListarProductosC_013AL();
+            //ListarProductosC_013AL();
             
             dateTimePicker1.Value = DateTime.Now; 
             dateTimePicker2.Value = dateTimePicker1.Value.AddDays(30);
+
+            CargarHistorial();
         }
         
         private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
-        {
-            
+        {            
             dateTimePicker2.Value = dateTimePicker1.Value.AddDays(30);
         }
         private void button2_Click(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = bll.ConsultaProductosC_013AL(
-        string.IsNullOrEmpty(textBox1.Text) ? (int?)null : Convert.ToInt32(textBox1.Text), // idp
-        textBox2.Text, // nombre
-        string.IsNullOrEmpty(dateTimePicker1.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker1.Text).Date, // fechaInicio
-        string.IsNullOrEmpty(dateTimePicker2.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker2.Text).Date // fechaFin
-        );
+            if (productoId.HasValue)
+            {
+                dataGridView1.DataSource = bll.ConsultaProductosC_013AL(
+                    productoId.Value,
+                    string.IsNullOrEmpty(dateTimePicker1.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker1.Text).Date,
+                    string.IsNullOrEmpty(dateTimePicker2.Text) ? (DateTime?)null : Convert.ToDateTime(dateTimePicker2.Text).Date
+                );
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -84,7 +98,7 @@ namespace UI
 
                     MessageBox.Show("Versión restaurada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                    ListarProductosC_013AL();
+                    CargarHistorial();
                 }
                 catch (Exception ex)
                 {

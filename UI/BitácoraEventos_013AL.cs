@@ -51,7 +51,8 @@ namespace UI
             this.ListarEventos_013AL();
             
             dataGridView1.SelectionChanged += dataGridView1_SelectionChanged;
-            dateTimePicker2.Value = dateTimePicker1.Value.AddDays(30);
+            dateTimePicker2.Value = DateTime.Now;
+            dateTimePicker1.Value = DateTime.Now.AddMonths(-1);
         }
 
         private void button2_Click(object sender, EventArgs e)

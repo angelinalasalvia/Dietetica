@@ -14,7 +14,7 @@ namespace DAL
         private readonly DALConexiones_013AL conexion = new DALConexiones_013AL();
         SqlCommand com;
 
-        public DataTable ConsultaProductosC_013AL(int? idp, string nombre, DateTime? fechaInicio, DateTime? fechaFin)
+        public DataTable ConsultaProductosC_013AL(int idProducto, DateTime? fechaInicio, DateTime? fechaFin)
         {
             DataTable dt = new DataTable();
             SqlDataReader resultado;
@@ -25,29 +25,10 @@ namespace DAL
                     SqlCommand cmd = new SqlCommand("[consultacambios-013AL]", con);
                     cmd.CommandType = CommandType.StoredProcedure;
 
-
-                    if (idp == null)
-                        cmd.Parameters.Add("@idp", SqlDbType.Int).Value = DBNull.Value;
-                    else
-                        cmd.Parameters.Add("@idp", SqlDbType.Int).Value = idp;
-
-
-                    if (string.IsNullOrEmpty(nombre))
-                        cmd.Parameters.Add("@nombre", SqlDbType.NVarChar, 50).Value = DBNull.Value;
-                    else
-                        cmd.Parameters.Add("@nombre", SqlDbType.NVarChar, 50).Value = nombre;
-
-
-                    if (fechaInicio == null)
-                        cmd.Parameters.Add("@fechaInicio", SqlDbType.Date).Value = DBNull.Value;
-                    else
-                        cmd.Parameters.Add("@fechaInicio", SqlDbType.Date).Value = fechaInicio;
-
-
-                    if (fechaFin == null)
-                        cmd.Parameters.Add("@fechaFin", SqlDbType.Date).Value = DBNull.Value;
-                    else
-                        cmd.Parameters.Add("@fechaFin", SqlDbType.Date).Value = fechaFin;
+                    cmd.Parameters.Add("@idp", SqlDbType.Int).Value = idProducto;
+                    cmd.Parameters.Add("@nombre", SqlDbType.NVarChar, 50).Value = DBNull.Value;
+                    cmd.Parameters.Add("@fechaInicio", SqlDbType.Date).Value = fechaInicio ?? (object)DBNull.Value;
+                    cmd.Parameters.Add("@fechaFin", SqlDbType.Date).Value = fechaFin ?? (object)DBNull.Value;
 
                     con.Open();
                     resultado = cmd.ExecuteReader();
@@ -56,12 +37,12 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al consultar los cambios de productos", ex);
+                throw new Exception("Error al consultar los cambios del producto", ex);
             }
             return dt;
         }
 
-        public DataTable ListarProductosC_013AL()
+        public DataTable ListarProductosC_013AL(int? idProducto = null)
         {
             SqlDataReader resultado;
             DataTable dt = new DataTable();
@@ -69,8 +50,16 @@ namespace DAL
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    SqlCommand com = new SqlCommand("SELECT * FROM [ProductoC-013AL]", con);
-                    //com.CommandType = CommandType.StoredProcedure;
+                    string query = "SELECT * FROM [ProductoC-013AL]";
+
+                    if (idProducto.HasValue)
+                        query += " WHERE [CodProducto-013AL] = @idProducto";
+
+                    SqlCommand com = new SqlCommand(query, con);
+
+                    if (idProducto.HasValue)
+                        com.Parameters.AddWithValue("@idProducto", idProducto.Value);
+
                     con.Open();
                     resultado = com.ExecuteReader();
                     dt.Load(resultado);
@@ -82,7 +71,6 @@ namespace DAL
             }
             return dt;
         }
-
 
         public void RestaurarVersionProducto_013AL(int codProductoC)
         {

@@ -17,9 +17,9 @@ namespace BLL_013AL
     {
         private DALUsuario_013AL dal = new DALUsuario_013AL();
 
-        public List<Usuarios_013AL> Listar_013AL()
+        public Usuarios_013AL Listar_013AL(string login)
         {
-            return dal.Listar_013AL();
+            return dal.Listar_013AL(login);
         }
 
         public string CambiarContraseña_013AL(string login, string contraseña)

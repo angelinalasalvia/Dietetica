@@ -15,43 +15,38 @@ namespace DAL
     {
         private readonly DALConexiones_013AL conexion = new DALConexiones_013AL();
         SqlCommand com;
-
-        
-        //arerglar esto para que no llame a todos los usuarios, solo al que necesito
-        public List<Usuarios_013AL> Listar_013AL()
+                
+        public Usuarios_013AL Listar_013AL(string login)
         {
-            List<Usuarios_013AL> Lista = new List<Usuarios_013AL>();
+            Usuarios_013AL usuario = null;
             try
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    string query = @"SELECT [Login-013AL], [Contraseña-013AL], [DNI-013AL], 
-                                [Bloqueo-013AL], [CodRol-013AL], [Activo-013AL], [Eliminado-013AL] 
-                         FROM [Usuario-013AL]";
+                    string query = @"SELECT [Login-013AL], [Contraseña-013AL], [DNI-013AL], [Bloqueo-013AL], [CodRol-013AL], [Activo-013AL], [Eliminado-013AL] 
+                         FROM [Usuario-013AL]
+                         WHERE [Login-013AL] = @login";
 
-                    com = new SqlCommand(query, con);
-                    com.CommandType = CommandType.Text;
-
-                    con.Open();
-
-
-                    using (SqlDataReader dr = com.ExecuteReader())
+                    using (SqlCommand com = new SqlCommand(query, con))
                     {
-                        
-                        while (dr.Read())
+                        com.Parameters.AddWithValue("@login", login);
+                        con.Open();
+
+                        using (SqlDataReader dr = com.ExecuteReader())
                         {
-                            int idRol = Convert.ToInt32(dr["CodRol-013AL"]);
-                            //Rol_013AL rol = new Rol_013AL { Cod_013AL = idRol };
-                            Lista.Add(new Usuarios_013AL()
+                            if (dr.Read())
                             {
-                                Login_013AL = dr["Login-013AL"].ToString(),
-                                Contraseña_013AL = dr["Contraseña-013AL"].ToString(),
-                                DNI_013AL = dr["DNI-013AL"].ToString(),
-                                Bloqueo_013AL = (bool)dr["Bloqueo-013AL"],
-                                CodRol_013AL = (int)dr["CodRol-013AL"],
-                                Activo_013AL = (bool)dr["Activo-013AL"],
-                                Eliminado_013AL = (bool)dr["Eliminado-013AL"]
-                            });
+                                usuario = new Usuarios_013AL()
+                                {
+                                    Login_013AL = dr["Login-013AL"].ToString(),
+                                    Contraseña_013AL = dr["Contraseña-013AL"].ToString(),
+                                    DNI_013AL = dr["DNI-013AL"].ToString(),
+                                    Bloqueo_013AL = (bool)dr["Bloqueo-013AL"],
+                                    CodRol_013AL = (int)dr["CodRol-013AL"],
+                                    Activo_013AL = (bool)dr["Activo-013AL"],
+                                    Eliminado_013AL = (bool)dr["Eliminado-013AL"]
+                                };
+                            }
                         }
                     }
                 }
@@ -61,8 +56,11 @@ namespace DAL
                 throw new Exception("Error al listar usuarios", ex);
             }
 
-            return Lista;
+            return usuario;
         }
+
+        //int idRol = Convert.ToInt32(dr["CodRol-013AL"]);
+        //Rol_013AL rol = new Rol_013AL { Cod_013AL = idRol };
 
         public string ObtenerContraseñaActual_013AL(string email)
         {

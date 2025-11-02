@@ -231,6 +231,19 @@ namespace UI
             }
         }
 
-      
+        private void btnHistorial_Click(object sender, EventArgs e)
+        {
+            if (dataGridView1.SelectedRows.Count > 0)
+            {
+                int idProducto = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["CodProducto-013AL"].Value);
+                Productos_C_013AL form = new Productos_C_013AL(idProducto);
+                form.ShowDialog();
+                CargarProductos_013AL();
+            }
+            else
+            {
+                MessageBox.Show("Selecciona un producto para ver su historial.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+        }
     }
 }

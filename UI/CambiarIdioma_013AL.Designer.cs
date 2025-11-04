@@ -46,9 +46,6 @@
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "Inglés",
-            "Español"});
             this.comboBox1.Location = new System.Drawing.Point(47, 47);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
@@ -64,7 +61,7 @@
             this.idioma.UseVisualStyleBackColor = true;
             this.idioma.Click += new System.EventHandler(this.button3_Click);
             // 
-            // CambiarIdioma
+            // CambiarIdioma_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -72,8 +69,9 @@
             this.Controls.Add(this.idioma);
             this.Controls.Add(this.comboBox1);
             this.Controls.Add(this.label1);
-            this.Name = "CambiarIdioma";
+            this.Name = "CambiarIdioma_013AL";
             this.Text = "CambiarIdioma";
+            this.Load += new System.EventHandler(this.CambiarIdioma_013AL_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

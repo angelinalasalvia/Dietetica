@@ -69,6 +69,7 @@
     <Compile Include="DALEvento_013AL.cs" />
     <Compile Include="DALFactura_013AL.cs" />
     <Compile Include="DALFamilia_013AL.cs" />
+    <Compile Include="DALIdioma_013AL.cs" />
     <Compile Include="DALOrdenCompra_013AL.cs" />
     <Compile Include="DALPermiso_013AL.cs" />
     <Compile Include="DALProductoC_013AL.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="DALProveedor_013AL.cs" />
     <Compile Include="DALRol_013AL.cs" />
     <Compile Include="DALSolicitudCotizacion_013AL.cs" />
+    <Compile Include="DALTraduccion_013AL.cs" />
     <Compile Include="DALUsuario_013AL.cs" />
     <Compile Include="DietéticaDataSet.Designer.cs">
       <AutoGen>True</AutoGen>

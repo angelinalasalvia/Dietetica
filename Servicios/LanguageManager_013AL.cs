@@ -1,38 +1,45 @@
-﻿using Servicios;
+﻿using BE;
+using Servicios;
 using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using System.Windows.Forms;
 
 public class LanguageManager_013AL : ISubject_013AL
 {
     private List<IObserver_013AL> ListaFormularios_013AL = new List<IObserver_013AL>();
-    private Dictionary<string, string> Diccionario_013AL;
+    private Dictionary<string, string> Diccionario_013AL = new Dictionary<string, string>();
 
-    // Patrón singleton
+    // 🔹 Delegado para obtener traducciones desde la capa BLL
+    public Func<int, List<Traduccion_013AL>> ObtenerTraduccionesPorIdioma { get; set; }
+
+    // 🔹 Singleton
     private static LanguageManager_013AL instancia_013AL;
-
-    private LanguageManager_013AL() 
-    {
-        Diccionario_013AL = new Dictionary<string, string>();
-        //SingletonSesion.Instance.IdiomaActual = "es";
-    }
+    private LanguageManager_013AL() { }
 
     public static LanguageManager_013AL ObtenerInstancia_013AL()
     {
         if (instancia_013AL == null)
-        {
             instancia_013AL = new LanguageManager_013AL();
-        }
+
         return instancia_013AL;
     }
 
-    // Patrón observer
+    // === Variables internas de idioma ===
+    private int idIdiomaActual_013AL = IDIOMA_ESPANOL;
+    public const int IDIOMA_ESPANOL = 1; // o el ID que tengas en la BD para español
+    public int IdiomaActual_013AL
+    {
+        get { return idIdiomaActual_013AL; }
+    }
+    // === Métodos del patrón Observer ===
     public void Agregar_013AL(IObserver_013AL observer)
     {
-        ListaFormularios_013AL.Add(observer);
+        if (!ListaFormularios_013AL.Contains(observer))
+            ListaFormularios_013AL.Add(observer);
     }
 
     public void Quitar_013AL(IObserver_013AL observer)
@@ -43,45 +50,44 @@ public class LanguageManager_013AL : ISubject_013AL
     public void Notificar_013AL()
     {
         foreach (IObserver_013AL observer in ListaFormularios_013AL)
-        {
             observer.ActualizarIdioma_013AL();
-        }
     }
 
+    // === Cambio de idioma ===
+    public void CambiarIdioma_013AL(int nuevoIdIdioma)
+    {
+        idIdiomaActual_013AL = nuevoIdIdioma;
+        CargarIdioma_013AL();
+        Notificar_013AL();
+    }
+
+    // === Carga de idioma desde BD ===
     public void CargarIdioma_013AL()
     {
-        try
+        Diccionario_013AL.Clear();
+
+        if (ObtenerTraduccionesPorIdioma != null /*&& idIdiomaActual_013AL != IDIOMA_ESPANOL*/)
         {
-            var NombreArchivo = $"{SingletonSession_013AL.Instance.IdiomaActual_013AL}.json";
-            if (File.Exists(NombreArchivo))
+            var traducciones = ObtenerTraduccionesPorIdioma(idIdiomaActual_013AL);
+
+            foreach (var t in traducciones)
             {
-                var jsonString = File.ReadAllText(NombreArchivo);
-                Diccionario_013AL = JsonSerializer.Deserialize<Dictionary<string, string>>(jsonString);
+                string clave = t.Etiqueta_013AL.Nombre_013AL; // viene de la tabla Etiqueta
+                if (!Diccionario_013AL.ContainsKey(clave))
+                    Diccionario_013AL.Add(clave, t.Texto_013AL);
             }
-            else
-            {
-                MessageBox.Show($"El archivo de idioma {NombreArchivo} no existe.");
-            }
-        }
-        catch (JsonException ex)
-        {
-            MessageBox.Show($"Error al deserializar el JSON: {ex.Message}");
-        }
-        catch (IOException ex)
-        {
-            MessageBox.Show($"Error al leer el archivo: {ex.Message}");
-        }
-        catch (Exception ex)
-        {
-            MessageBox.Show($"Error inesperado: {ex.Message}");
         }
     }
 
+    // === Obtener texto traducido ===
     public string ObtenerTexto_013AL(string key)
     {
-        return Diccionario_013AL.ContainsKey(key) ? Diccionario_013AL[key] : key;
+        return Diccionario_013AL.ContainsKey(key)
+            ? Diccionario_013AL[key]
+            : key;
     }
 
+    // === Aplicar idioma a los controles ===
     public void CambiarIdiomaControles_013AL(Control frm)
     {
         try
@@ -91,9 +97,7 @@ public class LanguageManager_013AL : ISubject_013AL
             foreach (Control c in frm.Controls)
             {
                 if (c is Button || c is Label || c is RadioButton || c is CheckBox)
-                {
                     c.Text = ObtenerTexto_013AL(frm.Name + "." + c.Name);
-                }
 
                 if (c is MenuStrip m)
                 {
@@ -105,9 +109,7 @@ public class LanguageManager_013AL : ISubject_013AL
                 }
 
                 if (c.Controls.Count > 0)
-                {
                     CambiarIdiomaControles_013AL(c);
-                }
             }
         }
         catch (Exception ex)
@@ -128,4 +130,3 @@ public class LanguageManager_013AL : ISubject_013AL
         }
     }
 }
-

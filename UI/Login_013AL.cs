@@ -29,6 +29,8 @@ namespace UI
         public Login_013AL()
         {
             InitializeComponent();
+            LanguageManager_013AL.ObtenerInstancia_013AL().ObtenerTraduccionesPorIdioma = new TraduccionBLL_013AL().ObtenerPorIdioma;
+
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }

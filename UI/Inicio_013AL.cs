@@ -1,5 +1,6 @@
 ﻿using BE_013AL;
 using BE_013AL.Composite;
+using BLL;
 using BLL_013AL;
 using Servicios;
 using Servicios_013AL;
@@ -30,7 +31,10 @@ namespace UI
             
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             SingletonSession_013AL.Instance.IdiomaActual_013AL = "es";
-            
+
+            var lm = LanguageManager_013AL.ObtenerInstancia_013AL();
+            var bllTraduccion = new TraduccionBLL_013AL();
+            lm.ObtenerTraduccionesPorIdioma = (id) => bllTraduccion.ObtenerPorIdioma(id);
         }
 
         
@@ -276,6 +280,10 @@ namespace UI
 
         private void Inicio_Load(object sender, EventArgs e)
         {
+            var lm = LanguageManager_013AL.ObtenerInstancia_013AL();
+            lm.CargarIdioma_013AL();  // carga el idioma por defecto (español)
+            lm.Notificar_013AL();
+
             if (SingletonSession_013AL.Instance.IsLoggedIn_013AL() == false)
             {
                 toolStripStatusLabel.Text = "No hay ningún usuario conectado.";
@@ -416,6 +424,12 @@ namespace UI
         private void recepciónDeProductosToolStripMenuItem_Click(object sender, EventArgs e)
         {
             RecepciónProductos_013AL form = new RecepciónProductos_013AL();
+            form.ShowDialog();
+        }
+
+        private void gestorDeIdiomasToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GestionarIdiomas_013AL form = new GestionarIdiomas_013AL();
             form.ShowDialog();
         }
     }

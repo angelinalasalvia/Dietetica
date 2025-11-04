@@ -65,15 +65,18 @@
     <Compile Include="Composite_013AL\Familia_013AL.cs" />
     <Compile Include="Composite_013AL\Rol_013AL.cs" />
     <Compile Include="ErrorIntegridad_013AL.cs" />
+    <Compile Include="Etiqueta_013AL.cs" />
     <Compile Include="Factura_013AL.cs" />
     <Compile Include="Detalle_013AL.cs" />
     <Compile Include="DetalleSolicitudC_013AL.cs" />
     <Compile Include="DigitoVerificador_013AL.cs" />
+    <Compile Include="Idioma_013AL.cs" />
     <Compile Include="OrdenCompra_013AL.cs" />
     <Compile Include="Producto_013AL.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Proveedor_013AL.cs" />
     <Compile Include="SolicitudCotizacion_013AL.cs" />
+    <Compile Include="Traduccion_013AL.cs" />
     <Compile Include="Usuarios_013AL.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -1,4 +1,6 @@
-﻿using Servicios_013AL;
+﻿using BE;
+using BLL;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -31,17 +33,37 @@ namespace UI
             LanguageManager.ObtenerInstancia().Quitar(this);*/
         }
         
+        IdiomaBLL_013AL bll = new IdiomaBLL_013AL();
+
+        private void CargarIdiomas()
+        {
+            List<Idioma_013AL> idiomas = bll.ListarIdiomas_013AL();
+            comboBox1.DataSource = idiomas;
+            comboBox1.DisplayMember = "Nombre_013AL";
+            comboBox1.ValueMember = "IdIdioma_013AL";
+            comboBox1.SelectedIndex = -1; // Nada seleccionado al inicio
+        }
 
         private void button3_Click(object sender, EventArgs e)
         {
-            if(comboBox1.Text == "Español")
+            var lm = LanguageManager_013AL.ObtenerInstancia_013AL();
+
+            if (comboBox1.SelectedValue != null)
             {
-                SingletonSession_013AL.Instance.IdiomaActual_013AL = "es";
+                int nuevoId = (int)comboBox1.SelectedValue;
+                lm.CambiarIdioma_013AL(nuevoId);
+
+                MessageBox.Show("Idioma cambiado correctamente.", "Idioma", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            if (comboBox1.Text == "Inglés")
+            else
             {
-                SingletonSession_013AL.Instance.IdiomaActual_013AL = "en";
+                MessageBox.Show("Seleccione un idioma antes de continuar.", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
+        }
+
+        private void CambiarIdioma_013AL_Load(object sender, EventArgs e)
+        {
+            CargarIdiomas();
         }
     }
 }

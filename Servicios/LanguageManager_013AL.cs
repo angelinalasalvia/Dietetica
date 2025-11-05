@@ -13,10 +13,8 @@ public class LanguageManager_013AL : ISubject_013AL
     private List<IObserver_013AL> ListaFormularios_013AL = new List<IObserver_013AL>();
     private Dictionary<string, string> Diccionario_013AL = new Dictionary<string, string>();
 
-    // 🔹 Delegado para obtener traducciones desde la capa BLL
     public Func<int, List<Traduccion_013AL>> ObtenerTraduccionesPorIdioma { get; set; }
 
-    // 🔹 Singleton
     private static LanguageManager_013AL instancia_013AL;
     private LanguageManager_013AL() { }
 
@@ -28,14 +26,12 @@ public class LanguageManager_013AL : ISubject_013AL
         return instancia_013AL;
     }
 
-    // === Variables internas de idioma ===
     private int idIdiomaActual_013AL = IDIOMA_ESPANOL;
-    public const int IDIOMA_ESPANOL = 1; // o el ID que tengas en la BD para español
+    public const int IDIOMA_ESPANOL = 1; 
     public int IdiomaActual_013AL
     {
         get { return idIdiomaActual_013AL; }
     }
-    // === Métodos del patrón Observer ===
     public void Agregar_013AL(IObserver_013AL observer)
     {
         if (!ListaFormularios_013AL.Contains(observer))
@@ -53,7 +49,6 @@ public class LanguageManager_013AL : ISubject_013AL
             observer.ActualizarIdioma_013AL();
     }
 
-    // === Cambio de idioma ===
     public void CambiarIdioma_013AL(int nuevoIdIdioma)
     {
         idIdiomaActual_013AL = nuevoIdIdioma;
@@ -61,25 +56,23 @@ public class LanguageManager_013AL : ISubject_013AL
         Notificar_013AL();
     }
 
-    // === Carga de idioma desde BD ===
     public void CargarIdioma_013AL()
     {
         Diccionario_013AL.Clear();
 
-        if (ObtenerTraduccionesPorIdioma != null /*&& idIdiomaActual_013AL != IDIOMA_ESPANOL*/)
+        if (ObtenerTraduccionesPorIdioma != null)
         {
             var traducciones = ObtenerTraduccionesPorIdioma(idIdiomaActual_013AL);
 
             foreach (var t in traducciones)
             {
-                string clave = t.Etiqueta_013AL.Nombre_013AL; // viene de la tabla Etiqueta
+                string clave = t.Etiqueta_013AL.Nombre_013AL; 
                 if (!Diccionario_013AL.ContainsKey(clave))
                     Diccionario_013AL.Add(clave, t.Texto_013AL);
             }
         }
     }
 
-    // === Obtener texto traducido ===
     public string ObtenerTexto_013AL(string key)
     {
         return Diccionario_013AL.ContainsKey(key)
@@ -87,7 +80,6 @@ public class LanguageManager_013AL : ISubject_013AL
             : key;
     }
 
-    // === Aplicar idioma a los controles ===
     public void CambiarIdiomaControles_013AL(Control frm)
     {
         try

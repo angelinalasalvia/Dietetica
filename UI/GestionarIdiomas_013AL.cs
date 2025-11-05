@@ -25,6 +25,13 @@ namespace UI
             languageManager.Agregar_013AL(this);
             CargarIdiomas();
             dataGridView1.CellEndEdit += dataGridViewTraducciones_CellEndEdit;
+            LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
+            ActualizarIdioma_013AL();
+        }
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+            LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
         private void CargarIdiomas()
         {

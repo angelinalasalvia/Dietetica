@@ -42,12 +42,12 @@
             this.mnuGestores = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuGestorUsuarios = new System.Windows.Forms.ToolStripMenuItem();
             this.mnuGestorPermisos = new System.Windows.Forms.ToolStripMenuItem();
+            this.gestorDeIdiomasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.eventosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.respaldosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menucliente = new System.Windows.Forms.ToolStripMenuItem();
             this.clientesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.productosToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.productosCToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.proveedoresToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.menuventa = new System.Windows.Forms.ToolStripMenuItem();
             this.comprasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,7 +58,6 @@
             this.menureportes = new System.Windows.Forms.ToolStripMenuItem();
             this.menuayuda = new System.Windows.Forms.ToolStripMenuItem();
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
-            this.gestorDeIdiomasToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip.SuspendLayout();
             this.menuStrip1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -165,6 +164,13 @@
             this.mnuGestorPermisos.Text = "Gestor de Perfiles";
             this.mnuGestorPermisos.Click += new System.EventHandler(this.mnuGestorPermisos_Click);
             // 
+            // gestorDeIdiomasToolStripMenuItem
+            // 
+            this.gestorDeIdiomasToolStripMenuItem.Name = "gestorDeIdiomasToolStripMenuItem";
+            this.gestorDeIdiomasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gestorDeIdiomasToolStripMenuItem.Text = "Gestor de Idiomas";
+            this.gestorDeIdiomasToolStripMenuItem.Click += new System.EventHandler(this.gestorDeIdiomasToolStripMenuItem_Click);
+            // 
             // eventosToolStripMenuItem
             // 
             this.eventosToolStripMenuItem.Name = "eventosToolStripMenuItem";
@@ -184,7 +190,6 @@
             this.menucliente.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.clientesToolStripMenuItem,
             this.productosToolStripMenuItem,
-            this.productosCToolStripMenuItem,
             this.proveedoresToolStripMenuItem});
             this.menucliente.Name = "menucliente";
             this.menucliente.Size = new System.Drawing.Size(67, 20);
@@ -203,13 +208,6 @@
             this.productosToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.productosToolStripMenuItem.Text = "Productos";
             this.productosToolStripMenuItem.Click += new System.EventHandler(this.productosToolStripMenuItem_Click);
-            // 
-            // productosCToolStripMenuItem
-            // 
-            this.productosCToolStripMenuItem.Name = "productosCToolStripMenuItem";
-            this.productosCToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.productosCToolStripMenuItem.Text = "Productos_C";
-            this.productosCToolStripMenuItem.Click += new System.EventHandler(this.productosCToolStripMenuItem_Click);
             // 
             // proveedoresToolStripMenuItem
             // 
@@ -285,13 +283,6 @@
             this.pictureBox1.TabIndex = 6;
             this.pictureBox1.TabStop = false;
             // 
-            // gestorDeIdiomasToolStripMenuItem
-            // 
-            this.gestorDeIdiomasToolStripMenuItem.Name = "gestorDeIdiomasToolStripMenuItem";
-            this.gestorDeIdiomasToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.gestorDeIdiomasToolStripMenuItem.Text = "Gestor de Idiomas";
-            this.gestorDeIdiomasToolStripMenuItem.Click += new System.EventHandler(this.gestorDeIdiomasToolStripMenuItem_Click);
-            // 
             // Inicio_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -337,7 +328,6 @@
         private System.Windows.Forms.ToolStripMenuItem comprasToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem cotizacionesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem productosToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem productosCToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem proveedoresToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem ordenDeCompraToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem registrarCompraToolStripMenuItem;

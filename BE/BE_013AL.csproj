@@ -69,7 +69,6 @@
     <Compile Include="Factura_013AL.cs" />
     <Compile Include="Detalle_013AL.cs" />
     <Compile Include="DetalleSolicitudC_013AL.cs" />
-    <Compile Include="DigitoVerificador_013AL.cs" />
     <Compile Include="Idioma_013AL.cs" />
     <Compile Include="OrdenCompra_013AL.cs" />
     <Compile Include="Producto_013AL.cs" />

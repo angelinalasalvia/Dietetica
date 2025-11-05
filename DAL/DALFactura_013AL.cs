@@ -607,7 +607,7 @@ namespace DAL
 
                         foreach (DataColumn col in dt.Columns)
                         {
-                            // ❌ NO incluir el DVH en el cálculo
+                            
                             if (col.ColumnName.Equals("DigitoHorizontal-013AL", StringComparison.OrdinalIgnoreCase))
                                 continue;
 

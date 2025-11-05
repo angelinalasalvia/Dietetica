@@ -14,5 +14,6 @@ namespace BE_013AL
         public int IVA_013AL { get; set; }
         public int Total_013AL { get; set; }
         public string MetPago_013AL { get; set; }
+        public string DigitoHorizontal_013AL { get; set; }
     }
 }

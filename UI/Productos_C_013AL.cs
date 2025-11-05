@@ -80,8 +80,6 @@ namespace UI
         private void button1_Click(object sender, EventArgs e)
         {
             this.ListarProductosC_013AL();
-            textBox1.Text = "";
-            textBox2.Text = "";
             dateTimePicker1.Text = "";
             dateTimePicker2.Text = "";
         }

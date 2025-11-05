@@ -23,14 +23,12 @@ namespace UI
 
         public void ActualizarIdioma_013AL()
         {
-            //LanguageManager.ObtenerInstancia().Notificar();
             LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-           /* base.OnFormClosing(e);
-            LanguageManager.ObtenerInstancia().Quitar(this);*/
+           
         }
         
         IdiomaBLL_013AL bll = new IdiomaBLL_013AL();
@@ -41,7 +39,7 @@ namespace UI
             comboBox1.DataSource = idiomas;
             comboBox1.DisplayMember = "Nombre_013AL";
             comboBox1.ValueMember = "IdIdioma_013AL";
-            comboBox1.SelectedIndex = -1; // Nada seleccionado al inicio
+            comboBox1.SelectedIndex = -1; 
         }
 
         private void button3_Click(object sender, EventArgs e)

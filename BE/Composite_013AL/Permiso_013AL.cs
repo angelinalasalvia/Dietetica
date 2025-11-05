@@ -8,10 +8,7 @@ namespace BE_013AL.Composite
 {
     public class Permiso_013AL : Rol_013AL
     {
-        /*public override int Id { get; set; }
-        public override string Nombre { get; set; }
-        public override string Tipo { get; set; }*/
-
+        
         public override void AgregarHijo_013AL(Rol_013AL comp)
         {
         }

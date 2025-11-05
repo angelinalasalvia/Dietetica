@@ -2,7 +2,9 @@
 using BE_013AL.Composite;
 using BLL;
 using BLL_013AL;
+using Microsoft.VisualBasic.ApplicationServices;
 using Servicios;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -21,13 +23,11 @@ namespace UI
         PermisoBLL_013AL pbll = new PermisoBLL_013AL();
         RolBLL_013AL rbll = new RolBLL_013AL();
         FamiliaBLL_013AL fbll = new FamiliaBLL_013AL();
+        EventoBLL_013AL bll = new EventoBLL_013AL();
+        Usuarios_013AL user;
         public GestorPerfiles_013AL()
         {
             InitializeComponent();
-            /*CargarPatentesCombo();
-            CargarFamiliasCombo();
-            CargarRolesCombo();*/
-            //InitializeTreeView();
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }
@@ -62,11 +62,9 @@ namespace UI
                 return;
             }
 
-            // obtener id de rol
             string[] partesRol = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             int idRol = int.Parse(partesRol[0].Trim());
 
-            // comprobar si seleccionó en listBoxPermisos
             if (listBoxPermisos.SelectedItems.Count == 0)
             {
                 MessageBox.Show("Seleccione un permiso para agregar");
@@ -78,23 +76,23 @@ namespace UI
 
             if (ExisteConflicto_013AL(permisoSeleccionado))
             {
-                // Los mensajes de conflicto los maneja ExisteConflicto_
                 return;
             }
 
-            // Intentar insertar en BD: usá el método BLL que tengas (en tu código principal usabas InsertarFamiliaRol_013AL en btnAplicar)
-            string insertado = fbll.InsertarFamiliaRol_013AL(idRol, permisoSeleccionado.Cod_013AL); // si no existe, crear wrapper en BLL
-
+            string insertado = fbll.InsertarFamiliaRol_013AL(idRol, permisoSeleccionado.Cod_013AL); 
             if (insertado == "OK")
             {
-                // Guardar en memoria y refrescar vista
                 RolConfigurado.AgregarHijo_013AL(permisoSeleccionado);
                 MostrarRolEnTreeView(RolConfigurado);
-                MessageBox.Show("Permiso/familia agregado al rol correctamente.");
+                MessageBox.Show("Permiso agregado al rol correctamente.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "Permiso agregado al rol correctamente.", 3);
             }
             else
             {
-                MessageBox.Show("No se pudo agregar el permiso/familia. Puede que ya exista la relación.");
+                MessageBox.Show("No se pudo agregar el permiso. Puede que ya exista la relación.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "No se pudo agregar el permiso al rol", 3);
             }
         }
 
@@ -107,7 +105,6 @@ namespace UI
         {
             treeViewRol.Nodes.Clear();
 
-            // Asegurarse de que el rol tenga toda su estructura cargada antes de mostrar
             CargarHijosDesdeBDRecursivoParaRol(rol);
 
             TreeNode nodoRaiz = new TreeNode($"{rol.Nombre_013AL} ({rol.Cod_013AL})")
@@ -142,14 +139,11 @@ namespace UI
         }
 
 
-
-        // --- Cargar hijos del rol desde BD recursivamente (como en GestionarFamilias) ---
         private void CargarHijosDesdeBDRecursivoParaRol(Familia_013AL familia)
         {
             List<Rol_013AL> hijos = rbll.TraerListaHijos_013AL(familia.Cod_013AL);
             foreach (var hijo in hijos)
             {
-                // Evitar duplicados en memoria
                 if (!familia.ObtenerHijos_013AL().Any(h => h.Cod_013AL == hijo.Cod_013AL))
                     familia.AgregarHijo_013AL(hijo);
 
@@ -166,14 +160,12 @@ namespace UI
 
         private bool ExisteConflicto_013AL(Rol_013AL permisoSeleccionado)
         {
-            // Verificar si el componente ya está dentro del rol (en cualquier nivel)
             if (EstaEnFamiliaDelRol_013AL(permisoSeleccionado.Cod_013AL, RolConfigurado))
             {
                 MessageBox.Show($"El componente {permisoSeleccionado.Nombre_013AL} ya existe dentro del rol (en otra familia).");
                 return true;
             }
 
-            // Si el seleccionado es una familia, verificar sus hijos también
             if (permisoSeleccionado is Familia_013AL familiaSeleccionada)
             {
                 List<Rol_013AL> hijos = rbll.TraerListaHijos_013AL(familiaSeleccionada.Cod_013AL);
@@ -270,7 +262,6 @@ namespace UI
                 MessageBox.Show("El ID del permiso no es un número válido.");
                 return null;
             }
-            //int id = int.Parse(partes[0].Trim());
             string nombre = partes[1].Trim();
             string tipo = partes[2].Trim();
             Rol_013AL componenteSeleccionado;
@@ -291,11 +282,9 @@ namespace UI
                 return;
             }
 
-            // obtener id de rol
             string[] partesRol = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
             int idRol = int.Parse(partesRol[0].Trim());
 
-            // comprobar si seleccionó en listBoxPermisos
             if (listBoxFamilias.SelectedItems.Count == 0)
             {
                 MessageBox.Show("Seleccione una familia para agregar");
@@ -307,22 +296,26 @@ namespace UI
 
             if (ExisteConflicto_013AL(permisoSeleccionado))
             {
-                // Los mensajes de conflicto los maneja ExisteConflicto_
                 return;
             }
 
-            // Intentar insertar en BD: usá el método BLL que tengas (en tu código principal usabas InsertarFamiliaRol_013AL en btnAplicar)
-            string insertado = fbll.InsertarFamiliaRol_013AL(idRol, permisoSeleccionado.Cod_013AL); // si no existe, crear wrapper en BLL
+            
+            string insertado = fbll.InsertarFamiliaRol_013AL(idRol, permisoSeleccionado.Cod_013AL);
 
             if (insertado == "OK")
             {
                 RolConfigurado.AgregarHijo_013AL(permisoSeleccionado);
                 MostrarRolEnTreeView(RolConfigurado);
-                MessageBox.Show("Permiso/familia agregado al rol correctamente.");
+                MessageBox.Show("Familia agregado al rol correctamente.");
+
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "Permiso/familia agregado al rol correctamente.", 3);
             }
             else
             {
-                MessageBox.Show("No se pudo agregar el permiso/familia. Puede que ya exista la relación.");
+                MessageBox.Show("No se pudo agregar el familia. Puede que ya exista la relación.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "No se pudo agregar el familia al rol.", 3);
             }
         }
 
@@ -350,20 +343,23 @@ namespace UI
                 return;
             }
 
-            // Pregunta confirmación
             DialogResult dr = MessageBox.Show($"¿Eliminar {permisoSeleccionado.Nombre_013AL} del rol?", "Confirmar", MessageBoxButtons.YesNo);
             if (dr != DialogResult.Yes) return;
 
-            bool eliminado = rbll.EliminarPermisoRol_013AL(idRol, permisoSeleccionado.Cod_013AL); // ya existe en BLL/DAL
+            bool eliminado = rbll.EliminarPermisoRol_013AL(idRol, permisoSeleccionado.Cod_013AL); 
             if (eliminado)
             {
                 RolConfigurado.QuitarHijo_013AL(permisoSeleccionado);
                 MostrarRolEnTreeView(RolConfigurado);
                 MessageBox.Show("Eliminado correctamente del rol.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "Permiso/familia eliminado correctamente del rol.", 3);
             }
             else
             {
                 MessageBox.Show("No se pudo eliminar la relación en la BD.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "No se pudo eliminar Permiso/familia del rol.", 3);
             }
         }
 
@@ -394,9 +390,20 @@ namespace UI
                 return;
             }
 
-            int respuesta = rbll.CrearRol_013AL(nombreRol);
-            MessageBox.Show("Rol creado con éxito.");
-            ActualizarComboBox_013AL();
+            try
+            {
+                int respuesta = rbll.CrearRol_013AL(nombreRol);
+                MessageBox.Show("Rol creado con éxito.");
+                ActualizarComboBox_013AL();
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "Se creó nuevo rol", 3);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al crear el rol: {ex.Message}");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", $"Error al crear rol {ex.Message}", 3);
+            }
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -416,9 +423,20 @@ namespace UI
                 DialogResult resultado = MessageBox.Show("¿Está seguro de que desea eliminar este rol?", "Confirmación", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (resultado == DialogResult.Yes)
                 {
-                    rbll.EliminarRol_013AL(idRol);
-                    MessageBox.Show("Rol eliminado correctamente.");
-                    ActualizarComboBox_013AL();
+                    try
+                    {
+                        rbll.EliminarRol_013AL(idRol);
+                        MessageBox.Show("Rol eliminado correctamente.");
+                        ActualizarComboBox_013AL();
+
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", $"Se eliminó rol: {cmbRoles.Text} ", 3);
+                    }
+                    catch(Exception ex) { 
+                        MessageBox.Show($"Error al eliminar el rol: {ex.Message}");
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", $"Error al eliminar rol {cmbRoles.Text}: {ex.Message}", 3);
+                    }
                 }
             }
             else
@@ -434,7 +452,7 @@ namespace UI
                 string[] partes = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                 int id = int.Parse(partes[0].Trim());
                 string nombreActual = partes[1].Trim();
-                string nuevoNombre = txtNombreRol.Text.Trim(); 
+                string nuevoNombre = txtNombreRol.Text.Trim();
 
                 if (string.IsNullOrEmpty(nuevoNombre))
                 {
@@ -442,11 +460,23 @@ namespace UI
                     return;
                 }
 
-                string resultado = rbll.ModificarRol_013AL(id, nuevoNombre);
+                try
+                {
+                    string resultado = rbll.ModificarRol_013AL(id, nuevoNombre);
 
-                MessageBox.Show(resultado);
+                    MessageBox.Show(resultado);
 
-                ActualizarComboBox_013AL();
+                    ActualizarComboBox_013AL();
+
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", $"Se modifico el rol {cmbRoles.Text} por {nuevoNombre}", 3);
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error al modificar el rol: {ex.Message}");
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", $"Error al modificar el rol {cmbRoles.Text}: {ex.Message}", 3);
+                }
             }
             else
             {
@@ -458,7 +488,7 @@ namespace UI
         {
             if (cmbRoles.SelectedItem != null)
             {
-                RolConfigurado = new Familia_013AL(); // reset
+                RolConfigurado = new Familia_013AL(); 
                 string[] partes = cmbRoles.SelectedItem.ToString().Split(new char[] { '-' }, StringSplitOptions.RemoveEmptyEntries);
                 int id = int.Parse(partes[0].Trim());
                 string nombre = partes[1].Trim();
@@ -466,22 +496,18 @@ namespace UI
                 RolConfigurado.Cod_013AL = id;
                 RolConfigurado.Nombre_013AL = nombre;
 
-                // Traer los permisos/familias raíz asignados al rol (solo primer nivel)
                 List<Rol_013AL> lista = rbll.TraerListaPermisosRol_013AL(RolConfigurado.Cod_013AL);
 
-                // Limpiar y poblar la estructura en memoria recursivamente
                 RolConfigurado.ObtenerHijos_013AL().Clear();
                 foreach (var permiso in lista)
                 {
                     RolConfigurado.AgregarHijo_013AL(permiso);
-                    // si es familia, cargar sus hijos recursivamente desde BD
                     if (permiso is Familia_013AL fam)
                     {
                         CargarHijosDesdeBDRecursivoParaRol(fam);
                     }
                 }
 
-                // Mostrar el rol completo en treeView
                 MostrarRolEnTreeView(RolConfigurado);
             }
         

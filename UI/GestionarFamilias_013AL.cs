@@ -1,6 +1,9 @@
-﻿using BE_013AL.Composite;
+﻿using BE_013AL;
+using BE_013AL.Composite;
 using BLL;
 using BLL_013AL;
+using Microsoft.VisualBasic.ApplicationServices;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -22,6 +25,8 @@ namespace UI
         PermisoBLL_013AL pbll = new PermisoBLL_013AL();
         FamiliaBLL_013AL fbll = new FamiliaBLL_013AL();
         RolBLL_013AL rbll = new RolBLL_013AL();
+        EventoBLL_013AL bll = new EventoBLL_013AL();
+        Usuarios_013AL user;
 
         private Familia_013AL FamiliaConfigurada = new Familia_013AL();
         private void GestionarFamilias_Load(object sender, EventArgs e)
@@ -238,6 +243,8 @@ namespace UI
             if (componenteSeleccionado is Familia_013AL fam && fam.Cod_013AL == familiaSeleccionada.Cod_013AL)
             {
                 MessageBox.Show("No puedes agregar una familia dentro de sí misma.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "No se puede agregar una familia dentro de sí misma.", 3);
                 return;
             }
 
@@ -249,6 +256,9 @@ namespace UI
                 if (permisosFamiliaNueva.Intersect(permisosFamiliaDestino).Any())
                 {
                     MessageBox.Show("No se puede agregar esta familia porque contiene permisos que ya existen en la familia destino o sus subfamilias.");
+
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "No se pudo agregar la familia porque contiene permisos que ya existen en la familia destino o sus subfamilias.", 3);
                     return;
                 }
             }
@@ -260,6 +270,9 @@ namespace UI
             if (ExisteEnJerarquia(familiaRaiz, componenteSeleccionado.Cod_013AL))
             {
                 MessageBox.Show("Este componente ya existe en otra familia dentro de la jerarquía.");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "El componente ya existe en otra familia dentro de la jerarquía.", 3);
+
                 return;
             }
 
@@ -273,7 +286,10 @@ namespace UI
                 {
                     familiaSeleccionada.AgregarHijo_013AL(componenteSeleccionado);
                     MostrarFamiliaEnTreeView(familiaSeleccionada);
-                    MessageBox.Show("Componente agregado correctamente a la familia.");
+                    MessageBox.Show("Componente agregado correctamente a la familia."); 
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "Componente agregado correctamente a la familia.", 3);
+
                 }
                 else
                 {
@@ -283,6 +299,9 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Error al agregar componente: " + ex.Message);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", $"Error al agregar el componente a la familia. {ex.Message}", 3);
+
             }
         }
 
@@ -338,10 +357,16 @@ namespace UI
                 familiaSeleccionada.ObtenerHijos_013AL().Clear();
                 CargarHijosDesdeBDRecursivo(familiaSeleccionada);
                 MostrarFamiliaEnTreeView(familiaSeleccionada);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "Se quito el componente de la familia.", 3);
+
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al quitar el componente: " + ex.Message);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", $"Error al quitar el componente. {ex.Message}", 3);
+
             }
         }
 
@@ -405,10 +430,20 @@ namespace UI
                 MessageBox.Show("El nombre de la familia ya existe. Escriba un nombre diferente.");
                 return;
             }
-
-            int respuesta = fbll.CrearFamilia_013AL(nombreFamilia);
-            MessageBox.Show("Familia creada con éxito.");
-            ActualizarComboBox_013AL();
+            try
+            {
+                int respuesta = fbll.CrearFamilia_013AL(nombreFamilia);
+                MessageBox.Show("Familia creada con éxito.");
+                ActualizarComboBox_013AL();
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "La familia se creó correctamente.", 3);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al crear la familia: " + ex.Message);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "No se pudo agregar la familia.", 3);
+            }
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)
@@ -421,9 +456,15 @@ namespace UI
                 string respuesta = fbll.EliminarFamilia_013AL(idFamilia);
                 MessageBox.Show(respuesta);
 
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "Familia eliminada correctamente.", 3);
+
                 if (!respuesta.Contains("No se puede eliminar"))
                 {
                     ActualizarComboBox_013AL();
+
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bll.AgregarEvento_013AL(user.Login_013AL, "Gestor Perfiles", "No se pudo eliminar familia.", 3);
                 }
             }
             else
@@ -452,10 +493,22 @@ namespace UI
             }
 
             Familia_013AL familiaModificada = new Familia_013AL { Cod_013AL = idFamilia, Nombre_013AL = nuevoNombre };
+            try { 
             fbll.ModificarFamilia_013AL(familiaModificada);
 
             MessageBox.Show("Familia modificada con éxito.");
             ActualizarComboBox_013AL();
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "La familia se modifico correctamente", 3);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al modificar la familia: " + ex.Message);
+
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Familias", "Error al modificar la familia", 3);
+            }
+
         }
 
     }

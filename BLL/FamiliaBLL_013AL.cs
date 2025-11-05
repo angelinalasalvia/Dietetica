@@ -80,10 +80,6 @@ namespace BLL
             }
             return dal.EliminarFamilia_013AL(id);
         }
-        /*public string Eliminarfamiliarol_013AL(int rol, int fam)
-        {
-            return dal.Eliminarfamiliarol_013AL(rol, fam);
-        }*/
         public bool FamiliaTieneRelaciones_013AL(int idFamilia)
         {
             return dal.FamiliaTieneRelaciones_013AL(idFamilia);

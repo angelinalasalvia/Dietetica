@@ -17,10 +17,6 @@ namespace BE_013AL.Composite
 
         public abstract List<Rol_013AL> ObtenerHijos_013AL();
 
-        /*public override string ToString()
-        {
-            return Nombre; 
-        }*/
         public override string ToString()
         {
             return $"{Cod_013AL} - {Nombre_013AL} - {Tipo_013AL}";

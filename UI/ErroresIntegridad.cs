@@ -1,6 +1,9 @@
 ﻿using BE;
+using BE_013AL;
 using BLL;
+using BLL_013AL;
 using Servicios;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +20,8 @@ namespace UI
     {
         List<ErrorIntegridad_013AL> ListaErrores;
         FacturaBLL_013AL fbll = new FacturaBLL_013AL();
+        Usuarios_013AL user;
+        EventoBLL_013AL bll = new EventoBLL_013AL();
         public ErroresIntegridad(List<ErrorIntegridad_013AL> errores)
         {
             InitializeComponent();
@@ -42,12 +47,16 @@ namespace UI
             if (nuevosErrores.Count == 0)
             {
                 MessageBox.Show("Integridad restaurada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                //user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL("Administrador", "Errores Integridad", "Se actualizaron los digitos verificadores de la tabla Factura-013AL", 4);
                 this.Close();
             }
             else
             {
                 MessageBox.Show("Persisten errores de integridad. Revise los datos manualmente.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 dataGridView1.DataSource = nuevosErrores;
+                //user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL("Administrador", "Errores Integridad", "Persisten errores de integridad de la tabla Factura-013AL", 5);
             }
         }
 

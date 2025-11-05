@@ -1,5 +1,9 @@
 ﻿using BE;
+using BE_013AL;
 using BLL;
+using BLL_013AL;
+using Microsoft.VisualBasic.ApplicationServices;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +13,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using Servicios_013AL;
 
 namespace UI
 {
@@ -18,7 +21,8 @@ namespace UI
         private readonly IdiomaBLL_013AL idiomaBLL = new IdiomaBLL_013AL();
         private readonly TraduccionBLL_013AL traduccionBLL = new TraduccionBLL_013AL();
         private readonly LanguageManager_013AL languageManager = LanguageManager_013AL.ObtenerInstancia_013AL();
-
+        Usuarios_013AL user;
+        EventoBLL_013AL bll = new EventoBLL_013AL();
         public GestionarIdiomas_013AL()
         {
             InitializeComponent();
@@ -54,10 +58,14 @@ namespace UI
                 idiomaBLL.CrearIdiomaConTraducciones(nuevo);
                 MessageBox.Show("Idioma creado con éxito.");
                 CargarIdiomas();
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Idiomas", "Se creó nuevo idioma", 3);
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error: {ex.Message}");
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Idiomas", "Error al crear nuevo idioma", 3);
             }
         }
 
@@ -82,7 +90,6 @@ namespace UI
         {
             var traducciones = traduccionBLL.ObtenerPorIdioma(idIdioma);
 
-            // Crear una tabla editable
             DataTable dt = new DataTable();
             dt.Columns.Add("IdTraduccion", typeof(int));
             dt.Columns.Add("Etiqueta", typeof(string));
@@ -95,12 +102,10 @@ namespace UI
 
             dataGridView1.DataSource = dt;
 
-            // Configurar columnas
             dataGridView1.Columns["IdTraduccion"].Visible = false;
             dataGridView1.Columns["Etiqueta"].ReadOnly = true;
             dataGridView1.Columns["Traduccion"].ReadOnly = false;
 
-            // Permitir edición
             dataGridView1.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
@@ -111,7 +116,6 @@ namespace UI
         {
             try
             {
-                // Solo procesar si la columna editada es “Traduccion”
                 if (dataGridView1.Columns[e.ColumnIndex].Name == "Traduccion")
                 {
                     var fila = dataGridView1.Rows[e.RowIndex];
@@ -128,11 +132,16 @@ namespace UI
                         languageManager.CargarIdioma_013AL();
                         languageManager.Notificar_013AL();
                     }
+
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Idiomas", $"Se actualizo la traducción del idioma {comboBox1.Text}", 3);
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error al actualizar traducción: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                bll.AgregarEvento_013AL(user.Login_013AL, "Gestionar Idiomas", $"Error al actualizar traducción del idioma {comboBox1.Text}", 3);
             }
         }
     }

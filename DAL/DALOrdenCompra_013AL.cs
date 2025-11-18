@@ -67,7 +67,7 @@ namespace DAL
                             Lista.Add(new OrdenCompra_013AL()
                             {
                                 CodOrdenCompra_013AL = Convert.ToInt32(dr["CodOrdenCompra-013AL"].ToString()),
-                                CodSolicitud_013AL = Convert.ToInt32(dr["IdSolicitud-013AL"].ToString()),
+                                CodSolicitud_013AL = Convert.ToInt32(dr["CodSolicitud-013AL"].ToString()),
                                 CUITProveedor_013AL = Convert.ToInt32(dr["CUITProveedor-013AL"].ToString()),
                                 Fecha_013AL = Convert.ToDateTime(dr["Fecha-013AL"].ToString()),
                                 Total_013AL = Convert.ToInt32(dr["Total-013AL"].ToString())
@@ -127,13 +127,21 @@ namespace DAL
         public DataTable ListarOrdenesCompra_013AL()
         {
             DataTable dt = new DataTable();
+
             using (SqlConnection con = conexion.ObtenerConexion())
             {
-                SqlDataAdapter da = new SqlDataAdapter(com);
-                da.Fill(dt);
+                using (SqlCommand com = new SqlCommand("SELECT * FROM [OrdenCompra-013AL]", con))
+                {
+                    com.CommandType = CommandType.Text; // O CommandType.StoredProcedure
+
+                    SqlDataAdapter da = new SqlDataAdapter(com);
+                    da.Fill(dt);
+                }
             }
+
             return dt;
         }
+
         public DataTable ObtenerProductosPorOrden_013AL(int codOrdenCompra)
         {
             using (SqlConnection con = conexion.ObtenerConexion())

@@ -265,7 +265,7 @@ namespace DAL
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    SqlCommand com = new SqlCommand("[ModificarProducto_013AL]", con);
+                    SqlCommand com = new SqlCommand("[ModificarProducto-013AL]", con);
                     com.CommandType = CommandType.StoredProcedure;
                     com.Parameters.Add("@id", SqlDbType.Int).Value = obj.CodProducto_013AL;
                     com.Parameters.Add("@nombre", SqlDbType.NVarChar).Value = obj.Nombre_013AL;

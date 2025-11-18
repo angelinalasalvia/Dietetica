@@ -47,7 +47,11 @@ namespace UI
 
         public void ActualizarIdioma_013AL()
         {
-            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
+            var lm = LanguageManager_013AL.ObtenerInstancia_013AL();
+            lm.CambiarIdiomaControles_013AL(this);
+
+            lm.CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
+            lm.CambiarIdiomaColumnas_013AL(dataGridView2, this.Name);
         }
         private int? compraId;
         private bool facturaCobrada = false;
@@ -102,8 +106,10 @@ namespace UI
                 else
                 {
                     dataGridView2.DataSource = new List<Cliente_013AL> { cliente };
+                    LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView2, this.Name);
                     MessageBox.Show("¡Cliente encontrado!" + cliente.Nombre_013AL + " " + cliente.Apellido_013AL, "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                     btnCobrar.Enabled = true; // sólo ahora se habilita el cobro
+                    
                 }
             }
             catch (Exception ex)
@@ -156,7 +162,10 @@ namespace UI
                 dataGridView1.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Precio Unitario", DataPropertyName = "PrecioUnitario_013AL", Name = "PrecioUnitario_013AL" });
                 dataGridView1.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Subtotal", DataPropertyName = "Subtotal_013AL", Name = "Subtotal_013AL" });
 
+                
                 dataGridView1.DataSource = listaFinal;
+
+                LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
 
                 decimal total = listaFinal.Sum(p => p.Subtotal_013AL);
                 txtTotal.Text = total.ToString();
@@ -249,6 +258,8 @@ namespace UI
                 {
                    
                     dataGridView1.DataSource = compraProductos;
+                    LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
+
 
                 GenerarFacturaPDF_013AL(compraCliente, compraProductos, numeroTarjeta);
                 }
@@ -382,6 +393,8 @@ namespace UI
                         dataGridView1.Columns.Add(new DataGridViewTextBoxColumn() { HeaderText = "Subtotal", DataPropertyName = "Subtotal_013AL", Name = "Subtotal_013AL" });
 
                         dataGridView1.DataSource = carritoTemporal;
+                        LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
+
 
                         // Actualizar total
                         decimal total = carritoTemporal.Sum(p => p.Subtotal_013AL);

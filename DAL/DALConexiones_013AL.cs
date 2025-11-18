@@ -25,7 +25,7 @@ namespace DAL_013AL
         SqlCommand com;*/
 
         private readonly string connectionString =
-            @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dietética;Integrated Security=True";
+            @"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietética;Integrated Security=True";
 
         public SqlConnection ObtenerConexion()
         {

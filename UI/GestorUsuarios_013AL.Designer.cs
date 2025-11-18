@@ -229,9 +229,9 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(54, 239);
+            this.textBox1.Location = new System.Drawing.Point(71, 239);
             this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(177, 20);
+            this.textBox1.Size = new System.Drawing.Size(160, 20);
             this.textBox1.TabIndex = 19;
             // 
             // textBox2
@@ -257,9 +257,9 @@
             // 
             // textBox6
             // 
-            this.textBox6.Location = new System.Drawing.Point(45, 361);
+            this.textBox6.Location = new System.Drawing.Point(71, 361);
             this.textBox6.Name = "textBox6";
-            this.textBox6.Size = new System.Drawing.Size(186, 20);
+            this.textBox6.Size = new System.Drawing.Size(160, 20);
             this.textBox6.TabIndex = 24;
             // 
             // textBox7
@@ -305,9 +305,9 @@
             // cborol
             // 
             this.cborol.FormattingEnabled = true;
-            this.cborol.Location = new System.Drawing.Point(45, 337);
+            this.cborol.Location = new System.Drawing.Point(71, 337);
             this.cborol.Name = "cborol";
-            this.cborol.Size = new System.Drawing.Size(186, 21);
+            this.cborol.Size = new System.Drawing.Size(160, 21);
             this.cborol.TabIndex = 33;
             // 
             // checkBox1

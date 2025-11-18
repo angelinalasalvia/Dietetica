@@ -37,6 +37,7 @@ namespace UI
         public void ActualizarIdioma_013AL()
         {
             LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -203,6 +204,10 @@ namespace UI
                 txtNumUsers.Text = contador.ToString();
 
                 radioButton2.Checked = true;
+
+
+                LanguageManager_013AL.ObtenerInstancia_013AL()
+                    .CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
             }
         }
 
@@ -218,7 +223,10 @@ namespace UI
                 AgregarNombresDeRol(dsUsuariosBD, roles);
 
 
-                dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];      
+                dataGridView1.DataSource = dsUsuariosBD.Tables["Usuario"];
+
+                LanguageManager_013AL.ObtenerInstancia_013AL()
+                    .CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
             }
             catch (Exception ex)
             {
@@ -251,6 +259,7 @@ namespace UI
 
                             MessageBox.Show("El usuario fue desbloqueado con éxito. Presione 'Guardar' para aplicar los cambios definitivamente.", "Información", MessageBoxButtons.OK, MessageBoxIcon.Information);
                             bool mostrarActivos = radioButton1.Checked;
+
                             if (mostrarActivos)
                             {
                                 radioButton1.Checked = true;
@@ -259,6 +268,7 @@ namespace UI
                             {
                                 radioButton2.Checked = true;
                             }
+
                         }
                         else
                         {

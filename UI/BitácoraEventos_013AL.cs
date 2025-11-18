@@ -29,6 +29,7 @@ namespace UI
         public void ActualizarIdioma_013AL()
         {
             LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
@@ -44,6 +45,7 @@ namespace UI
         private void ListarEventos_013AL()
         {
             dataGridView1.DataSource = bll.ListarEventos_013AL();
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
         }
 
         private void BitácoraEventos_Load(object sender, EventArgs e)
@@ -66,7 +68,8 @@ namespace UI
             string.IsNullOrEmpty(textBox8.Text) ? (int?)null : Convert.ToInt32(textBox8.Text) 
             );
 
-            
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -78,7 +81,8 @@ namespace UI
             textBox8.Text = "";
             dateTimePicker1.Text = "";
             dateTimePicker2.Text = "";
-            
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
+
         }
         private void dataGridView1_SelectionChanged(object sender, EventArgs e)
         {

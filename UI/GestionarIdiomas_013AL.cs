@@ -72,6 +72,7 @@ namespace UI
         public void ActualizarIdioma_013AL()
         {
             languageManager.CambiarIdiomaControles_013AL(this);
+            languageManager.CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -109,6 +110,8 @@ namespace UI
             dataGridView1.EditMode = DataGridViewEditMode.EditOnKeystrokeOrF2;
             dataGridView1.AllowUserToAddRows = false;
             dataGridView1.AllowUserToDeleteRows = false;
+
+            languageManager.CambiarIdiomaColumnas_013AL(dataGridView1, this.Name);
         }
 
 

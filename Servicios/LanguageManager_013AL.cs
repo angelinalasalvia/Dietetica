@@ -121,4 +121,19 @@ public class LanguageManager_013AL : ISubject_013AL
             }
         }
     }
+
+    public void CambiarIdiomaColumnas_013AL(DataGridView dgv, string nombreFormulario)
+    {
+        foreach (DataGridViewColumn col in dgv.Columns)
+        {
+            string clave = $"{nombreFormulario}.{col.Name}";
+            string traduccion = ObtenerTexto_013AL(clave);
+
+            if (!string.IsNullOrEmpty(traduccion))
+            {
+                col.HeaderText = traduccion;
+            }
+        }
+    }
+
 }

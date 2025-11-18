@@ -44,30 +44,30 @@ namespace UI
 
                 foreach (DataGridViewRow row in dataGridView1.Rows)
                 {
-                    if (row.Cells["imagen"].Value != DBNull.Value && row.Cells["imagen"].Value != null)
+                    if (row.Cells["Imagen-013AL"].Value != DBNull.Value && row.Cells["Imagen-013AL"].Value != null)
                     {
-                        if (row.Cells["imagen"].Value is byte[] imagenBytes && imagenBytes.Length > 0)
+                        if (row.Cells["Imagen-013AL"].Value is byte[] imagenBytes && imagenBytes.Length > 0)
                         {
                             using (MemoryStream ms = new MemoryStream(imagenBytes))
                             {
-                                row.Cells["imagen"].Value = Image.FromStream(ms);
+                                row.Cells["Imagen-013AL"].Value = Image.FromStream(ms);
                             }
                         }
                         else
                         {
-                            row.Cells["imagen"].Value = null;
+                            row.Cells["Imagen-013AL"].Value = null;
                         }
                     }
                     else
                     {
-                        row.Cells["imagen"].Value = null;
+                        row.Cells["Imagen-013AL"].Value = null;
                     }
                 }
 
                 dataGridView1.RowTemplate.Height = 150;
-                dataGridView1.Columns["imagen"].Width = 150;
+                dataGridView1.Columns["Imagen-013AL"].Width = 150;
 
-                DataGridViewImageColumn imageColumn = (DataGridViewImageColumn)dataGridView1.Columns["imagen"];
+                DataGridViewImageColumn imageColumn = (DataGridViewImageColumn)dataGridView1.Columns["Imagen-013AL"];
                 imageColumn.ImageLayout = DataGridViewImageCellLayout.Zoom;
 
                 dataGridView1.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
@@ -88,8 +88,8 @@ namespace UI
             if (dataGridView1.SelectedRows.Count > 0)
             {
                 // Obtener el ID del producto seleccionado y el stock actual
-                int idProducto = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Id"].Value);
-                int stockActual = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Stock"].Value);
+                int idProducto = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["CodProducto-013AL"].Value);
+                int stockActual = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["Stock-013AL"].Value);
 
                 // Obtener la cantidad ingresada en textBox1
                 if (int.TryParse(textBox1.Text, out int cantidadIngresada))

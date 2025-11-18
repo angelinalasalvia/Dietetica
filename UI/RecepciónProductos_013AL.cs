@@ -61,8 +61,8 @@ namespace UI
         {
             dtOrdenesCompra = bll.ListarOrdenesCompra_013AL();
             comboBoxOrdenesCompra.DataSource = dtOrdenesCompra;
-            comboBoxOrdenesCompra.DisplayMember = "CodOrdenCompra";
-            comboBoxOrdenesCompra.ValueMember = "CodOrdenCompra";
+            comboBoxOrdenesCompra.DisplayMember = "CodOrdenCompra-013AL";
+            comboBoxOrdenesCompra.ValueMember = "CodOrdenCompra-013AL";
         }
 
         /*private void comboBoxOrdenesCompra_SelectedIndexChanged(object sender, EventArgs e)

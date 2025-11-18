@@ -63,7 +63,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AESCrypto_013AL.cs" />
-    <Compile Include="BackUpRestore_013AL.cs" />
     <Compile Include="Eventos.cs" />
     <Compile Include="HashHelper_013AL.cs" />
     <Compile Include="IObserver_013AL.cs" />

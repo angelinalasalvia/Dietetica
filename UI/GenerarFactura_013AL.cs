@@ -19,9 +19,6 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml.Linq;
 
-
-
-
 namespace UI
 {
     public partial class GenerarFactura_013AL : Form, IObserver_013AL

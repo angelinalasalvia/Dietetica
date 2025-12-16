@@ -42,10 +42,16 @@ namespace UI
             */
             if (imagenBytes != null)
             {
-                // Llamar al método para agregar el producto
+                int stock;
+                if (!int.TryParse(txtstock.Text, out stock) || stock < 0)
+                {
+                    MessageBox.Show("El stock no puede ser negativo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
+                }
+
                 string respuesta = bll.AgregarProducto_013AL(
                     txtnombre.Text,
-                    Convert.ToInt32(txtstock.Text),
+                    stock,
                     Convert.ToInt32(txtprecio.Text),
                     imagenBytes, 
                     txtdesc.Text
@@ -165,11 +171,17 @@ namespace UI
                 // Verificar que la imagen no sea nula
                 if (imagenBytes != null)
                 {
+                    int stock;
+                    if (!int.TryParse(txtstock.Text, out stock) || stock < 0)
+                    {
+                        MessageBox.Show("El stock no puede ser negativo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return;
+                    }
                     // Llamar al método para modificar el producto
                     string respuesta = bll.ModificarProducto_013AL(
                         idProducto, // Pasar el ID del producto
                         txtnombre.Text,
-                        Convert.ToInt32(txtstock.Text),
+                        stock,
                         Convert.ToInt32(txtprecio.Text),
                         imagenBytes,
                         txtdesc.Text

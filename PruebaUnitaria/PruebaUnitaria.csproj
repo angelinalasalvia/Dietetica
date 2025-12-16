@@ -1,0 +1,17 @@
+<Project Sdk="MSTest.Sdk/3.6.4">
+
+  <PropertyGroup>
+    <TargetFramework>net472</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UseVSTest>true</UseVSTest>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\BE\BE_013AL.csproj" />
+    <ProjectReference Include="..\BLL\BLL_013AL.csproj" />
+    <ProjectReference Include="..\DAL\DAL_013AL.csproj" />
+  </ItemGroup>
+
+</Project>

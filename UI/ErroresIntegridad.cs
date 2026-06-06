@@ -19,7 +19,7 @@ namespace UI
     public partial class ErroresIntegridad : Form
     {
         List<ErrorIntegridad_013AL> ListaErrores;
-        FacturaBLL_013AL fbll = new FacturaBLL_013AL();
+        PedidoBLL_013AL fbll = new PedidoBLL_013AL();
         Usuarios_013AL user;
         EventoBLL_013AL bll = new EventoBLL_013AL();
         public ErroresIntegridad(List<ErrorIntegridad_013AL> errores)
@@ -35,7 +35,7 @@ namespace UI
 
         private void button1_Click(object sender, EventArgs e)
         {
-            var tablas = new List<string> { "Factura-013AL" };
+            var tablas = new List<string> { "Pedido-013AL" };
             foreach (string tabla in tablas)
             {
                 fbll.ActualizarDVH(tabla);
@@ -48,7 +48,7 @@ namespace UI
             {
                 MessageBox.Show("Integridad restaurada correctamente.", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 //user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bll.AgregarEvento_013AL("Administrador", "Errores Integridad", "Se actualizaron los digitos verificadores de la tabla Factura-013AL", 4);
+                bll.AgregarEvento_013AL("Administrador", "Errores Integridad", "Se actualizaron los digitos verificadores de la tabla Pedido-013AL", 4);
                 this.Close();
             }
             else
@@ -56,7 +56,7 @@ namespace UI
                 MessageBox.Show("Persisten errores de integridad. Revise los datos manualmente.", "Advertencia", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 dataGridView1.DataSource = nuevosErrores;
                 //user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bll.AgregarEvento_013AL("Administrador", "Errores Integridad", "Persisten errores de integridad de la tabla Factura-013AL", 5);
+                bll.AgregarEvento_013AL("Administrador", "Errores Integridad", "Persisten errores de integridad de la tabla Pedido-013AL", 5);
             }
         }
 

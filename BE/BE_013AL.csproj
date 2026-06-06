@@ -66,7 +66,7 @@
     <Compile Include="Composite_013AL\Rol_013AL.cs" />
     <Compile Include="ErrorIntegridad_013AL.cs" />
     <Compile Include="Etiqueta_013AL.cs" />
-    <Compile Include="Factura_013AL.cs" />
+    <Compile Include="Pedido_013AL.cs" />
     <Compile Include="Detalle_013AL.cs" />
     <Compile Include="DetalleSolicitudC_013AL.cs" />
     <Compile Include="Idioma_013AL.cs" />

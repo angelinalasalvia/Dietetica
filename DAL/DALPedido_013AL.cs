@@ -12,20 +12,201 @@ using System.Threading.Tasks;
 
 namespace DAL
 {
-    public class DALFactura_013AL
+    public class DALPedido_013AL
     {
         private readonly DALConexiones_013AL conexion = new DALConexiones_013AL();
         SqlCommand com;
 
         
-        public List<Factura_013AL> ListarFactura_013AL()
+        public string CrearPedido_013AL(Pedido_013AL pedido)
         {
-            List<Factura_013AL> Lista = new List<Factura_013AL>();
             try
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    string query = "Select [CodCompra-013AL], [CUILCliente-013AL], [Fecha-013AL], [Total-013AL], [IVA-013AL], [MetodoPago-013AL] from [Factura-013AL]";
+                    con.Open();
+
+                    using (SqlTransaction transaction = con.BeginTransaction())
+                    {
+                        try
+                        {
+                            string insert = @"
+                            INSERT INTO [Pedido-013AL]
+                            (
+                                [CodCompra-013AL],
+                                [Fecha-013AL],
+                                [Estado-013AL]
+                            )
+                            VALUES
+                            (
+                                @cod,
+                                @fecha,
+                                @estado
+                            )";
+
+                            using (SqlCommand cmd = new SqlCommand(insert, con, transaction))
+                            {
+                                cmd.Parameters.AddWithValue("@cod", pedido.CodCompra_013AL);
+                                cmd.Parameters.AddWithValue("@fecha", pedido.Fecha_013AL);
+                                cmd.Parameters.AddWithValue("@estado", pedido.Estado_013AL);
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+
+                            DataTable dt = new DataTable();
+
+                            string consulta = @"
+                            SELECT * 
+                            FROM [Pedido-013AL]
+                            WHERE [CodCompra-013AL] = @id";
+
+                            using (SqlCommand cmdSelect = new SqlCommand(consulta, con, transaction))
+                            {
+                                cmdSelect.Parameters.AddWithValue("@id", pedido.CodCompra_013AL);
+
+                                using (SqlDataAdapter da = new SqlDataAdapter(cmdSelect))
+                                {
+                                    da.Fill(dt);
+                                }
+                            }
+
+                            if (dt.Rows.Count == 1)
+                            {
+                                DataRow row = dt.Rows[0];
+
+                                StringBuilder cadena = new StringBuilder();
+
+                                foreach (DataColumn col in dt.Columns)
+                                {
+                                    if (col.ColumnName.Equals("DigitoHorizontal-013AL", StringComparison.OrdinalIgnoreCase))
+                                        continue;
+
+                                    if (row[col] != DBNull.Value)
+                                        cadena.Append(row[col].ToString() + "|");
+                                }
+
+                                string dvh = HashHelper_013AL.CalcularSHA256_013AL(cadena.ToString());
+
+
+                                string updateDVH = @"
+                                UPDATE [Pedido-013AL]
+                                SET [DigitoHorizontal-013AL] = @dvh
+                                WHERE [CodCompra-013AL] = @id";
+
+                                using (SqlCommand cmdDVH = new SqlCommand(updateDVH, con, transaction))
+                                {
+                                    cmdDVH.Parameters.AddWithValue("@dvh", dvh);
+                                    cmdDVH.Parameters.AddWithValue("@id", pedido.CodCompra_013AL);
+
+                                    cmdDVH.ExecuteNonQuery();
+                                }
+                            }
+
+
+                            transaction.Commit();
+
+
+                            ActualizarDVV("Pedido-013AL");
+
+                            return "Pedido registrado correctamente";
+                        }
+                        catch (Exception ex)
+                        {
+                            transaction.Rollback();
+                            throw new Exception("Error al crear pedido.", ex);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error general al crear pedido.", ex);
+            }
+        }
+
+        
+        public string AsignarClientePedido_013AL(int codCompra, int cuil)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    string query = @"
+                    UPDATE [Pedido-013AL]
+                    SET [CUILCliente-013AL] = @cuil
+                    WHERE [CodCompra-013AL] = @cod";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@cuil", cuil);
+                        cmd.Parameters.AddWithValue("@cod", codCompra);
+
+                        con.Open();
+
+                        int filas = cmd.ExecuteNonQuery();
+
+                        if (filas == 0)
+                        {
+                            return "No se encontró el pedido.";
+                        }
+                    }
+                }
+
+                ActualizarDVH("Pedido-013AL");
+                ActualizarDVV("Pedido-013AL");
+
+                return "Cliente asignado correctamente.";
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "DAL: Error al asignar cliente al pedido. " + ex.Message
+                );
+            }
+        }
+
+
+        public void ActualizarTotalPedido_013AL(int idCompra, decimal total)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    string query = @"
+            UPDATE [Pedido-013AL]
+            SET [Total-013AL] = @total
+            WHERE [CodCompra-013AL] = @id";
+
+                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    {
+                        cmd.Parameters.AddWithValue("@total", total);
+                        cmd.Parameters.AddWithValue("@id", idCompra);
+
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+
+
+                ActualizarDVH("Pedido-013AL");
+                ActualizarDVV("Pedido-013AL");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar total del pedido.", ex);
+            }
+        }
+
+
+        public List<Pedido_013AL> ListarPedido_013AL()
+        {
+            List<Pedido_013AL> Lista = new List<Pedido_013AL>();
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    string query = @"SELECT [CodCompra-013AL], [CUILCliente-013AL], [Fecha-013AL], [Estado-013AL], [Total-013AL], [MetodoPago-013AL], [DigitoHorizontal-013AL] FROM [Pedido-013AL]"; 
                     com = new SqlCommand(query, con);
                     com.CommandType = CommandType.Text;
                     con.Open();
@@ -34,14 +215,15 @@ namespace DAL
                     {
                         while (dr.Read())
                         {
-                            Lista.Add(new Factura_013AL()
+                            Lista.Add(new Pedido_013AL()
                             {
                                 CodCompra_013AL = Convert.ToInt32(dr["CodCompra-013AL"]),
                                 CUIL_013AL = Convert.ToInt32(dr["CUILCliente-013AL"]),
                                 Fecha_013AL = Convert.ToDateTime(dr["Fecha-013AL"]),
+                                Estado_013AL = Convert.ToString(dr["Estado-013AL"]),
                                 Total_013AL = Convert.ToInt32(dr["Total-013AL"]),
-                                IVA_013AL = Convert.ToInt32(dr["IVA-013AL"]),
-                                MetPago_013AL = Convert.ToString(dr["MetodoPago-013AL"])
+                                MetPago_013AL = Convert.ToString(dr["MetodoPago-013AL"]),
+                                DigitoHorizontal_013AL = Convert.ToString(dr["DigitoHorizontal-013AL"])
                             });
                         }
                     }
@@ -55,7 +237,7 @@ namespace DAL
         }
 
         
-        public string RegistrarVentaCompleta_013AL(Factura_013AL factura, List<Detalle_013AL> detalles)
+        /*public string RegistrarVentaCompleta_013AL(Pedido_013AL factura, List<Detalle_013AL> detalles)
         {
             try
             {
@@ -148,7 +330,7 @@ namespace DAL
             {
                 throw new Exception("Error general al registrar la venta completa.", ex);
             }
-        }
+        }*/
         public bool ActualizarDVH(string tabla)
         {
             try
@@ -416,6 +598,224 @@ namespace DAL
             return errores;
         }
 
+        public List<Pedido_013AL> ListarPedidosPendientes_013AL()
+        {
+                    List<Pedido_013AL> lista = new List<Pedido_013AL>();
 
+                    try
+                    {
+                        using (SqlConnection con =
+                            conexion.ObtenerConexion())
+                        {
+                            string query = @"
+                            SELECT *
+                            FROM [Pedido-013AL]
+                            WHERE [Estado-013AL] =
+                            'Pendiente'";
+
+                            SqlCommand cmd = new SqlCommand(query, con);
+
+                            con.Open();
+
+                            SqlDataReader dr = cmd.ExecuteReader();
+
+                            while (dr.Read())
+                            {
+                                lista.Add(
+                                    new Pedido_013AL()
+                                    {
+                                        CodCompra_013AL =
+                                            Convert.ToInt32(
+                                                dr["CodCompra-013AL"]
+                                            ),
+
+                                        CUIL_013AL =
+                                            Convert.ToInt32(
+                                                dr["CUILCliente-013AL"]
+                                            ),
+
+                                        Fecha_013AL =
+                                            Convert.ToDateTime(
+                                                dr["Fecha-013AL"]
+                                            ),
+
+                                        Estado_013AL =
+                                            dr["Estado-013AL"]
+                                            .ToString(),
+
+                                        Total_013AL =
+                                            Convert.ToInt32(
+                                                dr["Total-013AL"]
+                                            )
+                                    });
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new Exception(
+                            "Error al listar pedidos pendientes: "
+                            + ex.Message
+                        );
+                    }
+
+                    return lista;
+        }
+
+        public string ActualizarEstadoPedido_013AL(int codCompra, string estado)
+        {
+                        try
+                        {
+                            using (SqlConnection con =
+                                conexion.ObtenerConexion())
+                            {
+                                string query = @"
+                                UPDATE [Pedido-013AL]
+                                SET [Estado-013AL] = @estado
+                                WHERE [CodCompra-013AL] =
+                                @cod";
+
+                                SqlCommand cmd =
+                                    new SqlCommand(query, con);
+
+                                cmd.Parameters.AddWithValue(
+                                    "@estado",
+                                    estado
+                                );
+
+                                cmd.Parameters.AddWithValue(
+                                    "@cod",
+                                    codCompra
+                                );
+
+                                con.Open();
+
+                                cmd.ExecuteNonQuery();
+                            }
+
+                            return "OK";
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new Exception(
+                                "Error al actualizar estado: "
+                                + ex.Message
+                            );
+                        }
+        }
+        public Pedido_013AL BuscarPedidoPorId_013AL(int codCompra) 
+        { 
+            Pedido_013AL pedido = null; 
+            try 
+            { 
+                using (SqlConnection con = conexion.ObtenerConexion()) 
+                { 
+                    string query = @" SELECT * FROM [Pedido-013AL] WHERE [CodCompra-013AL] = @CodCompra"; 
+                    SqlCommand com = new SqlCommand(query, con); 
+                    com.Parameters.Add("@CodCompra", SqlDbType.Int).Value = codCompra; 
+                    con.Open(); 
+                    SqlDataReader dr = com.ExecuteReader(); 
+                    if (dr.Read()) 
+                    { 
+                        pedido = new Pedido_013AL() 
+                        { 
+                            CodCompra_013AL = Convert.ToInt32(dr["CodCompra-013AL"]), 
+                            CUIL_013AL = Convert.ToInt32(dr["CUILCliente-013AL"]), 
+                            Fecha_013AL = Convert.ToDateTime(dr["Fecha-013AL"]), 
+                            Estado_013AL = dr["Estado-013AL"].ToString(), 
+                            Total_013AL = Convert.ToInt32(dr["Total-013AL"]) 
+                        }; 
+                    } 
+                } 
+            } 
+            catch (Exception ex) 
+            { 
+                throw new Exception("Error al buscar pedido: " + ex.Message); 
+            } 
+            return pedido; 
+        }
+        public void ActualizarMetodoPago_013AL(int codCompra, string metodoPago) 
+        { 
+            try 
+            { 
+                using (SqlConnection con = conexion.ObtenerConexion()) 
+                { 
+                    string query = @" UPDATE [Pedido-013AL] SET [MetodoPago-013AL] = @Metodo, [Estado-013AL] = @Estado WHERE [CodCompra-013AL] = @CodCompra"; 
+                    SqlCommand com = new SqlCommand(query, con); 
+                    com.Parameters.Add("@Metodo", SqlDbType.NVarChar).Value = metodoPago; 
+                    com.Parameters.Add("@Estado", SqlDbType.NVarChar).Value = "Cobrado"; 
+                    com.Parameters.Add("@CodCompra", SqlDbType.Int).Value = codCompra; 
+                    con.Open(); 
+                    com.ExecuteNonQuery(); 
+                } 
+            } 
+            catch (Exception ex) 
+            { 
+                throw new Exception("Error al actualizar método pago: " + ex.Message); 
+            } 
+        }
+        public List<Pedido_013AL> ListarPedidosAprobados_013AL()
+        {
+            List<Pedido_013AL> lista = new List<Pedido_013AL>();
+
+            try
+            {
+                using (SqlConnection con =
+                    conexion.ObtenerConexion())
+                {
+                    string query = @"
+                            SELECT *
+                            FROM [Pedido-013AL]
+                            WHERE [Estado-013AL] =
+                            'Aprobado'";
+
+                    SqlCommand cmd = new SqlCommand(query, con);
+
+                    con.Open();
+
+                    SqlDataReader dr = cmd.ExecuteReader();
+
+                    while (dr.Read())
+                    {
+                        lista.Add(
+                            new Pedido_013AL()
+                            {
+                                CodCompra_013AL =
+                                    Convert.ToInt32(
+                                        dr["CodCompra-013AL"]
+                                    ),
+
+                                CUIL_013AL =
+                                    Convert.ToInt32(
+                                        dr["CUILCliente-013AL"]
+                                    ),
+
+                                Fecha_013AL =
+                                    Convert.ToDateTime(
+                                        dr["Fecha-013AL"]
+                                    ),
+
+                                Estado_013AL =
+                                    dr["Estado-013AL"]
+                                    .ToString(),
+
+                                Total_013AL =
+                                    Convert.ToInt32(
+                                        dr["Total-013AL"]
+                                    )
+                            });
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "Error al listar pedidos pendientes: "
+                    + ex.Message
+                );
+            }
+
+            return lista;
+        }
     }
 }

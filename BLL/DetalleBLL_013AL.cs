@@ -14,20 +14,29 @@ namespace BLL
         public DALDetalle_013AL dal = new DALDetalle_013AL();
 
         public List<Detalle_013AL> ListarDetalle_013AL()
-        {            
+        {
             return dal.ListarDetalle_013AL();
         }
-
-        public string EliminarDetalle_013AL(int id)
+        public string AgregarDetalle_013AL(Detalle_013AL detalle)
         {
-            return dal.EliminarDetalle_013AL(id);
+            return dal.AgregarDetalle_013AL(detalle);
         }
-
-        public string ActualizarCantidadDetalle_013AL(int codCompra, int codProducto, int nuevaCantidad)
+        public Detalle_013AL ObtenerDetalle_013AL(int codCompra, int codProducto)
         {
-            return dal.ActualizarCantidadDetalle_013AL(codCompra, codProducto, nuevaCantidad);
+            return dal.ObtenerDetalle_013AL(codCompra, codProducto);
         }
-        public string AgregarDetalle_013AL(int idc, int idp, int cant, int pu)
+        public string ActualizarCantidadDetalle_013AL(int codCompra, int codProducto, int cantidad)
+        {
+            return dal.ActualizarCantidadDetalle_013AL(
+                codCompra,
+                codProducto,
+                cantidad);
+        }
+        public int CalcularTotalPedido_013AL(int codCompra)
+        {
+            return dal.CalcularTotalPedido_013AL(codCompra);
+        }
+        /*public string AgregarDetalle_013AL(int idc, int idp, int cant, int pu)
         {
             Detalle_013AL cp = new Detalle_013AL();
             cp.CodCompra_013AL = idc;
@@ -35,12 +44,19 @@ namespace BLL
             cp.Cantidad_013AL = cant;
             cp.PrecioUnitario_013AL = pu;
             return dal.AgregarDetalle_013AL(cp);
-        }
+        }*/
         public int ObtenerSiguienteIdCompra_013AL()
         {
             int ultimoId = dal.ObtenerUltimoIdCompra_013AL();
             return ultimoId + 1; 
         }
-
+        public string EliminarDetalle_013AL(int codCompra, int codProducto) 
+        { 
+            return dal.EliminarDetalle_013AL(codCompra, codProducto); 
+        }
+        public List<Detalle_013AL> ListarDetallePorCompra_013AL(int codCompra) 
+        { 
+            return dal.ListarDetallePorCompra_013AL(codCompra); 
+        }
     }
 }

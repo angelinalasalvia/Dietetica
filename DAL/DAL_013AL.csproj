@@ -67,7 +67,7 @@
     <Compile Include="DALDetalleSolicitud_013AL.cs" />
     <Compile Include="DALDetalle_013AL.cs" />
     <Compile Include="DALEvento_013AL.cs" />
-    <Compile Include="DALFactura_013AL.cs" />
+    <Compile Include="DALPedido_013AL.cs" />
     <Compile Include="DALFamilia_013AL.cs" />
     <Compile Include="DALIdioma_013AL.cs" />
     <Compile Include="DALOrdenCompra_013AL.cs" />

@@ -29,9 +29,7 @@
         private void InitializeComponent()
         {
             this.label1 = new System.Windows.Forms.Label();
-            this.btnCobrar = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
-            this.btnFactura = new System.Windows.Forms.Button();
             this.label3 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.textBox1 = new System.Windows.Forms.TextBox();
@@ -55,16 +53,6 @@
             this.label1.TabIndex = 0;
             this.label1.Text = "Total:";
             // 
-            // btnCobrar
-            // 
-            this.btnCobrar.Location = new System.Drawing.Point(12, 399);
-            this.btnCobrar.Name = "btnCobrar";
-            this.btnCobrar.Size = new System.Drawing.Size(49, 23);
-            this.btnCobrar.TabIndex = 2;
-            this.btnCobrar.Text = "Cobrar";
-            this.btnCobrar.UseVisualStyleBackColor = true;
-            this.btnCobrar.Click += new System.EventHandler(this.btnCobrar_Click);
-            // 
             // label2
             // 
             this.label2.AutoSize = true;
@@ -74,16 +62,6 @@
             this.label2.Size = new System.Drawing.Size(176, 24);
             this.label2.TabIndex = 4;
             this.label2.Text = "Datos de la venta:";
-            // 
-            // btnFactura
-            // 
-            this.btnFactura.Location = new System.Drawing.Point(67, 399);
-            this.btnFactura.Name = "btnFactura";
-            this.btnFactura.Size = new System.Drawing.Size(93, 23);
-            this.btnFactura.TabIndex = 5;
-            this.btnFactura.Text = "Imprimir Factura";
-            this.btnFactura.UseVisualStyleBackColor = true;
-            this.btnFactura.Click += new System.EventHandler(this.btnFactura_Click);
             // 
             // label3
             // 
@@ -110,7 +88,6 @@
             this.textBox1.Size = new System.Drawing.Size(130, 20);
             this.textBox1.TabIndex = 10;
             this.textBox1.Text = "23924";
-            
             // 
             // btnBuscarCliente
             // 
@@ -180,7 +157,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(288, 431);
+            this.ClientSize = new System.Drawing.Size(288, 400);
             this.Controls.Add(this.dataGridView2);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.txtTotal);
@@ -191,9 +168,7 @@
             this.Controls.Add(this.label4);
             this.Controls.Add(this.textBox1);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.btnFactura);
             this.Controls.Add(this.label2);
-            this.Controls.Add(this.btnCobrar);
             this.Controls.Add(this.label1);
             this.Name = "GenerarFactura_013AL";
             this.Text = "GenerarFactura";
@@ -207,9 +182,7 @@
         #endregion
 
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Button btnCobrar;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Button btnFactura;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox textBox1;

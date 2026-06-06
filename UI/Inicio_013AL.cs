@@ -355,12 +355,6 @@ namespace UI
             form.ShowDialog();
         }
 
-        private void menuventa_Click(object sender, EventArgs e)
-        {
-            GenerarFactura_013AL form = new GenerarFactura_013AL();
-            form.ShowDialog();
-        }
-
         private void cambiarIdiomaToolStripMenuItem_Click(object sender, EventArgs e)
         {
             CambiarIdioma_013AL form = new CambiarIdioma_013AL();
@@ -430,6 +424,24 @@ namespace UI
         private void gestorDeIdiomasToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GestionarIdiomas_013AL form = new GestionarIdiomas_013AL();
+            form.ShowDialog();
+        }
+
+        private void generarPedidoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            GenerarFactura_013AL form = new GenerarFactura_013AL();
+            form.ShowDialog();
+        }
+
+        private void controlFormalToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            ControlFormal_013AL form = new ControlFormal_013AL();
+            form.ShowDialog();
+        }
+
+        private void menuCobrarVenta_Click(object sender, EventArgs e)
+        {
+            CobrarVenta_013AL form = new CobrarVenta_013AL();
             form.ShowDialog();
         }
     }

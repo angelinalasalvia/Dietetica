@@ -38,12 +38,16 @@
             this.txttotal = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.txtTarjeta = new System.Windows.Forms.TextBox();
+            this.btnFactura = new System.Windows.Forms.Button();
+            this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.button1 = new System.Windows.Forms.Button();
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.SuspendLayout();
             // 
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(12, 29);
+            this.label5.Location = new System.Drawing.Point(11, 138);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(42, 13);
             this.label5.TabIndex = 15;
@@ -52,7 +56,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 7);
+            this.label2.Location = new System.Drawing.Point(12, 9);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(94, 13);
             this.label2.TabIndex = 12;
@@ -61,7 +65,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 52);
+            this.label1.Location = new System.Drawing.Point(11, 161);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(82, 13);
             this.label1.TabIndex = 10;
@@ -69,7 +73,7 @@
             // 
             // btnCobrar
             // 
-            this.btnCobrar.Location = new System.Drawing.Point(16, 147);
+            this.btnCobrar.Location = new System.Drawing.Point(15, 256);
             this.btnCobrar.Name = "btnCobrar";
             this.btnCobrar.Size = new System.Drawing.Size(49, 23);
             this.btnCobrar.TabIndex = 17;
@@ -80,7 +84,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(13, 78);
+            this.label7.Location = new System.Drawing.Point(12, 187);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(88, 13);
             this.label7.TabIndex = 19;
@@ -89,17 +93,15 @@
             // comboBox1
             // 
             this.comboBox1.FormattingEnabled = true;
-            this.comboBox1.Items.AddRange(new object[] {
-            "Efectivo",
-            "Tarjeta Débito"});
-            this.comboBox1.Location = new System.Drawing.Point(107, 75);
+            this.comboBox1.Location = new System.Drawing.Point(106, 184);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 21);
             this.comboBox1.TabIndex = 20;
+            this.comboBox1.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged_1);
             // 
             // txtcuil
             // 
-            this.txtcuil.Location = new System.Drawing.Point(60, 25);
+            this.txtcuil.Location = new System.Drawing.Point(59, 134);
             this.txtcuil.Name = "txtcuil";
             this.txtcuil.ReadOnly = true;
             this.txtcuil.Size = new System.Drawing.Size(168, 20);
@@ -107,7 +109,7 @@
             // 
             // txttotal
             // 
-            this.txttotal.Location = new System.Drawing.Point(107, 49);
+            this.txttotal.Location = new System.Drawing.Point(106, 158);
             this.txttotal.Name = "txttotal";
             this.txttotal.ReadOnly = true;
             this.txttotal.Size = new System.Drawing.Size(120, 20);
@@ -116,7 +118,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(14, 105);
+            this.label3.Location = new System.Drawing.Point(13, 214);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 13);
             this.label3.TabIndex = 23;
@@ -124,16 +126,47 @@
             // 
             // txtTarjeta
             // 
-            this.txtTarjeta.Location = new System.Drawing.Point(17, 121);
+            this.txtTarjeta.Location = new System.Drawing.Point(16, 230);
             this.txtTarjeta.Name = "txtTarjeta";
             this.txtTarjeta.Size = new System.Drawing.Size(121, 20);
             this.txtTarjeta.TabIndex = 24;
+            // 
+            // btnFactura
+            // 
+            this.btnFactura.Location = new System.Drawing.Point(70, 256);
+            this.btnFactura.Name = "btnFactura";
+            this.btnFactura.Size = new System.Drawing.Size(93, 23);
+            this.btnFactura.TabIndex = 25;
+            this.btnFactura.Text = "Imprimir Factura";
+            this.btnFactura.UseVisualStyleBackColor = true;
+            this.btnFactura.Click += new System.EventHandler(this.btnFactura_Click);
+            // 
+            // dataGridView1
+            // 
+            this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataGridView1.Location = new System.Drawing.Point(12, 27);
+            this.dataGridView1.Name = "dataGridView1";
+            this.dataGridView1.Size = new System.Drawing.Size(375, 73);
+            this.dataGridView1.TabIndex = 26;
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(12, 106);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(125, 23);
+            this.button1.TabIndex = 27;
+            this.button1.Text = "Seleccionar Pedido";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // CobrarVenta_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(239, 178);
+            this.ClientSize = new System.Drawing.Size(397, 286);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.dataGridView1);
+            this.Controls.Add(this.btnFactura);
             this.Controls.Add(this.txtTarjeta);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.txttotal);
@@ -147,6 +180,7 @@
             this.Name = "CobrarVenta_013AL";
             this.Text = "CobrarVenta";
             this.Load += new System.EventHandler(this.CobrarVenta_Load);
+            ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -163,5 +197,8 @@
         private System.Windows.Forms.TextBox txttotal;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.TextBox txtTarjeta;
+        private System.Windows.Forms.Button btnFactura;
+        private System.Windows.Forms.DataGridView dataGridView1;
+        private System.Windows.Forms.Button button1;
     }
 }

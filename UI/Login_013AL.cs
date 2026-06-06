@@ -22,7 +22,7 @@ namespace UI
         private UsuarioBLL_013AL bllUsuarios = new UsuarioBLL_013AL();
         private RolBLL_013AL rbll = new RolBLL_013AL();
         private PermisoBLL_013AL pbll = new PermisoBLL_013AL();
-        private FacturaBLL_013AL fbll = new FacturaBLL_013AL();
+        private PedidoBLL_013AL fbll = new PedidoBLL_013AL();
         Usuarios_013AL usuario;
         private Dictionary<string, int> intentosFallidosPorUsuario = new Dictionary<string, int>();
         private const int maxFailedAttempts = 3;
@@ -113,7 +113,7 @@ namespace UI
                 if (intentosFallidosPorUsuario.ContainsKey(usuario.Login_013AL))
                     intentosFallidosPorUsuario.Remove(usuario.Login_013AL);
 
-                List<string> tablas = new List<string> { "Factura-013AL" };
+                List<string> tablas = new List<string> { "Pedido-013AL" };
                 List<ErrorIntegridad_013AL> errores = fbll.VerificarIntegridadCompleta(tablas);
 
                 if (errores.Count > 0)
@@ -133,7 +133,7 @@ namespace UI
                 }
 
                 // si no hay errores, inicializar (recalcular) los DVH/DVV
-                fbll.InicializarDVH_DVV("Factura-013AL");
+                fbll.InicializarDVH_DVV("Pedido-013AL");
 
 
                 SingletonSession_013AL.Instance.Login_013AL(usuario);

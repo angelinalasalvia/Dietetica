@@ -18,13 +18,14 @@ namespace UI
     public partial class SeleccionarProducto_013AL : Form, IObserver_013AL
     {
         ProductoBLL_013AL prbll = new ProductoBLL_013AL();
-        public int IdCompra;
-        private List<Detalle_013AL> carritoTemporal;
-        public SeleccionarProducto_013AL(int id, List<Detalle_013AL> carrito)
+        PedidoBLL_013AL pbll = new PedidoBLL_013AL();
+        DetalleBLL_013AL dbll = new DetalleBLL_013AL();
+        public int IdCompraActual;
+        //private List<Detalle_013AL> carritoTemporal;
+        public SeleccionarProducto_013AL(int id)
         {
             InitializeComponent();
-            IdCompra = id;
-            carritoTemporal = carrito;  
+            IdCompraActual = id;
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
 
             txtBuscar = new TextBox(); 
@@ -117,7 +118,7 @@ namespace UI
             }
         }
 
-        private void SalesItem(object sender, EventArgs e)
+        /*private void SalesItem(object sender, EventArgs e)
         {
             try
             {
@@ -137,34 +138,60 @@ namespace UI
                     return;
                 }
 
-                // Ver si ya existe el producto en el carrito
-                var detalleExistente = carritoTemporal
-                    .FirstOrDefault(p => p.CodProducto_013AL == producto.CodProducto_013AL);
+                IdCompra = dbll.ObtenerSiguienteIdCompra_013AL();
+
+                Detalle_013AL detalleExistente = dbll.ObtenerDetalle_013AL(IdCompra, producto.CodProducto_013AL);
 
                 if (detalleExistente != null)
                 {
-                    detalleExistente.Cantidad_013AL += Cantidad;
-                    
+                    int nuevaCantidad = detalleExistente.Cantidad_013AL + Cantidad;
+
+                    dbll.ActualizarCantidadDetalle_013AL(
+                        IdCompra,
+                        producto.CodProducto_013AL,
+                        nuevaCantidad
+                    );
                 }
                 else
                 {
-                    carritoTemporal.Add(new Detalle_013AL
+                    Detalle_013AL detalle = new Detalle_013AL
                     {
                         CodCompra_013AL = IdCompra,
                         CodProducto_013AL = producto.CodProducto_013AL,
                         Cantidad_013AL = Cantidad,
-                        PrecioUnitario_013AL = producto.Precio_013AL,
+                        PrecioUnitario_013AL = producto.Precio_013AL
+                    };
+
+                    dbll.AgregarDetalle_013AL(detalle);
+
+                    List<PedidoBLL_013AL> lista = pbll.ListarPedido_013AL();
+
+                    if (!lista.Any(p => p.CodCompra_013AL == IdCompra))
+                    {
                         
-                    });
+                    }
+                    else
+                    {
+                        PedidoBLL_013AL pedido = new PedidoBLL_013AL
+                        {
+                            CodCompra_013AL = IdCompra,
+                            Fecha_013AL = DateTime.Now,
+                            Total_013AL = 0 
+                        };
+
+                        pbll.CrearPedido_013AL(pedido);
+                    }
                 }
 
                 // Descontar stock real
                 prbll.DescontarStock_013AL(producto.CodProducto_013AL, Cantidad);
 
+                decimal totalPedido = dbll.CalcularTotalPedido_013AL(IdCompra);
+
                 MessageBox.Show($"Producto '{producto.Nombre_013AL}' agregado.\nCantidad: {Cantidad}\nSubtotal: {(producto.Precio_013AL * Cantidad)}",
                     "Producto Agregado", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
-                LoadItems_013AL(); // Refrescar vista
+                LoadItems_013AL(); 
             }
             catch (Exception ex)
             {
@@ -223,7 +250,52 @@ namespace UI
                 MessageBox.Show("Ocurrió un error al agregar el producto: " + ex.Message,
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }*/
+      
+        private void SalesItem(object sender, EventArgs e)
+        {
+            try 
+            { 
+                int cantidad = Convert.ToInt32(Interaction.InputBox("Ingrese cantidad:")); 
+                string str = ((PictureBox)sender).Tag.ToString(); 
+                Producto_013AL producto = prbll.Devolver_Producto_Buscado_x_Id_013AL(Convert.ToInt32(str)); 
+                if (cantidad <= 0) 
+                { 
+                    MessageBox.Show("Cantidad inválida."); 
+                    return; 
+                } 
+                if (cantidad > producto.Stock_013AL) 
+                { 
+                    MessageBox.Show("Stock insuficiente."); 
+                    return; 
+                } 
+                Detalle_013AL detalleExistente = dbll.ObtenerDetalle_013AL(IdCompraActual, producto.CodProducto_013AL); 
+                if (detalleExistente != null) 
+                { 
+                    int nuevaCantidad = detalleExistente.Cantidad_013AL + cantidad; 
+                    dbll.ActualizarCantidadDetalle_013AL(IdCompraActual, producto.CodProducto_013AL, nuevaCantidad); 
+                } 
+                else 
+                { 
+                    Detalle_013AL detalle = new Detalle_013AL() 
+                    { 
+                        CodCompra_013AL = IdCompraActual, 
+                        CodProducto_013AL = producto.CodProducto_013AL, 
+                        Cantidad_013AL = cantidad, 
+                        PrecioUnitario_013AL = producto.Precio_013AL 
+                    }; 
+                    dbll.AgregarDetalle_013AL(detalle); 
+                } 
+                prbll.DescontarStock_013AL(producto.CodProducto_013AL, cantidad); 
+                decimal total = dbll.CalcularTotalPedido_013AL(IdCompraActual); 
+                pbll.ActualizarTotalPedido_013AL(IdCompraActual, total); 
+                //MessageBox.Show("Producto agregado.");
+                MessageBox.Show($"Producto '{producto.Nombre_013AL}' agregado.\nCantidad: {cantidad}\nSubtotal: {(producto.Precio_013AL * cantidad)}",
+                    "Producto Agregado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                LoadItems_013AL(); 
+            } catch (Exception ex) { MessageBox.Show(ex.Message); }
         }
+
+
 
         private void FinalizarCompra_Click(object sender, EventArgs e)
         {

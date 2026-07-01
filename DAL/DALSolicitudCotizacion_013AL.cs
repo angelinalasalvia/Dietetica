@@ -77,5 +77,36 @@ namespace DAL
             }
             return Lista;
         }
+        public string EliminarSCotizacion_013AL(int codsc)
+        {
+            string resultado = "";
+
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    SqlCommand com =
+                        new SqlCommand("[EliminarSolicitudCotizacion-013AL]", con);
+
+                    com.CommandType = CommandType.StoredProcedure;
+
+                    com.Parameters.Add("@codsc", SqlDbType.Int).Value = codsc;
+
+                    con.Open();
+
+                    com.ExecuteNonQuery();
+
+                    resultado = "OK";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "Error al eliminar la solicitud de cotización",
+                    ex);
+            }
+
+            return resultado;
+        }
     }
 }

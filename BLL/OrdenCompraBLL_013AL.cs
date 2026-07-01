@@ -30,10 +30,7 @@ namespace BLL_013AL
         {
             return dal.TraerDatosProveedor_013AL(codOrdenCompra);
         }
-        public List<OrdenCompra_013AL> ListarOrdenCompra_013AL()
-        {
-            return dal.ListarOrdenCompra_013AL();
-        }
+        
         public int ObtenerCodOrdenCompra_013AL(int idSolicitud, int cuitProveedor, DateTime fecha)
         {
             return dal.ObtenerCodOrdenCompra_013AL(idSolicitud, cuitProveedor, fecha); 
@@ -58,6 +55,18 @@ namespace BLL_013AL
         public string ActualizarEstadoCompleto_013AL(int codOrdenCompra, bool completo)
         {
             return dal.ActualizarEstadoCompleto_013AL(codOrdenCompra, completo);
+        }
+        public string ConfirmarRecepcion_013AL(int codOrdenCompra)
+        {
+            return dal.ConfirmarRecepcion_013AL(codOrdenCompra);
+        }
+        public DataTable ListarOrdenesPendientesPago_013AL()
+        {
+            return dal.ListarOrdenesPendientesPago_013AL();
+        }
+        public string ActualizarEstadoCobrado_013AL(int codOrdenCompra)
+        {
+            return dal.ActualizarEstadoCobrado_013AL(codOrdenCompra);
         }
     }
 }

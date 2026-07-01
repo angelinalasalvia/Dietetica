@@ -396,9 +396,9 @@ namespace UI
             string nombre = partes[1].Trim();
             string tipo = partes[2].Trim();
 
-            if (tipo == "Simple")
+            if (tipo == "Permiso")
             {
-                return new Permiso_013AL { Cod_013AL = id, Nombre_013AL = nombre, Tipo_013AL = "Simple" };
+                return new Permiso_013AL { Cod_013AL = id, Nombre_013AL = nombre, Tipo_013AL = "Permiso" };
             }
             else
             {

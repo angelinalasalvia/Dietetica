@@ -56,7 +56,7 @@ namespace DAL
         public bool VerificarCuit_013AL(int cuit)
         {
             int count = 0;
-            string query = "SELECT COUNT(*) FROM [Proveedores-013AL] WHERE [CUIT-013AL] = @Cuit";
+            string query = "SELECT COUNT(*) FROM [Proveedor-013AL] WHERE [CUIT-013AL] = @Cuit";
 
             try
             {
@@ -99,7 +99,7 @@ namespace DAL
             }
             catch (SqlException ex)
             {
-                if (ex.Number == 2627 || ex.Number == 2601) // 2627 = Clave duplicada, 2601 = Índice único violado
+                if (ex.Number == 2627 || ex.Number == 2601) 
                 {
                     respuesta = "El CUIT ingresado ya está registrado.";
                 }
@@ -191,6 +191,25 @@ namespace DAL
             catch (Exception ex) { throw new Exception("Error al eliminar proveedor", ex); }
             return resultado;
         }
-        
+        public bool ProveedorRegistrado_013AL(int cuit)
+        {
+            string query = @"SELECT COUNT(*) 
+                     FROM [Proveedor-013AL]
+                     WHERE [CUIT-013AL] = @cuit
+                     AND [ApellidoProveedor-013AL] IS NOT NULL
+                     AND [Domicilio-013AL] IS NOT NULL
+                     AND [Mail-013AL] IS NOT NULL
+                     AND [Telefono-013AL] IS NOT NULL";
+
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Parameters.AddWithValue("@cuit", cuit);
+
+                con.Open();
+
+                return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
+            }
+        }
     }
 }

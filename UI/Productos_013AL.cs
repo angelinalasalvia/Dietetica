@@ -74,7 +74,7 @@ namespace UI
 
         private void button2_Click(object sender, EventArgs e)
         {
-            using (OpenFileDialog openFileDialog = new OpenFileDialog())
+            /*using (OpenFileDialog openFileDialog = new OpenFileDialog())
             {
                 openFileDialog.Filter = "Archivos de imagen|*.jpg;*.jpeg;*.png;*.bmp";
                 openFileDialog.Title = "Seleccionar una imagen";
@@ -89,6 +89,39 @@ namespace UI
 
                     // Guarda la imagen en bytes para su posterior uso
                     imagenBytes = File.ReadAllBytes(openFileDialog.FileName);
+                }
+            }*/
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            ofd.Filter = "Imagenes|*.jpg;*.jpeg;*.png;*.bmp";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    txtimagen.Text = ofd.FileName;
+
+                    // Guardar bytes
+                    imagenBytes = File.ReadAllBytes(ofd.FileName);
+
+                    // Liberar imagen anterior
+                    if (pictureBox1.Image != null)
+                    {
+                        pictureBox1.Image.Dispose();
+                        pictureBox1.Image = null;
+                    }
+
+                    // Cargar imagen directamente
+                    using (FileStream fs = new FileStream(ofd.FileName, FileMode.Open, FileAccess.Read))
+                    {
+                        pictureBox1.Image = Image.FromStream(fs);
+                    }
+
+                    MessageBox.Show("Imagen cargada correctamente");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show(ex.Message);
                 }
             }
         }

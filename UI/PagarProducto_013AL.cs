@@ -35,22 +35,6 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        public void CargarOrdenCompra_013AL()
-        {
-            var listacod = bll.ListarOrdenCompra_013AL();
-            comboBox1.Items.Clear();
-
-            foreach (var cod in listacod)
-            {
-                string detalle = $"{cod.CodOrdenCompra_013AL}";
-
-                comboBox1.Items.Add(new ComboBoxItem
-                {
-                    Text = detalle,
-                    Value = cod
-                });
-            }
-        }
         private class ComboBoxItem
         {
             public string Text { get; set; }
@@ -64,27 +48,86 @@ namespace UI
 
         private void button2_Click(object sender, EventArgs e)
         {
-            if (comboBox1.SelectedItem is ComboBoxItem selectedItem)
+            /*if (comboBox1.SelectedItem is ComboBoxItem selectedItem)
             {
                 var solicitudSeleccionada = (OrdenCompra_013AL)selectedItem.Value;
                 int codsc = solicitudSeleccionada.Total_013AL;
                 label3.Text = codsc.ToString();
-            }
+            }*/
 
         }
-
+        Usuarios_013AL user;
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         private void button1_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Pago realizado con éxito");
+            if (dataGridView1.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Seleccione una orden.");
+                return;
+            }
 
-            EventoBLL_013AL bbll = new EventoBLL_013AL();
-            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-            bbll.AgregarEvento_013AL(user.Login_013AL, "PagarProducto", "Compra Pagada", 2);
+            if (comboBox2.Text == "")
+            {
+                MessageBox.Show("Seleccione método de pago.");
+                return;
+            }
+
+            if (comboBox2.Text == "Tarjeta Débito")
+            {
+                if (txtTarjeta.Text.Length != 16 || !txtTarjeta.Text.All(char.IsDigit))
+                {
+                    MessageBox.Show("Tarjeta inválida.");
+                    return;
+                }
+            }
+
+            int codOrden = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["CodOrdenCompra-013AL"].Value);
+
+            string resultado = bll.ActualizarEstadoCobrado_013AL(codOrden);
+
+            if (resultado == "OK")
+            {
+                MessageBox.Show("Pago realizado con éxito");
+
+                CargarOrdenes_013AL();
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Pagar Producto", $"Compra número {codOrden} Pagada", 2);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
+            }
+            else
+            {
+                MessageBox.Show(resultado);
+            }
         }
-
+        private void CargarOrdenes_013AL()
+        {
+            dataGridView1.DataSource =
+                bll.ListarOrdenesPendientesPago_013AL();
+        }
         private void PagarProducto_Load(object sender, EventArgs e)
         {
-            CargarOrdenCompra_013AL();
+            CargarOrdenes_013AL();
+            comboBox2.Items.Add("Efectivo");
+            comboBox2.Items.Add("Tarjeta Débito");
+            txtTarjeta.Enabled = false;
+        }
+        
+        private void comboBox2_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            txtTarjeta.Enabled = comboBox2.Text == "Tarjeta Débito";
+        }
+
+        private void dataGridView1_CellClick_1(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0)
+            {
+                int total = Convert.ToInt32(dataGridView1.Rows[e.RowIndex].Cells["Total-013AL"].Value);
+
+                textBox1.Text = total.ToString();
+            }
         }
     }
 }

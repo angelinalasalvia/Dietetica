@@ -1,4 +1,6 @@
-﻿using BLL_013AL;
+﻿using BE_013AL;
+using BLL_013AL;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -36,14 +38,11 @@ namespace UI
 
         private void dataGridViewProductos_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            // Verifica si la columna modificada es "Completo"
             if (dataGridViewProductos.Columns[e.ColumnIndex].Name == "Completo")
             {
-                // Obtener el valor actualizado de la celda
                 bool nuevoValorCompleto = Convert.ToBoolean(dataGridViewProductos.Rows[e.RowIndex].Cells["Completo"].Value);
-                int codOrdenCompra = Convert.ToInt32(dataGridViewProductos.Rows[e.RowIndex].Cells["CodOrdenCompra"].Value); // Asegúrate de tener "CodOrdenCompra" en los datos
+                int codOrdenCompra = Convert.ToInt32(dataGridViewProductos.Rows[e.RowIndex].Cells["CodOrdenCompra"].Value); 
 
-                // Actualizar en la base de datos
                 string resultado = bll.ActualizarEstadoCompleto_013AL(codOrdenCompra, nuevoValorCompleto);
                 if (resultado == "OK")
                 {
@@ -63,27 +62,11 @@ namespace UI
             comboBoxOrdenesCompra.DataSource = dtOrdenesCompra;
             comboBoxOrdenesCompra.DisplayMember = "CodOrdenCompra-013AL";
             comboBoxOrdenesCompra.ValueMember = "CodOrdenCompra-013AL";
+            comboBoxOrdenesCompra.SelectedIndex = -1;
         }
 
-        /*private void comboBoxOrdenesCompra_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            if (comboBoxOrdenesCompra.SelectedValue != null)
-            {
-                int codSolicitud = Convert.ToInt32(comboBoxOrdenesCompra.SelectedValue);
-
-                // Llama al método en BLL para obtener los productos asociados a la orden de compra
-                DataTable dtProductos = bll.ListarProductosPorSolicitud(codSolicitud);
-
-                // Carga los datos en el DataGridView
-                dataGridViewProductos.DataSource = dtProductos;
-
-                // Configura la columna "Completo" para que sea la única editable
-                ConfigurarDataGridView();
-            }
-        }*/
         private void ConfigurarDataGridView_013AL()
         {
-            // Configurar todas las columnas como de solo lectura excepto "Completo"
             foreach (DataGridViewColumn column in dataGridViewProductos.Columns)
             {
                 column.ReadOnly = column.Name != "Completo";
@@ -97,16 +80,45 @@ namespace UI
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (comboBoxOrdenesCompra.SelectedIndex == -1)
+            {
+                MessageBox.Show("Seleccione una orden de compra.");
+                return;
+            }
+
             int codOrdenCompra = Convert.ToInt32(comboBoxOrdenesCompra.SelectedValue);
 
-            // Llama al método BLL para obtener los productos de la orden
             DataTable dtProductos = bll.ListarProductosPorOrden_013AL(codOrdenCompra);
 
-            // Carga los productos en el DataGridView
             dataGridViewProductos.DataSource = dtProductos;
 
-            // Configura el DataGridView para que solo la columna "Completo" sea editable
             ConfigurarDataGridView_013AL();
         }
+        Usuarios_013AL user;
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
+        private void button2_Click(object sender, EventArgs e)
+        {
+            int codOC = Convert.ToInt32(comboBoxOrdenesCompra.SelectedValue);
+
+            string resultado = bll.ConfirmarRecepcion_013AL(codOC);
+
+            if (resultado == "OK")
+            {
+                MessageBox.Show("Recepción confirmada correctamente.");
+                dataGridViewProductos.DataSource = null;
+                CargarOrdenesCompra_013AL();
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Recepción Productos", $"Productos de Orden de Compra número {codOC} recibidos.", 3);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
+            }
+            else
+            {
+                MessageBox.Show(resultado);
+            }
+        }
+
     }
 }

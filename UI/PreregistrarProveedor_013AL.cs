@@ -23,6 +23,8 @@ namespace UI
             ActualizarIdioma_013AL();
         }
         ProveedorBLL_013AL bll = new ProveedorBLL_013AL();
+        Usuarios_013AL user;
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         private void button1_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text) || string.IsNullOrWhiteSpace(textBox3.Text))
@@ -48,18 +50,15 @@ namespace UI
             MessageBox.Show(respuesta);
 
             if (respuesta == "Proveedor preregistrado correctamente.")
-            {
-                EventoBLL_013AL bbll = new EventoBLL_013AL();
-                Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                bbll.AgregarEvento_013AL(user.Login_013AL, "Preregistrar Proveedores", "Preregistrar Proveedor", 2);
+            {                
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Preregistrar Proveedor", $"Proveedor {textBox1.Text} pre-registrado.", 2);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
             }
-            /*string respuesta = "";
-            respuesta = bll.PreregistrarProveedor(textBox1.Text, Convert.ToInt32(textBox2.Text), textBox3.Text);
-
-
-            BLLBitacora bbll = new BLLBitacora();
-            Usuarios user = SingletonSesion.Instance.GetUsuario();
-            bbll.AgregarEvento(user.NombreUsuario, "Preregistrar Proveedores", "Preregistrar Proveedor", 2);*/
+            
         }
 
         public void ActualizarIdioma_013AL()

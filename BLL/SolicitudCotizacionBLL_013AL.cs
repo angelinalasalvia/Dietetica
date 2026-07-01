@@ -22,6 +22,9 @@ namespace BLL
         {
             return dal.ListarSCotizacion_013AL();
         }
-
+        public string EliminarSCotizacion_013AL(int codsc)
+        {
+            return dal.EliminarSCotizacion_013AL(codsc);
+        }
     }
 }

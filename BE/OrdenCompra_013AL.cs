@@ -14,5 +14,6 @@ namespace BE_013AL
         public DateTime Fecha_013AL { get; set; }
         public int Total_013AL { get; set; }
         public bool Completo_013AL { get; set; }
+        public bool Cobrado_013AL { get; set; }
     }
 }

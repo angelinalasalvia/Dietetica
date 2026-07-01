@@ -1,5 +1,7 @@
 ﻿using BE_013AL;
 using BLL;
+using BLL_013AL;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -12,16 +14,29 @@ using System.Windows.Forms;
 
 namespace UI
 {
-    public partial class ControlFormal_013AL : Form
+    public partial class ControlFormal_013AL : Form, IObserver_013AL
     {
         public ControlFormal_013AL()
         {
             InitializeComponent();
+            LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
+            ActualizarIdioma_013AL();
         }
         PedidoBLL_013AL pBLL = new PedidoBLL_013AL();
         DetalleBLL_013AL dBLL = new DetalleBLL_013AL();
         ClienteBLL_013AL cBLL = new ClienteBLL_013AL();
         ProductoBLL_013AL prBLL = new ProductoBLL_013AL();
+
+        public void ActualizarIdioma_013AL()
+        {
+            LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
+        }
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            base.OnFormClosing(e);
+
+            LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
+        }
         private void ControlFormal_013AL_Load(object sender, EventArgs e)
         {
             CargarPedidosPendientes();
@@ -32,7 +47,8 @@ namespace UI
             DataGridViewPedidos.DataSource = null; 
             DataGridViewPedidos.DataSource = pBLL.ListarPedidosPendientes_013AL();
         }
-
+        Usuarios_013AL user;
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         private void button2_Click(object sender, EventArgs e)
         {
             try 
@@ -52,7 +68,13 @@ namespace UI
                     DataGridViewDetalle.DataSource = null; 
                     txtCUIL.Clear(); 
                     txtNombre.Clear(); 
-                    txtApellido.Clear(); 
+                    txtApellido.Clear();
+                    try
+                    {
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Control Formal", $"Pedido número {codCompra} aprobado.", 3);
+                    }
+                    catch (Exception ex) { Console.WriteLine(ex); }
                 } 
             } 
             catch (Exception ex) 
@@ -110,7 +132,13 @@ namespace UI
                     DataGridViewDetalle.DataSource = null; 
                     txtCUIL.Clear(); 
                     txtNombre.Clear(); 
-                    txtApellido.Clear(); 
+                    txtApellido.Clear();
+                    try
+                    {
+                        user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                        bbll.AgregarEvento_013AL(user.Login_013AL, "Control Formal", $"Pedido número {codCompra} rechazado.", 3);
+                    }
+                    catch (Exception ex) { Console.WriteLine(ex); }
                 } 
             } catch (Exception ex) 
             { 

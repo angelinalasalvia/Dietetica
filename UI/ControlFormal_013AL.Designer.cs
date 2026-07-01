@@ -190,7 +190,7 @@
             this.Controls.Add(this.label1);
             this.Controls.Add(this.DataGridViewPedidos);
             this.Name = "ControlFormal_013AL";
-            this.Text = "ControlFormal_013AL";
+            this.Text = "ControlFormal";
             this.Load += new System.EventHandler(this.ControlFormal_013AL_Load);
             ((System.ComponentModel.ISupportInitialize)(this.DataGridViewPedidos)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.DataGridViewDetalle)).EndInit();

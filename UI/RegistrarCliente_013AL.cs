@@ -86,6 +86,7 @@ namespace UI
 
                 eventosPendientes.Add($"Cliente {Convert.ToString(newRow["Nombre-013AL"])} {Convert.ToString(newRow["Apellido-013AL"])} registrado");
 
+                MessageBox.Show("Cliente registrado correctamente. Recuerde guardar los cambios para que se apliquen en la base de datos.");
             }
             catch (Exception ex)
             {

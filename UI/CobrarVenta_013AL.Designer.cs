@@ -118,7 +118,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 214);
+            this.label3.Location = new System.Drawing.Point(13, 213);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(135, 13);
             this.label3.TabIndex = 23;
@@ -137,7 +137,7 @@
             this.btnFactura.Name = "btnFactura";
             this.btnFactura.Size = new System.Drawing.Size(93, 23);
             this.btnFactura.TabIndex = 25;
-            this.btnFactura.Text = "Imprimir Factura";
+            this.btnFactura.Text = "Generar Factura";
             this.btnFactura.UseVisualStyleBackColor = true;
             this.btnFactura.Click += new System.EventHandler(this.btnFactura_Click);
             // 

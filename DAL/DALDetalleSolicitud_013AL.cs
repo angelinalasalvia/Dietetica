@@ -52,27 +52,35 @@ namespace DAL
             catch (Exception ex) { throw new Exception("Error al eliminar el detalle de la solicitud de cotizacion", ex); }
             return resultado;
         }
-        public DetalleSolicitudC_013AL ListarProductosOC_013AL(int codsc)
+        public List<DetalleSolicitudC_013AL> ListarProductosOC_013AL(int codsc)
         {
-            DetalleSolicitudC_013AL detalleProducto = null;
+            List<DetalleSolicitudC_013AL> detalleProducto =
+                new List<DetalleSolicitudC_013AL>();
+
             try
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    SqlCommand command = new SqlCommand("[ListarProductosOC-013AL]", con);
+                    SqlCommand command =
+                        new SqlCommand("[ListarProductosOC-013AL]", con);
+
                     command.CommandType = CommandType.StoredProcedure;
+
                     command.Parameters.AddWithValue("@codsc", codsc);
 
                     con.Open();
+
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        if (reader.Read())
+                        while (reader.Read())
                         {
-                            detalleProducto = new DetalleSolicitudC_013AL
-                            {
-                                CodProducto_013AL = (int)reader["CodProducto-013AL"],
-                                Cantidad_013AL = (int)reader["Cantidad-013AL"]
-                            };
+                            detalleProducto.Add(
+                                new DetalleSolicitudC_013AL
+                                {
+                                    CodSCotizacion_013AL = codsc,
+                                    CodProducto_013AL = (int)reader["CodProducto-013AL"],
+                                    Cantidad_013AL = (int)reader["Cantidad-013AL"]
+                                });
                         }
                     }
                 }
@@ -81,7 +89,47 @@ namespace DAL
             {
                 throw new Exception("Error al listar productos", ex);
             }
+
             return detalleProducto;
+        }
+        public string ActualizarCantidadDetalleSC_013AL(DetalleSolicitudC_013AL obj)
+        {
+            string resultado = "";
+
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    SqlCommand com = new SqlCommand(
+                        "[ActualizarCantidadDetalleSC-013AL]",
+                        con);
+
+                    com.CommandType = CommandType.StoredProcedure;
+
+                    com.Parameters.Add("@codsc", SqlDbType.Int)
+                        .Value = obj.CodSCotizacion_013AL;
+
+                    com.Parameters.Add("@idp", SqlDbType.Int)
+                        .Value = obj.CodProducto_013AL;
+
+                    com.Parameters.Add("@cant", SqlDbType.Int)
+                        .Value = obj.Cantidad_013AL;
+
+                    con.Open();
+
+                    resultado = com.ExecuteNonQuery() > 0
+                        ? "OK"
+                        : "Error";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "Error al actualizar la cantidad del detalle de la solicitud de cotización",
+                    ex);
+            }
+
+            return resultado;
         }
     }
 }

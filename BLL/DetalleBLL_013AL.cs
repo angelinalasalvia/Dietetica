@@ -36,15 +36,7 @@ namespace BLL
         {
             return dal.CalcularTotalPedido_013AL(codCompra);
         }
-        /*public string AgregarDetalle_013AL(int idc, int idp, int cant, int pu)
-        {
-            Detalle_013AL cp = new Detalle_013AL();
-            cp.CodCompra_013AL = idc;
-            cp.CodProducto_013AL = idp;
-            cp.Cantidad_013AL = cant;
-            cp.PrecioUnitario_013AL = pu;
-            return dal.AgregarDetalle_013AL(cp);
-        }*/
+        
         public int ObtenerSiguienteIdCompra_013AL()
         {
             int ultimoId = dal.ObtenerUltimoIdCompra_013AL();

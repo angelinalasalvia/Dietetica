@@ -17,6 +17,16 @@ namespace UI
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.ThreadException += (sender, e) =>
+            {
+                MessageBox.Show("Error: " + e.Exception.Message);
+            };
+            Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+
+            AppDomain.CurrentDomain.UnhandledException += (sender, e) =>
+            {
+                MessageBox.Show("Error crítico: " + (e.ExceptionObject as Exception)?.Message);
+            };
             Application.Run(new Inicio_013AL());
         }
     }

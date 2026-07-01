@@ -64,6 +64,8 @@ namespace UI
             ActualizarIdioma_013AL();
         }
         private List<Detalle_013AL> detallesVenta;
+        Usuarios_013AL user;
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         private void btnCobrar_Click(object sender, EventArgs e)
         {
             try 
@@ -90,7 +92,13 @@ namespace UI
                 blln.ActualizarEstadoPedido_013AL(pedidoSeleccionado, "Cobrado"); 
                 MessageBox.Show("Venta cobrada correctamente."); 
                 btnFactura.Enabled = true; 
-                CargarPedidosAprobados(); 
+                CargarPedidosAprobados();
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Registrar Pedido", $"Pedido número {pedidoActual.CodCompra_013AL} cobrado.", 3);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
             } 
             catch (Exception ex) 
             { 

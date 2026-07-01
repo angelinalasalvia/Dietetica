@@ -174,9 +174,9 @@ namespace DAL
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
                     string query = @"
-            UPDATE [Pedido-013AL]
-            SET [Total-013AL] = @total
-            WHERE [CodCompra-013AL] = @id";
+                    UPDATE [Pedido-013AL]
+                    SET [Total-013AL] = @total
+                    WHERE [CodCompra-013AL] = @id";
 
                     using (SqlCommand cmd = new SqlCommand(query, con))
                     {
@@ -619,37 +619,32 @@ namespace DAL
 
                             SqlDataReader dr = cmd.ExecuteReader();
 
-                            while (dr.Read())
+                    while (dr.Read())
+                    {
+                        lista.Add(
+                            new Pedido_013AL()
                             {
-                                lista.Add(
-                                    new Pedido_013AL()
-                                    {
-                                        CodCompra_013AL =
-                                            Convert.ToInt32(
-                                                dr["CodCompra-013AL"]
-                                            ),
+                                CodCompra_013AL =
+                                    Convert.ToInt32(dr["CodCompra-013AL"]),
 
-                                        CUIL_013AL =
-                                            Convert.ToInt32(
-                                                dr["CUILCliente-013AL"]
-                                            ),
+                                CUIL_013AL =
+                                    dr["CUILCliente-013AL"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["CUILCliente-013AL"]),
 
-                                        Fecha_013AL =
-                                            Convert.ToDateTime(
-                                                dr["Fecha-013AL"]
-                                            ),
+                                Fecha_013AL =
+                                    Convert.ToDateTime(dr["Fecha-013AL"]),
 
-                                        Estado_013AL =
-                                            dr["Estado-013AL"]
-                                            .ToString(),
+                                Estado_013AL =
+                                    dr["Estado-013AL"].ToString(),
 
-                                        Total_013AL =
-                                            Convert.ToInt32(
-                                                dr["Total-013AL"]
-                                            )
-                                    });
-                            }
-                        }
+                                Total_013AL =
+                                    dr["Total-013AL"] == DBNull.Value
+                                    ? 0
+                                    : Convert.ToInt32(dr["Total-013AL"])
+                            });
+                    }
+                }
                     }
                     catch (Exception ex)
                     {
@@ -692,7 +687,8 @@ namespace DAL
 
                                 cmd.ExecuteNonQuery();
                             }
-
+                            ActualizarDVH("Pedido-013AL");
+                            ActualizarDVV("Pedido-013AL");
                             return "OK";
                         }
                         catch (Exception ex)
@@ -746,8 +742,11 @@ namespace DAL
                     com.Parameters.Add("@Estado", SqlDbType.NVarChar).Value = "Cobrado"; 
                     com.Parameters.Add("@CodCompra", SqlDbType.Int).Value = codCompra; 
                     con.Open(); 
-                    com.ExecuteNonQuery(); 
-                } 
+                    com.ExecuteNonQuery();
+                }
+
+                ActualizarDVH("Pedido-013AL");
+                ActualizarDVV("Pedido-013AL");
             } 
             catch (Exception ex) 
             { 

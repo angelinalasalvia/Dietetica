@@ -55,7 +55,6 @@
             this.txtUsuario.Name = "txtUsuario";
             this.txtUsuario.Size = new System.Drawing.Size(160, 20);
             this.txtUsuario.TabIndex = 4;
-            this.txtUsuario.Text = "Admin1";
             // 
             // label2
             // 
@@ -75,7 +74,6 @@
             this.txtPassword.PasswordChar = '*';
             this.txtPassword.Size = new System.Drawing.Size(160, 20);
             this.txtPassword.TabIndex = 5;
-            this.txtPassword.Text = "789";
             // 
             // label1
             // 
@@ -99,7 +97,7 @@
             this.btnIngresar.UseVisualStyleBackColor = true;
             this.btnIngresar.Click += new System.EventHandler(this.btnIngresar_Click_1);
             // 
-            // Login
+            // Login_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -110,7 +108,7 @@
             this.Controls.Add(this.txtPassword);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.btnIngresar);
-            this.Name = "Login";
+            this.Name = "Login_013AL";
             this.Text = "Login";
             this.ResumeLayout(false);
             this.PerformLayout();

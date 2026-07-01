@@ -140,7 +140,7 @@ namespace UI
                             
                             bool habilitarCotizacion = permisos.Any((P) => P.Nombre_013AL == "cotizacionesToolStripMenuItem");
                             bool habilitarOrdenCompra = permisos.Any((P) => P.Nombre_013AL == "ordenDeCompraToolStripMenuItem");
-                            bool habilitarregiscom = permisos.Any((P) => P.Nombre_013AL ==   "registrarCompraToolStripMenuItem");
+                            bool habilitarregiscom = permisos.Any((P) => P.Nombre_013AL == "pagarProductosToolStripMenuItem");
                             bool habilitarrecepprod = permisos.Any((P) => P.Nombre_013AL == "recepciónDeProductosToolStripMenuItem");
 
 
@@ -157,7 +157,7 @@ namespace UI
                                     {
                                         subItem.Enabled = true; 
                                     }
-                                    else if (habilitarregiscom && subItem.Name == "registrarCompraToolStripMenuItem")
+                                    else if (habilitarregiscom && subItem.Name == "pagarProductosToolStripMenuItem")
                                     {
                                         subItem.Enabled = true;
                                     }
@@ -205,6 +205,40 @@ namespace UI
                                         subItem.Enabled = true; 
                                     }
                                     
+                                }
+                            }
+                        }
+                    }
+                    if (permisos.Any((P) => P.Nombre_013AL == "menuventa"))
+                    {
+                        var ventasMenuItem = menuStrip1.Items["menuventa"] as ToolStripMenuItem;
+
+                        if (ventasMenuItem != null)
+                        {
+                            ventasMenuItem.Enabled = true;
+
+
+                            bool habilitarPedido = permisos.Any((P) => P.Nombre_013AL == "menuGenerarPedido");
+                            bool habilitarControl = permisos.Any((P) => P.Nombre_013AL == "menuControlFormal");
+                            bool habilitarCobrar = permisos.Any((P) => P.Nombre_013AL == "menuCobrarVenta");
+
+                            foreach (ToolStripItem item in ventasMenuItem.DropDownItems)
+                            {
+                                if (item is ToolStripMenuItem subItem)
+                                {
+                                    subItem.Enabled = false;
+                                    if (habilitarPedido && subItem.Name == "menuGenerarPedido")
+                                    {
+                                        subItem.Enabled = true;
+                                    }
+                                    else if (habilitarControl && subItem.Name == "menuControlFormal")
+                                    {
+                                        subItem.Enabled = true;
+                                    }
+                                    else if (habilitarCobrar && subItem.Name == "menuCobrarVenta")
+                                    {
+                                        subItem.Enabled = true;
+                                    }
                                 }
                             }
                         }
@@ -409,11 +443,6 @@ namespace UI
             form.ShowDialog();
         }
 
-        private void registrarCompraToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            RegistrarCompra_013AL form = new RegistrarCompra_013AL();
-            form.ShowDialog();
-        }
 
         private void recepciónDeProductosToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -429,7 +458,7 @@ namespace UI
 
         private void generarPedidoToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GenerarFactura_013AL form = new GenerarFactura_013AL();
+            RegistrarPedido_013AL form = new RegistrarPedido_013AL();
             form.ShowDialog();
         }
 
@@ -442,6 +471,12 @@ namespace UI
         private void menuCobrarVenta_Click(object sender, EventArgs e)
         {
             CobrarVenta_013AL form = new CobrarVenta_013AL();
+            form.ShowDialog();
+        }
+
+        private void pagarProductosToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            PagarProducto_013AL form = new PagarProducto_013AL();
             form.ShowDialog();
         }
     }

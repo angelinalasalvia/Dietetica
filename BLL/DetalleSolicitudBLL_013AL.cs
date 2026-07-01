@@ -27,9 +27,19 @@ namespace BLL
             p.CodSCotizacion_013AL = codsc;
             return dal.EliminarDetalleSC_013AL(p);
         }
-        public DetalleSolicitudC_013AL ListarProductosOC_013AL(int codsc)
+        public List<DetalleSolicitudC_013AL> ListarProductosOC_013AL(int codsc)
         {
             return dal.ListarProductosOC_013AL(codsc);
+        }
+        public string ActualizarCantidadDetalleSC_013AL(int codsc, int idp, int cantidad)
+        {
+            DetalleSolicitudC_013AL detalle = new DetalleSolicitudC_013AL();
+
+            detalle.CodSCotizacion_013AL = codsc;
+            detalle.CodProducto_013AL = idp;
+            detalle.Cantidad_013AL = cantidad;
+
+            return dal.ActualizarCantidadDetalleSC_013AL(detalle);
         }
     }
 }

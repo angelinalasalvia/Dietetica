@@ -83,7 +83,7 @@ namespace DAL
             catch (Exception ex)
             {
                 throw new Exception("Error al listar detalle: " + ex.Message);
-                //throw new Exception("Error al listar detalle", ex);
+                
             }
             return detalle;
         }

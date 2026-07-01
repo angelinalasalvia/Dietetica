@@ -32,10 +32,7 @@ namespace BLL
             obj.NombreProveedor_013AL = nombre;
             obj.CUIT_013AL = cuit;
             obj.RazonSocial_013AL = razonsocial;
-            /*if (ExisteCuit(cuit))
-            {
-                return "El CUIT ingresado ya está registrado.";
-            }*/
+            
             return dal.PreregistrarProveedor_013AL(obj);
         }
         public string RegistrarProveedor_013AL(int cuit, string apellido, string dom, string mail, int tel)
@@ -69,6 +66,10 @@ namespace BLL
             Proveedor_013AL p = new Proveedor_013AL();
             p.CUIT_013AL = cuit;
             return dal.EliminarProveedor_013AL(p);
+        }
+        public bool ProveedorRegistrado_013AL(int cuit)
+        {
+            return dal.ProveedorRegistrado_013AL(cuit);
         }
     }
 }

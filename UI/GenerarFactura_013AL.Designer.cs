@@ -1,6 +1,6 @@
 ﻿namespace UI
 {
-    partial class GenerarFactura_013AL
+    partial class RegistrarPedido_013AL
     {
         /// <summary>
         /// Required designer variable.
@@ -143,7 +143,7 @@
             this.button2.TabIndex = 20;
             this.button2.Text = "EliminarProducto";
             this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click_1);
+            this.button2.Click += new System.EventHandler(this.button2_Click);
             // 
             // dataGridView2
             // 
@@ -153,7 +153,7 @@
             this.dataGridView2.Size = new System.Drawing.Size(267, 80);
             this.dataGridView2.TabIndex = 21;
             // 
-            // GenerarFactura_013AL
+            // RegistrarPedido_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -170,8 +170,8 @@
             this.Controls.Add(this.label3);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Name = "GenerarFactura_013AL";
-            this.Text = "GenerarFactura";
+            this.Name = "RegistrarPedido_013AL";
+            this.Text = "RegistrarPedido";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView2)).EndInit();
             this.ResumeLayout(false);

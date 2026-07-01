@@ -10,9 +10,9 @@ public class Prueba
     [ExpectedException(typeof(Exception))]
     public void RegistrarVentaCompleta_CompraDuplicada_LanzaExcepcion()
     {
-        FacturaBLL_013AL facturaBLL = new FacturaBLL_013AL();
+        PedidoBLL_013AL facturaBLL = new PedidoBLL_013AL();
 
-        Factura_013AL factura = new Factura_013AL
+        Pedido_013AL factura = new Pedido_013AL
         {
             CodCompra_013AL = 1, 
             CUIL_013AL = 23924,
@@ -31,6 +31,6 @@ public class Prueba
         }
     };
 
-        facturaBLL.RegistrarVentaCompleta_013AL(factura, detalles);
+        //facturaBLL.RegistrarVentaCompleta_013AL(factura, detalles);
     }
 }

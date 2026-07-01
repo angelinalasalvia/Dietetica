@@ -1,20 +1,21 @@
 ﻿using BE_013AL;
+using BLL;
 using BLL_013AL;
+using iTextSharp.text;
+using iTextSharp.text.pdf;
+using Servicios_013AL;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Forms;
-using iTextSharp.text;
-using iTextSharp.text.pdf;
-using System.IO;
-using Servicios_013AL;
-using BLL;
+using System.Xml.Serialization;
 
 namespace UI
 {
@@ -105,82 +106,165 @@ namespace UI
             dataGridView1.Columns.Add("PrecioUnitario", "Precio Unitario");
 
             // Formato para la columna de Precio Unitario
-            dataGridView1.Columns["PrecioUnitario"].DefaultCellStyle.Format = "C2";
+            //dataGridView1.Columns["PrecioUnitario"].DefaultCellStyle.Format = "C2";
         }
 
         private void ActualizarDataGridView_013AL()
         {
             dataGridView1.Rows.Clear();
 
-            /*if (!dataGridView1.Columns.Contains("PrecioUnitario"))
-            {
-                DataGridViewTextBoxColumn precioColumn = new DataGridViewTextBoxColumn();
-                precioColumn.Name = "PrecioUnitario";
-                precioColumn.HeaderText = "Precio Unitario";
-                precioColumn.ValueType = typeof(int);
-                precioColumn.DefaultCellStyle.Format = "C2"; 
-                dataGridView1.Columns.Add(precioColumn);
-            }
-            */
-            
             if (comboBox1.SelectedItem is ComboBoxItem selectedItem)
             {
-                var solicitudSeleccionada = (SolicitudCotizacion_013AL)selectedItem.Value;
-                int codsc = solicitudSeleccionada.CodSCotizacion_013AL;
+                var solicitudSeleccionada =
+                    (SolicitudCotizacion_013AL)selectedItem.Value;
 
-                var detalleSolicitud = dbll.ListarProductosOC_013AL(codsc);
+                int codsc =
+                    solicitudSeleccionada.CodSCotizacion_013AL;
 
-                if (detalleSolicitud != null)
+                var detallesSolicitud =
+                    dbll.ListarProductosOC_013AL(codsc);
+
+                if (detallesSolicitud.Count > 0)
                 {
-                    var producto = prbll.ObtenerProductoPorId_013AL(detalleSolicitud.CodProducto_013AL);
+                    foreach (var detalle in detallesSolicitud)
+                    {
+                        var producto =
+                            prbll.ObtenerProductoPorId_013AL(
+                                detalle.CodProducto_013AL);
 
-                    if (producto != null)
-                    {
-                        dataGridView1.Rows.Add(producto.CodProducto_013AL, producto.Nombre_013AL, detalleSolicitud.Cantidad_013AL, producto.Precio_013AL);
-                    }
-                    else
-                    {
-                        MessageBox.Show("No se encontró el producto.");
+                        if (producto != null)
+                        {
+                            dataGridView1.Rows.Add(
+                                producto.CodProducto_013AL,
+                                producto.Nombre_013AL,
+                                detalle.Cantidad_013AL,
+                                producto.Precio_013AL
+                            );
+                        }
                     }
                 }
                 else
                 {
-                    MessageBox.Show("No se encontró ningún detalle de productos para la solicitud seleccionada.");
+                    MessageBox.Show(
+                        "No se encontraron productos para esta solicitud.");
                 }
-            }
-            else
-            {
-                MessageBox.Show("Por favor, selecciona un código válido.");
             }
         }
-
-        /*private void dataGridView1_CellValidating(object sender, DataGridViewCellValidatingEventArgs e)
-        {
-            if (dataGridView1.Columns[e.ColumnIndex].Name == "PrecioUnitario")
-            {
-                
-                if (!decimal.TryParse(e.FormattedValue.ToString(), out _))
-                {
-                    MessageBox.Show("Por favor, ingresa un valor numérico válido para el precio unitario.");
-                    e.Cancel = true; 
-                }
-            }
-        }*/
-      
-
         private void button2_Click(object sender, EventArgs e)
         {
             GuardarOrdenCompraEnBaseDeDatos_013AL();
-
-
-            EventoBLL_013AL bbll = new EventoBLL_013AL();
-            Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-            bbll.AgregarEvento_013AL(user.Login_013AL, "OrdenCompra", "Generar Orden Compra", 2);
         }
 
         private void GuardarOrdenCompraEnBaseDeDatos_013AL()
         {
             try
+            {
+                if (string.IsNullOrEmpty(textBox1.Text))
+                {
+                    MessageBox.Show("Por favor, selecciona un proveedor.");
+                    return;
+                }
+
+                if (comboBox1.SelectedItem is ComboBoxItem selectedItem)
+                {
+                    var solicitudSeleccionada = (SolicitudCotizacion_013AL)selectedItem.Value;
+                    int idSolicitud = solicitudSeleccionada.CodSCotizacion_013AL;
+
+                    ProveedorBLL_013AL proveedorBLL = new ProveedorBLL_013AL();
+
+                    int cuitProveedor = Convert.ToInt32(textBox1.Text);
+
+                    if (!proveedorBLL.ProveedorRegistrado_013AL(cuitProveedor))
+                    {
+                        MessageBox.Show(
+                            "El proveedor seleccionado está preregistrado. Debe completar su registro antes de generar una Orden de Compra.",
+                            "Proveedor no registrado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+
+                        return;
+                    }
+
+                    int total = 0;
+
+                    foreach (DataGridViewRow row in dataGridView1.Rows)
+                    {
+                        if (row.IsNewRow)
+                            continue;
+
+                        if (row.Cells["PrecioUnitario"].Value == null ||
+                            row.Cells["Cantidad"].Value == null)
+                        {
+                            MessageBox.Show("Hay filas con datos incompletos.");
+                            return;
+                        }
+
+                        int precioUnitario;
+                        int cantidad;
+
+                        string precioTexto = row.Cells["PrecioUnitario"].Value.ToString().Trim();
+                        string cantidadTexto = row.Cells["Cantidad"].Value.ToString().Trim();
+
+                        if (!int.TryParse(precioTexto, out precioUnitario))
+                        {
+                            MessageBox.Show(
+                                $"Error en el precio de la fila {row.Index + 1}.\n" +
+                                $"Valor ingresado: '{precioTexto}'");
+                            return;
+                        }
+
+                        if (!int.TryParse(cantidadTexto, out cantidad))
+                        {
+                            MessageBox.Show(
+                                $"Error en la cantidad de la fila {row.Index + 1}.\n" +
+                                $"Valor ingresado: '{cantidadTexto}'");
+                            return;
+                        }
+
+                        total += precioUnitario * cantidad;
+                    }
+
+                    OrdenCompra_013AL nuevaOrden = new OrdenCompra_013AL
+                    {
+                        CodSolicitud_013AL = idSolicitud,
+                        CUITProveedor_013AL = cuitProveedor,
+                        Total_013AL = total
+                    };
+
+                    int codOrdenCompra = ocbll.GuardarOrdenCompra_013AL(nuevaOrden);
+
+                    EventoBLL_013AL bbll = new EventoBLL_013AL();
+                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+
+                    bbll.AgregarEvento_013AL(
+                        user.Login_013AL,
+                        "OrdenCompra",
+                        $"Orden de Compra número {codOrdenCompra} generada.",
+                        3);
+
+                    GenerarPDFOrdenCompra_013AL(
+                        codOrdenCompra,
+                        nuevaOrden,
+                        total);
+
+                    MessageBox.Show(
+                        "Orden de compra guardada correctamente con código: " +
+                        codOrdenCompra);
+                }
+                else
+                {
+                    MessageBox.Show(
+                        "Por favor, selecciona una solicitud válida.");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    "Ocurrió un error al guardar la orden de compra: " +
+                    ex.Message);
+            }
+
+            /*try
             {
                 
                 if (string.IsNullOrEmpty(textBox1.Text))
@@ -189,21 +273,55 @@ namespace UI
                     return;
                 }
 
-                // Obtener los valores necesarios
                 if (comboBox1.SelectedItem is ComboBoxItem selectedItem)
                 {
                     var solicitudSeleccionada = (SolicitudCotizacion_013AL)selectedItem.Value;
                     int idSolicitud = solicitudSeleccionada.CodSCotizacion_013AL;
+
+                    ProveedorBLL_013AL proveedorBLL = new ProveedorBLL_013AL();
+
                     int cuitProveedor = Convert.ToInt32(textBox1.Text);
+
+                    if (!proveedorBLL.ProveedorRegistrado_013AL(cuitProveedor))
+                    {
+                        MessageBox.Show(
+                            "El proveedor seleccionado está preregistrado. Debe completar su registro antes de generar una Orden de Compra.",
+                            "Proveedor no registrado",
+                            MessageBoxButtons.OK,
+                            MessageBoxIcon.Warning);
+
+                        return;
+                    }
                     
                     int total = 0;
                     foreach (DataGridViewRow row in dataGridView1.Rows)
                     {
-                        if (row.Cells["PrecioUnitario"].Value != null && row.Cells["Cantidad"].Value != null)
+                        if (row.IsNewRow)
+                            continue;
+
+                        if (row.Cells["PrecioUnitario"].Value != null &&
+                            row.Cells["Cantidad"].Value != null)
                         {
-                            int precioUnitario = Convert.ToInt32(row.Cells["PrecioUnitario"].Value);
-                            int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
-                            total += precioUnitario * cantidad;
+                            decimal precioUnitario;
+                            int cantidad;
+
+                            if (decimal.TryParse(
+                                    row.Cells["PrecioUnitario"].Value.ToString(),
+                                    out precioUnitario)
+                                &&
+                                int.TryParse(
+                                    row.Cells["Cantidad"].Value.ToString(),
+                                    out cantidad))
+                            {
+                                total += (int)(precioUnitario * cantidad);
+                            }
+                            else
+                            {
+                                MessageBox.Show(
+                                    "Error en el formato del precio.");
+
+                                return;
+                            }
                         }
                     }
 
@@ -214,13 +332,16 @@ namespace UI
                         Total_013AL = total 
                     };
 
-                    
-                    ocbll.GuardarOrdenCompra_013AL(nuevaOrden); 
+                    int codOrdenCompra = ocbll.GuardarOrdenCompra_013AL(nuevaOrden);
 
-                    int codOrdenCompra = ocbll.ObtenerCodOrdenCompra_013AL(nuevaOrden.CodSolicitud_013AL, nuevaOrden.CUITProveedor_013AL, DateTime.Now);
+                    EventoBLL_013AL bbll = new EventoBLL_013AL();
+                    Usuarios_013AL user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "OrdenCompra", $"Orden de Compra número {codOrdenCompra} generada.", 3);
 
                     GenerarPDFOrdenCompra_013AL(codOrdenCompra, nuevaOrden, total);
                     
+                    MessageBox.Show("Orden de compra guardada correctamente con código: " + codOrdenCompra);
+
                 }
                 else
                 {
@@ -230,7 +351,7 @@ namespace UI
             catch (Exception ex)
             {
                 MessageBox.Show("Ocurrió un error al guardar la orden de compra: " + ex.Message);
-            }
+            }*/
         }
 
         private void GenerarPDFOrdenCompra_013AL(int codOrdenCompra, OrdenCompra_013AL orden, int totalGeneral)
@@ -285,7 +406,16 @@ namespace UI
                         string idProducto = row.Cells["IdProducto"].Value.ToString();
                         string nombreProducto = row.Cells["Nombre"].Value.ToString();
                         int cantidad = Convert.ToInt32(row.Cells["Cantidad"].Value);
-                        decimal precioUnitario = Convert.ToDecimal(row.Cells["PrecioUnitario"].Value);
+                        decimal precioUnitario;
+                        if (!decimal.TryParse(
+                                row.Cells["PrecioUnitario"].Value.ToString(),
+                                out precioUnitario))
+                        {
+                            MessageBox.Show(
+                                "Precio unitario inválido.");
+
+                            return;
+                        }
                         decimal totalIndividual = cantidad * precioUnitario;
 
                         // Agregar los datos a la tabla
@@ -321,10 +451,87 @@ namespace UI
             CargarProveedor_013AL();
         }
 
-        private void button4_Click(object sender, EventArgs e)
+        private List<DetalleSolicitudC_013AL> DeserializarXML_013AL(string path)
         {
-            PagarProducto_013AL form = new PagarProducto_013AL();
-            form.ShowDialog();
+            using (FileStream fs = new FileStream(path, FileMode.Open))
+            {
+                XmlSerializer serializer =
+                    new XmlSerializer(typeof(List<DetalleSolicitudC_013AL>));
+
+                return (List<DetalleSolicitudC_013AL>)
+                    serializer.Deserialize(fs);
+            }
+        }
+        private void CargarCotizacionXML_013AL(List<DetalleSolicitudC_013AL> cotizacion)
+        {
+            if (comboBox1.SelectedItem == null)
+            {
+                MessageBox.Show("Seleccione una solicitud primero.");
+                return;
+            }
+
+            if (cotizacion == null || cotizacion.Count == 0)
+            {
+                MessageBox.Show("El archivo XML no contiene productos.");
+                return;
+            }
+
+            int solicitudActual =
+                ((SolicitudCotizacion_013AL)
+                ((ComboBoxItem)comboBox1.SelectedItem).Value)
+                .CodSCotizacion_013AL;
+
+            if (cotizacion.First().CodSCotizacion_013AL != solicitudActual)
+            {
+                MessageBox.Show(
+                    "El XML no corresponde a la solicitud seleccionada.");
+
+                return;
+            }
+
+            foreach (var itemXML in cotizacion)
+            {
+                foreach (DataGridViewRow row in dataGridView1.Rows)
+                {
+                    if (row.Cells["IdProducto"].Value != null)
+                    {
+                        int idProductoGrid =
+                            Convert.ToInt32(row.Cells["IdProducto"].Value);
+
+                        if (idProductoGrid == itemXML.CodProducto_013AL)
+                        {
+                            row.Cells["PrecioUnitario"].Value =
+                                itemXML.PrecioUnitario_013AL;
+
+                            break;
+                        }
+                    }
+                }
+            }
+
+            MessageBox.Show("Cotización cargada correctamente.");
+        }
+        private void button5_Click(object sender, EventArgs e)
+        {
+            OpenFileDialog ofd = new OpenFileDialog();
+
+            ofd.Filter = "Archivos XML (*.xml)|*.xml";
+
+            if (ofd.ShowDialog() == DialogResult.OK)
+            {
+                try
+                {
+                    var cotizacion = DeserializarXML_013AL(ofd.FileName);
+
+                    CargarCotizacionXML_013AL(cotizacion);
+
+                    MessageBox.Show("Cotización cargada correctamente.");
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error al cargar XML: " + ex.Message);
+                }
+            }
         }
     }
 }

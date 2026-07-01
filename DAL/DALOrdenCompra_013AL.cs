@@ -46,14 +46,14 @@ namespace DAL
         }
 
 
-        public List<OrdenCompra_013AL> ListarOrdenCompra_013AL()
+        /*public List<OrdenCompra_013AL> ListarOrdenCompra_013AL()
         {
             List<OrdenCompra_013AL> Lista = new List<OrdenCompra_013AL>();
             try
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    string query = "SELECT * FROM [OrdenCompra-013AL]";
+                    string query = "SELECT * FROM [OrdenCompra-013AL] Where [Completo-013AL] = 0";
                     com = new SqlCommand(query, con);
                     com.CommandType = CommandType.Text;
                     con.Open();
@@ -81,7 +81,7 @@ namespace DAL
                 throw new Exception("Error al listar ordenes de compra", ex);
             }
             return Lista;
-        }
+        }*/
         public int ObtenerCodOrdenCompra_013AL(int idSolicitud, int cuitProveedor, DateTime fecha)
         {
             int codOrdenCompra = 0;
@@ -130,9 +130,11 @@ namespace DAL
 
             using (SqlConnection con = conexion.ObtenerConexion())
             {
-                using (SqlCommand com = new SqlCommand("SELECT * FROM [OrdenCompra-013AL]", con))
+                string query = "SELECT * FROM [OrdenCompra-013AL] WHERE [Completo-013AL] = 0";
+
+                using (SqlCommand com = new SqlCommand(query, con))
                 {
-                    com.CommandType = CommandType.Text; // O CommandType.StoredProcedure
+                    com.CommandType = CommandType.Text;
 
                     SqlDataAdapter da = new SqlDataAdapter(com);
                     da.Fill(dt);
@@ -150,24 +152,19 @@ namespace DAL
                 {
                     cmd.Connection = con;
                     cmd.CommandText = @"
-                    SELECT 
-                    [Producto-013AL].[CodProducto-013AL], 
-                    [Producto-013AL].[Nombre-013AL], 
-                    [Producto-013AL].[Stock-013AL], 
-                    [Producto-013AL].[Precio-013AL], 
-                    [Producto-013AL].[Imagen-013AL], 
-                    [Producto-013AL].[Descripcion-013AL], 
-                    [Producto-013AL].[Bit_Lo_Bo-013AL], 
-                    [DetalleSolicitudC-013AL].[Cantidad-013AL],
-                    [OrdenCompra-013AL].[Completo-013AL]
-                    FROM [OrdenCompra-013AL]
-                    JOIN [SolicitudCotizacion-013AL] 
-                    ON [OrdenCompra-013AL].[CodSolicitud-013AL] = [SolicitudCotizacion-013AL].[CodSCotizacion-013AL]
-                    JOIN [DetalleSolicitudC-013AL] 
-                    ON [SolicitudCotizacion-013AL].[CodSCotizacion-013AL] = [DetalleSolicitudC-013AL].[CodSCotizacion-013AL]
-                    JOIN [Producto-013AL] 
-                    ON [DetalleSolicitudC-013AL].[CodProducto-013AL] = [Producto-013AL].[CodProducto-013AL]
-                    WHERE [OrdenCompra-013AL].[CodOrdenCompra-013AL] = @CodOrdenCompra;";
+                    SELECT
+                        p.[CodProducto-013AL],
+                        p.[Nombre-013AL],
+                        p.[Stock-013AL] AS StockActual,
+                        d.[Cantidad-013AL] AS CantidadComprada
+                    FROM [OrdenCompra-013AL] oc
+                    INNER JOIN [SolicitudCotizacion-013AL] sc
+                        ON oc.[CodSolicitud-013AL] = sc.[CodSCotizacion-013AL]
+                    INNER JOIN [DetalleSolicitudC-013AL] d
+                        ON sc.[CodSCotizacion-013AL] = d.[CodSCotizacion-013AL]
+                    INNER JOIN [Producto-013AL] p
+                        ON d.[CodProducto-013AL] = p.[CodProducto-013AL]
+                    WHERE oc.[CodOrdenCompra-013AL] = @CodOrdenCompra";
                     cmd.Parameters.AddWithValue("@CodOrdenCompra", codOrdenCompra);
 
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -238,6 +235,141 @@ namespace DAL
                 throw new Exception("Error al traer datos del proveedor: " + ex.Message);
             }
             return proveedor;
+        }
+        public string ConfirmarRecepcion_013AL(int codOrdenCompra)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    con.Open();
+
+                    SqlTransaction trans = con.BeginTransaction();
+
+                    try
+                    {
+                        // Obtener productos de la OC
+                        string queryProductos = @"
+                        SELECT
+                            p.[CodProducto-013AL],
+                            p.[Stock-013AL],
+                            d.[Cantidad-013AL]
+                        FROM [OrdenCompra-013AL] oc
+                        INNER JOIN [SolicitudCotizacion-013AL] sc
+                            ON oc.[CodSolicitud-013AL] = sc.[CodSCotizacion-013AL]
+                        INNER JOIN [DetalleSolicitudC-013AL] d
+                            ON sc.[CodSCotizacion-013AL] = d.[CodSCotizacion-013AL]
+                        INNER JOIN [Producto-013AL] p
+                            ON d.[CodProducto-013AL] = p.[CodProducto-013AL]
+                        WHERE oc.[CodOrdenCompra-013AL] = @CodOrdenCompra";
+
+                        DataTable dtProductos = new DataTable();
+
+                        using (SqlCommand cmd = new SqlCommand(queryProductos, con, trans))
+                        {
+                            cmd.Parameters.AddWithValue("@CodOrdenCompra", codOrdenCompra);
+
+                            using (SqlDataAdapter da = new SqlDataAdapter(cmd))
+                            {
+                                da.Fill(dtProductos);
+                            }
+                        }
+
+
+                        foreach (DataRow row in dtProductos.Rows)
+                        {
+                            int codProducto = Convert.ToInt32(row["CodProducto-013AL"]);
+                            int stockActual = Convert.ToInt32(row["Stock-013AL"]);
+                            int cantidadComprada = Convert.ToInt32(row["Cantidad-013AL"]);
+
+                            int nuevoStock = stockActual + cantidadComprada;
+
+                            string updateStock = @"
+                            UPDATE [Producto-013AL]
+                            SET [Stock-013AL] = @NuevoStock
+                            WHERE [CodProducto-013AL] = @CodProducto";
+
+                            using (SqlCommand cmdUpdate = new SqlCommand(updateStock, con, trans))
+                            {
+                                cmdUpdate.Parameters.AddWithValue("@NuevoStock", nuevoStock);
+                                cmdUpdate.Parameters.AddWithValue("@CodProducto", codProducto);
+
+                                cmdUpdate.ExecuteNonQuery();
+                            }
+                        }
+
+                        string updateOC = @"
+                        UPDATE [OrdenCompra-013AL]
+                        SET [Completo-013AL] = 1
+                        WHERE [CodOrdenCompra-013AL] = @CodOrdenCompra";
+
+                        using (SqlCommand cmdOC = new SqlCommand(updateOC, con, trans))
+                        {
+                            cmdOC.Parameters.AddWithValue("@CodOrdenCompra", codOrdenCompra);
+                            cmdOC.ExecuteNonQuery();
+                        }
+
+                        trans.Commit();
+
+                        return "OK";
+                    }
+                    catch
+                    {
+                        trans.Rollback();
+                        throw;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                return "Error: " + ex.Message;
+            }
+        }
+        public DataTable ListarOrdenesPendientesPago_013AL()
+        {
+            DataTable dt = new DataTable();
+
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                string query = @"
+                SELECT *
+                FROM [OrdenCompra-013AL]
+                WHERE [Completo-013AL] = 0
+                AND [Cobrado-013AL] = 0";
+
+                using (SqlCommand com = new SqlCommand(query, con))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter(com);
+                    da.Fill(dt);
+                }
+            }
+
+            return dt;
+        }
+        public string ActualizarEstadoCobrado_013AL(int codOrdenCompra)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    string query = @"
+                    UPDATE [OrdenCompra-013AL]
+                    SET [Cobrado-013AL] = 1
+                    WHERE [CodOrdenCompra-013AL] = @CodOrdenCompra";
+
+                    SqlCommand cmd = new SqlCommand(query, con);
+
+                    cmd.Parameters.AddWithValue("@CodOrdenCompra", codOrdenCompra);
+
+                    con.Open();
+
+                    return cmd.ExecuteNonQuery() == 1 ? "OK" : "Error";
+                }
+            }
+            catch (Exception ex)
+            {
+                return ex.Message;
+            }
         }
     }
 }

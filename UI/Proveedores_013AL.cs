@@ -163,6 +163,8 @@ namespace UI
             }
         }
 
+        Usuarios_013AL user;
+        EventoBLL_013AL bbll = new EventoBLL_013AL();
         private void button3_Click(object sender, EventArgs e)
         {
             if (dataGridView1.SelectedRows.Count > 0)
@@ -182,6 +184,12 @@ namespace UI
 
                 CargarProveedores_013AL();
 
+                try
+                {
+                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
+                    bbll.AgregarEvento_013AL(user.Login_013AL, "Proveedores", $"Proveedor {txtnombre.Text} registrado.", 2);
+                }
+                catch (Exception ex) { Console.WriteLine(ex); }
             }
             else
             {

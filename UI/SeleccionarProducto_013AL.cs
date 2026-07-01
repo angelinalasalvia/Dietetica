@@ -118,139 +118,6 @@ namespace UI
             }
         }
 
-        /*private void SalesItem(object sender, EventArgs e)
-        {
-            try
-            {
-                int Cantidad = Convert.ToInt32(Interaction.InputBox("Ingrese la cantidad que desea comprar: "));
-                string str = ((PictureBox)sender).Tag.ToString();
-                Producto_013AL producto = prbll.Devolver_Producto_Buscado_x_Id_013AL(Convert.ToInt32(str));
-
-                if (Cantidad <= 0)
-                {
-                    MessageBox.Show("La cantidad ingresada debe ser mayor a cero.");
-                    return;
-                }
-
-                if (Cantidad > producto.Stock_013AL)
-                {
-                    MessageBox.Show("La cantidad solicitada supera el stock disponible.");
-                    return;
-                }
-
-                IdCompra = dbll.ObtenerSiguienteIdCompra_013AL();
-
-                Detalle_013AL detalleExistente = dbll.ObtenerDetalle_013AL(IdCompra, producto.CodProducto_013AL);
-
-                if (detalleExistente != null)
-                {
-                    int nuevaCantidad = detalleExistente.Cantidad_013AL + Cantidad;
-
-                    dbll.ActualizarCantidadDetalle_013AL(
-                        IdCompra,
-                        producto.CodProducto_013AL,
-                        nuevaCantidad
-                    );
-                }
-                else
-                {
-                    Detalle_013AL detalle = new Detalle_013AL
-                    {
-                        CodCompra_013AL = IdCompra,
-                        CodProducto_013AL = producto.CodProducto_013AL,
-                        Cantidad_013AL = Cantidad,
-                        PrecioUnitario_013AL = producto.Precio_013AL
-                    };
-
-                    dbll.AgregarDetalle_013AL(detalle);
-
-                    List<PedidoBLL_013AL> lista = pbll.ListarPedido_013AL();
-
-                    if (!lista.Any(p => p.CodCompra_013AL == IdCompra))
-                    {
-                        
-                    }
-                    else
-                    {
-                        PedidoBLL_013AL pedido = new PedidoBLL_013AL
-                        {
-                            CodCompra_013AL = IdCompra,
-                            Fecha_013AL = DateTime.Now,
-                            Total_013AL = 0 
-                        };
-
-                        pbll.CrearPedido_013AL(pedido);
-                    }
-                }
-
-                // Descontar stock real
-                prbll.DescontarStock_013AL(producto.CodProducto_013AL, Cantidad);
-
-                decimal totalPedido = dbll.CalcularTotalPedido_013AL(IdCompra);
-
-                MessageBox.Show($"Producto '{producto.Nombre_013AL}' agregado.\nCantidad: {Cantidad}\nSubtotal: {(producto.Precio_013AL * Cantidad)}",
-                    "Producto Agregado", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                LoadItems_013AL(); 
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ocurrió un error al agregar el producto: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-            /*try
-            {
-                int Cantidad = Convert.ToInt32(Interaction.InputBox("Ingrese la cantidad que desea comprar: "));
-                string str = ((PictureBox)sender).Tag.ToString();
-                Producto_013AL producto = bll.Devolver_Producto_Buscado_x_Id_013AL(Convert.ToInt32(str));
-
-                if (Cantidad <= 0)
-                {
-                    MessageBox.Show("La cantidad ingresada debe ser mayor a cero.");
-                    return;
-                }
-
-                if (Cantidad > producto.Stock_013AL)
-                {
-                    MessageBox.Show("La cantidad solicitada supera el stock disponible.");
-                    return;
-                }
-
-
-                var listaProductosCompra = bll.ListarCompraProducto_013AL();
-                var detalleExistente = listaProductosCompra
-                    .FirstOrDefault(p => p.CodCompra_013AL == IdCompra && p.CodProducto_013AL == producto.CodProducto_013AL);
-
-                string respuesta;
-                
-                bll.DescontarStock_013AL(producto.CodProducto_013AL, Cantidad);
-
-                if (detalleExistente != null)
-                {
-                    
-                    int nuevaCantidad = detalleExistente.Cantidad_013AL + Cantidad;
-                    respuesta = bll.ActualizarCantidadCompraProducto_013AL(IdCompra, producto.CodProducto_013AL, nuevaCantidad);
-                }
-                else
-                {
-                    
-                    respuesta = bll.AgregarCompraProducto_013AL(IdCompra, producto.CodProducto_013AL, Cantidad, producto.Precio_013AL);
-                }
-              
-
-                // Mostrar feedback al usuario
-                MessageBox.Show($"Producto '{producto.Nombre_013AL}' agregado.\nCantidad: {Cantidad}\nSubtotal: {(producto.Precio_013AL * Cantidad)}",
-                    "Producto Agregado", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Opcional: Actualizar los productos en pantalla para reflejar el stock
-                LoadItems_013AL();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show("Ocurrió un error al agregar el producto: " + ex.Message,
-                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }*/
-      
         private void SalesItem(object sender, EventArgs e)
         {
             try 
@@ -267,7 +134,12 @@ namespace UI
                 { 
                     MessageBox.Show("Stock insuficiente."); 
                     return; 
-                } 
+                }
+                if (cantidad > 10000)
+                {
+                    MessageBox.Show("Cantidad máxima permitida es 10.000.");
+                    return;
+                }
                 Detalle_013AL detalleExistente = dbll.ObtenerDetalle_013AL(IdCompraActual, producto.CodProducto_013AL); 
                 if (detalleExistente != null) 
                 { 

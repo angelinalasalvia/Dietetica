@@ -46,6 +46,7 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label3 = new System.Windows.Forms.Label();
             this.btnHistorial = new System.Windows.Forms.Button();
+            this.button3 = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
@@ -204,11 +205,22 @@
             this.btnHistorial.UseVisualStyleBackColor = true;
             this.btnHistorial.Click += new System.EventHandler(this.btnHistorial_Click);
             // 
+            // button3
+            // 
+            this.button3.Location = new System.Drawing.Point(309, 305);
+            this.button3.Name = "button3";
+            this.button3.Size = new System.Drawing.Size(84, 36);
+            this.button3.TabIndex = 41;
+            this.button3.Text = "Mostrar Lotes";
+            this.button3.UseVisualStyleBackColor = true;
+            this.button3.Click += new System.EventHandler(this.button3_Click);
+            // 
             // Productos_013AL
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(412, 453);
+            this.Controls.Add(this.button3);
             this.Controls.Add(this.btnHistorial);
             this.Controls.Add(this.label3);
             this.Controls.Add(this.pictureBox1);
@@ -257,5 +269,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Button btnHistorial;
+        private System.Windows.Forms.Button button3;
     }
 }

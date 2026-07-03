@@ -17,7 +17,7 @@ namespace BLL
             DetalleSolicitudC_013AL obj = new DetalleSolicitudC_013AL();
             obj.CodSCotizacion_013AL = sc;
             obj.CodProducto_013AL = prod;
-            obj.Cantidad_013AL = cant;
+            obj.CantidadPedida_013AL = cant;
             return dal.AgregarDetalleSC_013AL(obj);
         }
         public string EliminarDetalleSC_013AL(int idp, int codsc)
@@ -37,7 +37,7 @@ namespace BLL
 
             detalle.CodSCotizacion_013AL = codsc;
             detalle.CodProducto_013AL = idp;
-            detalle.Cantidad_013AL = cantidad;
+            detalle.CantidadPedida_013AL = cantidad;
 
             return dal.ActualizarCantidadDetalleSC_013AL(detalle);
         }

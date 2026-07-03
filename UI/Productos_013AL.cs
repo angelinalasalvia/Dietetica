@@ -290,5 +290,11 @@ namespace UI
                 MessageBox.Show("Selecciona un producto para ver su historial.", "Atención", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+            Lotes_013AL form = new Lotes_013AL();
+            form.ShowDialog();
+        }
     }
 }

@@ -66,6 +66,7 @@
     <Compile Include="ClienteBLL_013AL.cs" />
     <Compile Include="DetalleBLL_013AL.cs" />
     <Compile Include="DetalleSolicitudBLL_013AL.cs" />
+    <Compile Include="LoteBLL_013AL.cs" />
     <Compile Include="PedidoBLL_013AL.cs" />
     <Compile Include="FamiliaBLL_013AL.cs" />
     <Compile Include="IdiomaBLL_013AL.cs" />

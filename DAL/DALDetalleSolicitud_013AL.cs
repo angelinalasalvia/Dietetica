@@ -26,7 +26,7 @@ namespace DAL
                     com.CommandType = CommandType.StoredProcedure;
                     com.Parameters.Add("@sc", SqlDbType.Int).Value = obj.CodSCotizacion_013AL;
                     com.Parameters.Add("@prod", SqlDbType.Int).Value = obj.CodProducto_013AL;
-                    com.Parameters.Add("@cant", SqlDbType.Int).Value = obj.Cantidad_013AL;
+                    com.Parameters.Add("@cant", SqlDbType.Int).Value = obj.CantidadPedida_013AL;
                     con.Open();
                     respuesta = com.ExecuteNonQuery() == 1 ? "OK" : "No se pudo AgregarDetalleSC";
                 }
@@ -79,7 +79,7 @@ namespace DAL
                                 {
                                     CodSCotizacion_013AL = codsc,
                                     CodProducto_013AL = (int)reader["CodProducto-013AL"],
-                                    Cantidad_013AL = (int)reader["Cantidad-013AL"]
+                                    CantidadPedida_013AL = (int)reader["CantidadPedida-013AL"]
                                 });
                         }
                     }
@@ -113,7 +113,7 @@ namespace DAL
                         .Value = obj.CodProducto_013AL;
 
                     com.Parameters.Add("@cant", SqlDbType.Int)
-                        .Value = obj.Cantidad_013AL;
+                        .Value = obj.CantidadPedida_013AL;
 
                     con.Open();
 

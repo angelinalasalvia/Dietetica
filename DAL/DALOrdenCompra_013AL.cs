@@ -156,7 +156,8 @@ namespace DAL
                         p.[CodProducto-013AL],
                         p.[Nombre-013AL],
                         p.[Stock-013AL] AS StockActual,
-                        d.[Cantidad-013AL] AS CantidadComprada
+                        d.[CantidadPedida-013AL],
+                        d.[CantidadRecibida-013AL]
                     FROM [OrdenCompra-013AL] oc
                     INNER JOIN [SolicitudCotizacion-013AL] sc
                         ON oc.[CodSolicitud-013AL] = sc.[CodSCotizacion-013AL]

@@ -189,6 +189,12 @@
     <Compile Include="Inicio_013AL.Designer.cs">
       <DependentUpon>Inicio_013AL.cs</DependentUpon>
     </Compile>
+    <Compile Include="Lotes_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Lotes_013AL.Designer.cs">
+      <DependentUpon>Lotes_013AL.cs</DependentUpon>
+    </Compile>
     <Compile Include="OrdenCompraForm_013AL.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -214,6 +220,12 @@
       <DependentUpon>Productos_C_013AL.cs</DependentUpon>
     </Compile>
     <Compile Include="Program.cs" />
+    <Compile Include="Promociones_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Promociones_013AL.Designer.cs">
+      <DependentUpon>Promociones_013AL.cs</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="PreregistrarProveedor_013AL.cs">
       <SubType>Form</SubType>
@@ -292,6 +304,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Inicio_013AL.resx">
       <DependentUpon>Inicio_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Lotes_013AL.resx">
+      <DependentUpon>Lotes_013AL.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="OrdenCompraForm_013AL.resx">
       <DependentUpon>OrdenCompraForm_013AL.cs</DependentUpon>
@@ -388,7 +403,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
+      <UserProperties en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets')" />

@@ -24,41 +24,21 @@ namespace UI
         {
             dataGridView1.DataSource = bll.ListarLotes_013AL();
 
-            dataGridView1.Columns["IdLote"].Visible = false;
+            dataGridView1.Columns["CodLote-013AL"].Visible = false;
 
             dataGridView1.Columns["Producto"].HeaderText = "Producto";
-            dataGridView1.Columns["NumeroLote"].HeaderText = "Lote";
-            dataGridView1.Columns["FechaIngreso"].HeaderText = "Ingreso";
-            dataGridView1.Columns["FechaVencimiento"].HeaderText = "Vencimiento";
-            dataGridView1.Columns["CantidadInicial"].HeaderText = "Inicial";
-            dataGridView1.Columns["CantidadDisponible"].HeaderText = "Disponible";
-            dataGridView1.Columns["Estado"].HeaderText = "Estado";
-            dataGridView1.Columns["Promocion"].HeaderText = "Promoción";
-        }
-        private void dataGridView1_SelectionChanged(object sender, EventArgs e)
-        {
-            if (dataGridView1.CurrentRow != null)
-            {
-                textBox1.Text = dataGridView1.CurrentRow.Cells["Producto"].Value.ToString();
-                textBox2.Text = dataGridView1.CurrentRow.Cells["NumeroLote"].Value.ToString();
-                dateTimePicker1.Value = Convert.ToDateTime(dataGridView1.CurrentRow.Cells["FechaIngreso"].Value);
-                dateTimePicker2.Value = Convert.ToDateTime(dataGridView1.CurrentRow.Cells["FechaVencimiento"].Value);
-                textBox5.Text = dataGridView1.CurrentRow.Cells["CantidadInicial"].Value.ToString();
-                textBox6.Text = dataGridView1.CurrentRow.Cells["CantidadDisponible"].Value.ToString();
-                comboBox1.Text = dataGridView1.CurrentRow.Cells["Estado"].Value.ToString();
-
-                dateTimePicker2.Enabled = true;
-                comboBox1.Enabled = true;
-
-                button1.Enabled =
-                    comboBox1.Text == "Próximo a vencer";
-            }
+            dataGridView1.Columns["NumeroLote-013AL"].HeaderText = "Lote";
+            dataGridView1.Columns["FechaIngreso-013AL"].HeaderText = "Ingreso";
+            dataGridView1.Columns["FechaVencimiento-013AL"].HeaderText = "Vencimiento";
+            dataGridView1.Columns["CantidadInicial-013AL"].HeaderText = "Inicial";
+            dataGridView1.Columns["CantidadDisponible-013AL"].HeaderText = "Disponible";
+            dataGridView1.Columns["Estado-013AL"].HeaderText = "Estado";
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            int idLote = Convert.ToInt32(dataGridView1.CurrentRow.Cells["IdLote"].Value);
+            int idLote = Convert.ToInt32(dataGridView1.CurrentRow.Cells["CodLote-013AL"].Value);
 
-            Promociones_013AL frm = new Promociones_013AL(idLote);
+            SolicitudPromocionForm_013AL frm = new SolicitudPromocionForm_013AL(idLote);
             frm.ShowDialog();
 
             CargarLotes();
@@ -67,7 +47,7 @@ namespace UI
 
         private void button2_Click(object sender, EventArgs e)
         {
-            int idLote = Convert.ToInt32(dataGridView1.CurrentRow.Cells["IdLote"].Value);
+            int idLote = Convert.ToInt32(dataGridView1.CurrentRow.Cells["CodLote-013AL"].Value);
 
             bll.ModificarLote_013AL(
                 idLote,
@@ -85,6 +65,28 @@ namespace UI
         private void Lotes_013AL_Load(object sender, EventArgs e)
         {
             button1.Enabled = false;
+        }
+
+        private void dataGridView1_SelectionChanged_1(object sender, EventArgs e)
+        {
+            if (dataGridView1.CurrentRow != null)
+            {
+                textBox1.Text = dataGridView1.CurrentRow.Cells["Producto"].Value.ToString();
+                textBox2.Text = dataGridView1.CurrentRow.Cells["NumeroLote-013AL"].Value.ToString();
+                dateTimePicker1.Value = Convert.ToDateTime(dataGridView1.CurrentRow.Cells["FechaIngreso-013AL"].Value);
+                dateTimePicker2.Value = Convert.ToDateTime(dataGridView1.CurrentRow.Cells["FechaVencimiento-013AL"].Value);
+                textBox5.Text = dataGridView1.CurrentRow.Cells["CantidadInicial-013AL"].Value.ToString();
+                textBox6.Text = dataGridView1.CurrentRow.Cells["CantidadDisponible-013AL"].Value.ToString();
+                comboBox1.Text = dataGridView1.CurrentRow.Cells["Estado-013AL"].Value.ToString();
+
+                dateTimePicker2.Enabled = true;
+                comboBox1.Enabled = true;
+
+                DateTime fechaVencimiento = dateTimePicker2.Value.Date;
+                int diasRestantes = (fechaVencimiento - DateTime.Today).Days;
+
+                button1.Enabled = diasRestantes >= 0 && diasRestantes <= 14;
+            }
         }
     }
 }

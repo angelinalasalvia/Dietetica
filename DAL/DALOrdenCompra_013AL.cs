@@ -153,19 +153,22 @@ namespace DAL
                     cmd.Connection = con;
                     cmd.CommandText = @"
                     SELECT
+                        sc.[CodSCotizacion-013AL],
                         p.[CodProducto-013AL],
                         p.[Nombre-013AL],
                         p.[Stock-013AL] AS StockActual,
                         d.[CantidadPedida-013AL],
-                        d.[CantidadRecibida-013AL]
+                        ISNULL(d.[CantidadRecibida-013AL],0) AS CantidadRecibida,
+                        0 AS CantidadIngresada,
+                        CAST(NULL AS DATE) AS FechaVencimiento
                     FROM [OrdenCompra-013AL] oc
                     INNER JOIN [SolicitudCotizacion-013AL] sc
-                        ON oc.[CodSolicitud-013AL] = sc.[CodSCotizacion-013AL]
+                        ON oc.[CodSolicitud-013AL]=sc.[CodSCotizacion-013AL]
                     INNER JOIN [DetalleSolicitudC-013AL] d
-                        ON sc.[CodSCotizacion-013AL] = d.[CodSCotizacion-013AL]
+                        ON sc.[CodSCotizacion-013AL]=d.[CodSCotizacion-013AL]
                     INNER JOIN [Producto-013AL] p
-                        ON d.[CodProducto-013AL] = p.[CodProducto-013AL]
-                    WHERE oc.[CodOrdenCompra-013AL] = @CodOrdenCompra";
+                        ON d.[CodProducto-013AL]=p.[CodProducto-013AL]
+                    WHERE oc.[CodOrdenCompra-013AL]=@CodOrdenCompra";
                     cmd.Parameters.AddWithValue("@CodOrdenCompra", codOrdenCompra);
 
                     SqlDataAdapter da = new SqlDataAdapter(cmd);
@@ -175,7 +178,21 @@ namespace DAL
                 }
             }
         }
-        public string ActualizarEstadoCompleto_013AL(int codOrdenCompra, bool completo)
+
+        public void ActualizarEstadoOrden_013AL(int codOrdenCompra)
+        {
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand("ActualizarEstadoOrden-013AL", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@CodOrdenCompra", codOrdenCompra);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        /*public string ActualizarEstadoCompleto_013AL(int codOrdenCompra, bool completo)
         {
             using (SqlConnection con = conexion.ObtenerConexion())
             {
@@ -197,7 +214,7 @@ namespace DAL
                     con.Close();
                 }
             }
-        }
+        }*/
         public Proveedor_013AL TraerDatosProveedor_013AL(int codOrdenCompra)
         {
             Proveedor_013AL proveedor = null;

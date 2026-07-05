@@ -28,5 +28,19 @@ namespace BLL
 
             return dal.ModificarLote_013AL(lote);
         }
+        public void AgregarLote_013AL(Lote_013AL lote)
+        {
+            dal.AgregarLote_013AL(lote);
+        }
+        public void ActualizarEstadosLotes_013AL()
+        {
+            dal.ActualizarEstadosLotes_013AL();
+        }
+
+        public int ContarLotesProximosAVencer_013AL()
+        {
+            return dal.ContarLotesProximosAVencer_013AL();
+        }
     }
+
 }

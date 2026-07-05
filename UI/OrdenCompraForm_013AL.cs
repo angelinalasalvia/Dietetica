@@ -137,7 +137,7 @@ namespace UI
                             dataGridView1.Rows.Add(
                                 producto.CodProducto_013AL,
                                 producto.Nombre_013AL,
-                                detalle.Cantidad_013AL,
+                                detalle.CantidadPedida_013AL,
                                 producto.Precio_013AL
                             );
                         }

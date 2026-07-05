@@ -41,5 +41,9 @@ namespace BLL
 
             return dal.ActualizarCantidadDetalleSC_013AL(detalle);
         }
+        public void ActualizarCantidadRecibida_013AL(int codOrden, int codProducto, int cantidad)
+        {
+            dal.ActualizarCantidadRecibida_013AL(codOrden, codProducto, cantidad);
+        }
     }
 }

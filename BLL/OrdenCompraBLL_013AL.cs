@@ -52,9 +52,13 @@ namespace BLL_013AL
         {
             return dal.ObtenerProductosPorOrden_013AL(codOrdenCompra);
         }
-        public string ActualizarEstadoCompleto_013AL(int codOrdenCompra, bool completo)
+        /*public string ActualizarEstadoCompleto_013AL(int codOrdenCompra, bool completo)
         {
             return dal.ActualizarEstadoCompleto_013AL(codOrdenCompra, completo);
+        }*/
+        public void ActualizarEstadoOrden_013AL(int codOrden)
+        {
+            dal.ActualizarEstadoOrden_013AL(codOrden);
         }
         public string ConfirmarRecepcion_013AL(int codOrdenCompra)
         {

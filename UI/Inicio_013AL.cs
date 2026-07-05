@@ -22,7 +22,7 @@ namespace UI
     public partial class Inicio_013AL : Form, IObserver_013AL
     {
         private UsuarioBLL_013AL bllUsuarios = new UsuarioBLL_013AL();
-        
+        private LoteBLL_013AL loteBLL = new LoteBLL_013AL();
         private Usuarios_013AL _usuario;
 
         public Inicio_013AL()
@@ -36,20 +36,42 @@ namespace UI
             var bllTraduccion = new TraduccionBLL_013AL();
             lm.ObtenerTraduccionesPorIdioma = (id) => bllTraduccion.ObtenerPorIdioma(id);
         }
-
-        
-
         public void ActualizarIdioma_013AL()
         {
             LanguageManager_013AL.ObtenerInstancia_013AL().CambiarIdiomaControles_013AL(this);
         }
-
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             base.OnFormClosing(e);
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
+        private void MostrarAvisoLotesProximosAVencer()
+        {
+            Usuarios_013AL usuario = SingletonSession_013AL.Instance.GetUsuario_013AL();
 
+            // Reemplazar 3 por el código del rol Almacenista
+            if (usuario.CodRol_013AL != 14)
+                return;
+
+            loteBLL.ActualizarEstadosLotes_013AL();
+
+            int cantidad = loteBLL.ContarLotesProximosAVencer_013AL();
+
+            if (cantidad > 0)
+            {
+                DialogResult r = MessageBox.Show(
+                    $"Existen {cantidad} lotes próximos a vencer.\n\n¿Desea revisarlos ahora?",
+                    "Aviso",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (r == DialogResult.Yes)
+                {
+                    Lotes_013AL frm = new Lotes_013AL();
+                    frm.ShowDialog();
+                }
+            }
+        }
         private List<Rol_013AL> ObtenerTodosLosPermisos(List<Rol_013AL> permisosCompuestos)
         {
             List<Rol_013AL> lista = new List<Rol_013AL>();
@@ -77,6 +99,8 @@ namespace UI
                 {
                     _usuario = SingletonSession_013AL.Instance.LoggedInUser_013AL;
                     UpdateSessionStatus();
+
+                    MostrarAvisoLotesProximosAVencer();
                 }
                 else
                 {

@@ -70,6 +70,54 @@ namespace DAL
 
             return resultado;
         }
+        public void AgregarLote_013AL(Lote_013AL lote)
+        {
+            SqlConnection cn = conexion.ObtenerConexion();
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand("InsertarLote-013AL", cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@CodProducto", lote.CodProducto_013AL);
+                cmd.Parameters.AddWithValue("@FechaVencimiento", lote.FechaVencimiento_013AL);
+                cmd.Parameters.AddWithValue("@Cantidad", lote.CantidadInicial_013AL);
+
+                cn.Open();
+                cmd.ExecuteNonQuery();
+                cn.Close();
+            }
+            catch
+            {
+                if (cn.State == ConnectionState.Open)
+                    cn.Close();
+
+                throw;
+            }
+        }
+        public void ActualizarEstadosLotes_013AL()
+        {
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand("ActualizarEstadosLotes_013AL", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+        public int ContarLotesProximosAVencer_013AL()
+        {
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand("ContarLotesProximosAVencer_013AL", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                con.Open();
+
+                return Convert.ToInt32(cmd.ExecuteScalar());
+            }
+        }
     }
     
 }

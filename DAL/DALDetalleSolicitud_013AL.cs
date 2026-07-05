@@ -131,5 +131,27 @@ namespace DAL
 
             return resultado;
         }
+        public void ActualizarCantidadRecibida_013AL(int codSolicitud, int codProducto, int cantidad)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    SqlCommand cmd = new SqlCommand("ActualizarCantidadRecibida-013AL", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+
+                    cmd.Parameters.Add("@CodSolicitud", SqlDbType.Int).Value = codSolicitud;
+                    cmd.Parameters.Add("@CodProducto", SqlDbType.Int).Value = codProducto;
+                    cmd.Parameters.Add("@Cantidad", SqlDbType.Int).Value = cantidad;
+
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar la cantidad recibida.", ex);
+            }
+        }
     }
 }

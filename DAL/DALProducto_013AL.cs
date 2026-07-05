@@ -299,5 +299,18 @@ namespace DAL
             catch (Exception ex) { throw new Exception("Error al eliminar producto", ex); }
             return resultado;
         }
+        public void ActualizarStockDesdeLotes_013AL(int codProducto)
+        {
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand("ActualizarStockDesdeLotes-013AL", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                cmd.Parameters.AddWithValue("@CodProducto", codProducto);
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
     }
 }

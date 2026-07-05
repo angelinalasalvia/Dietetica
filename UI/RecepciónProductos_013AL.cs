@@ -1,4 +1,6 @@
-﻿using BE_013AL;
+﻿using BE;
+using BE_013AL;
+using BLL;
 using BLL_013AL;
 using Servicios_013AL;
 using System;
@@ -18,7 +20,6 @@ namespace UI
         public RecepciónProductos_013AL()
         {
             InitializeComponent();
-            dataGridViewProductos.CellValueChanged += dataGridViewProductos_CellValueChanged;
             LanguageManager_013AL.ObtenerInstancia_013AL().Agregar_013AL(this);
             ActualizarIdioma_013AL();
         }
@@ -33,32 +34,17 @@ namespace UI
             LanguageManager_013AL.ObtenerInstancia_013AL().Quitar_013AL(this);
         }
 
-        OrdenCompraBLL_013AL bll = new OrdenCompraBLL_013AL();
+        OrdenCompraBLL_013AL ocbll = new OrdenCompraBLL_013AL();
+        DetalleSolicitudBLL_013AL dbll = new DetalleSolicitudBLL_013AL();
+        ProductoBLL_013AL productoBLL = new ProductoBLL_013AL();
+        LoteBLL_013AL loteBLL = new LoteBLL_013AL();
+
         private DataTable dtOrdenesCompra;
 
-        private void dataGridViewProductos_CellValueChanged(object sender, DataGridViewCellEventArgs e)
-        {
-            if (dataGridViewProductos.Columns[e.ColumnIndex].Name == "Completo")
-            {
-                bool nuevoValorCompleto = Convert.ToBoolean(dataGridViewProductos.Rows[e.RowIndex].Cells["Completo"].Value);
-                int codOrdenCompra = Convert.ToInt32(dataGridViewProductos.Rows[e.RowIndex].Cells["CodOrdenCompra"].Value); 
-
-                string resultado = bll.ActualizarEstadoCompleto_013AL(codOrdenCompra, nuevoValorCompleto);
-                if (resultado == "OK")
-                {
-                    MessageBox.Show("Estado de 'Completo' actualizado correctamente.");
-                }
-                else
-                {
-                    MessageBox.Show("Error al actualizar el estado de 'Completo'.");
-                }
-            }
-        }
-
-
+        
         private void CargarOrdenesCompra_013AL()
         {
-            dtOrdenesCompra = bll.ListarOrdenesCompra_013AL();
+            dtOrdenesCompra = ocbll.ListarOrdenesCompra_013AL();
             comboBoxOrdenesCompra.DataSource = dtOrdenesCompra;
             comboBoxOrdenesCompra.DisplayMember = "CodOrdenCompra-013AL";
             comboBoxOrdenesCompra.ValueMember = "CodOrdenCompra-013AL";
@@ -68,9 +54,12 @@ namespace UI
         private void ConfigurarDataGridView_013AL()
         {
             foreach (DataGridViewColumn column in dataGridViewProductos.Columns)
-            {
-                column.ReadOnly = column.Name != "Completo";
-            }
+                column.ReadOnly = true;
+
+            dataGridViewProductos.Columns["CantidadIngresada"].ReadOnly = false;
+            dataGridViewProductos.Columns["FechaVencimiento"].ReadOnly = false;
+            dataGridViewProductos.Columns["CodSCotizacion-013AL"].Visible = false;
+            dataGridViewProductos.Columns["CodProducto-013AL"].Visible = false;
         }
 
         private void RecepciónProductos_Load(object sender, EventArgs e)
@@ -88,7 +77,7 @@ namespace UI
 
             int codOrdenCompra = Convert.ToInt32(comboBoxOrdenesCompra.SelectedValue);
 
-            DataTable dtProductos = bll.ListarProductosPorOrden_013AL(codOrdenCompra);
+            DataTable dtProductos = ocbll.ListarProductosPorOrden_013AL(codOrdenCompra);
 
             dataGridViewProductos.DataSource = dtProductos;
 
@@ -96,28 +85,105 @@ namespace UI
         }
         Usuarios_013AL user;
         EventoBLL_013AL bbll = new EventoBLL_013AL();
+
+        
         private void button2_Click(object sender, EventArgs e)
         {
-            int codOC = Convert.ToInt32(comboBoxOrdenesCompra.SelectedValue);
-
-            string resultado = bll.ConfirmarRecepcion_013AL(codOC);
-
-            if (resultado == "OK")
+            if (comboBoxOrdenesCompra.SelectedValue == null)
             {
-                MessageBox.Show("Recepción confirmada correctamente.");
-                dataGridViewProductos.DataSource = null;
-                CargarOrdenesCompra_013AL();
-                try
+                MessageBox.Show("Seleccione una orden de compra.");
+                return;
+            }
+
+            bool huboRecepcion = false;
+
+            try
+            {
+
+                foreach (DataGridViewRow fila in dataGridViewProductos.Rows)
                 {
-                    user = SingletonSession_013AL.Instance.GetUsuario_013AL();
-                    bbll.AgregarEvento_013AL(user.Login_013AL, "Recepción Productos", $"Productos de Orden de Compra número {codOC} recibidos.", 3);
+                    if (fila.IsNewRow)
+                        continue;
+
+                    int codSolicitud = Convert.ToInt32(fila.Cells["CodSCotizacion-013AL"].Value);
+                    int codProducto = Convert.ToInt32(fila.Cells["CodProducto-013AL"].Value);
+
+                    int cantidadPedida = Convert.ToInt32(fila.Cells["CantidadPedida-013AL"].Value);
+                    int cantidadRecibida = Convert.ToInt32(fila.Cells["CantidadRecibida"].Value);
+
+                    int cantidadIngresada = 0;
+
+                    if (fila.Cells["CantidadIngresada"].Value != null &&
+                    fila.Cells["CantidadIngresada"].Value != DBNull.Value &&
+                    fila.Cells["CantidadIngresada"].Value.ToString() != "")
+                    {
+                        cantidadIngresada = Convert.ToInt32(fila.Cells["CantidadIngresada"].Value);
+                    }
+
+                    if (cantidadIngresada < 0)
+                    {
+                        MessageBox.Show("La cantidad ingresada no puede ser negativa.");
+                        return;
+                    }
+
+                    if (cantidadIngresada == 0)
+                        continue;
+
+                    if (cantidadRecibida + cantidadIngresada > cantidadPedida)
+                    {
+                        MessageBox.Show("No puede recibir más cantidad de la solicitada.");
+                        return;
+                    }
+
+                    if (fila.Cells["FechaVencimiento"].Value == DBNull.Value ||
+                        fila.Cells["FechaVencimiento"].Value == null)
+                    {
+                        MessageBox.Show("Debe ingresar la fecha de vencimiento.");
+                        return;
+                    }
+
+                    DateTime fechaVencimiento =
+                        Convert.ToDateTime(fila.Cells["FechaVencimiento"].Value);
+
+
+                    huboRecepcion = true;
+
+                    dbll.ActualizarCantidadRecibida_013AL(
+                        codSolicitud,
+                        codProducto,
+                        cantidadIngresada);
+
+                    Lote_013AL lote = new Lote_013AL();
+
+                    lote.CodProducto_013AL = codProducto;
+                    lote.FechaVencimiento_013AL = fechaVencimiento;
+                    lote.CantidadInicial_013AL = cantidadIngresada;
+                    lote.CantidadDisponible_013AL = cantidadIngresada;
+
+                    loteBLL.AgregarLote_013AL(lote);
+
+                    productoBLL.ActualizarStockDesdeLotes_013AL(codProducto);
                 }
-                catch (Exception ex) { Console.WriteLine(ex); }
+
+                ocbll.ActualizarEstadoOrden_013AL(
+                    Convert.ToInt32(comboBoxOrdenesCompra.SelectedValue));
+
+                if (!huboRecepcion)
+                {
+                    MessageBox.Show("No hay cantidades para recibir.");
+                    return;
+                }
+
+                MessageBox.Show("Recepción registrada correctamente.");
+
+                button1.PerformClick();
             }
-            else
+
+            catch (Exception ex)
             {
-                MessageBox.Show(resultado);
+                MessageBox.Show("Ocurrió un error al registrar la recepción.\n\n" + ex.Message);
             }
+
         }
 
     }

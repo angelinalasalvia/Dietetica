@@ -130,5 +130,9 @@ namespace BLL
 
             return null;
         }
+        public void ActualizarStockDesdeLotes_013AL(int codProducto)
+        {
+            dal.ActualizarStockDesdeLotes_013AL(codProducto);
+        }
     }
 }

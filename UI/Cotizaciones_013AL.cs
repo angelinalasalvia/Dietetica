@@ -142,7 +142,7 @@ namespace UI
                 var producto = prbll.ObtenerProductoPorId_013AL(detalle.CodProducto_013AL);
                 string nombreProducto = producto != null ? producto.Nombre_013AL : "Desconocido";
 
-                dataGridView1.Rows.Add(detalle.CodProducto_013AL, nombreProducto, detalle.Cantidad_013AL);
+                dataGridView1.Rows.Add(detalle.CodProducto_013AL, nombreProducto, detalle.CantidadPedida_013AL);
             }
         }
         EventoBLL_013AL bbll = new EventoBLL_013AL();
@@ -207,7 +207,7 @@ namespace UI
 
                     table.AddCell(detalle.CodProducto_013AL.ToString());
                     table.AddCell(nombreProducto);
-                    table.AddCell(detalle.Cantidad_013AL.ToString());
+                    table.AddCell(detalle.CantidadPedida_013AL.ToString());
                 }
 
                 doc.Add(table);
@@ -291,13 +291,13 @@ namespace UI
 
                     if (detalleExistente != null)
                     {
-                        detalleExistente.Cantidad_013AL += cantidad;
+                        detalleExistente.CantidadPedida_013AL += cantidad;
 
                         string result =
                             dsbll.ActualizarCantidadDetalleSC_013AL(
                                 idSolicitudCotizacion,
                                 idProducto,
-                                detalleExistente.Cantidad_013AL);
+                                detalleExistente.CantidadPedida_013AL);
 
                         MessageBox.Show("Cantidad actualizada.");
                     }
@@ -315,7 +315,7 @@ namespace UI
                         {
                             CodSCotizacion_013AL = idSolicitudCotizacion,
                             CodProducto_013AL = idProducto,
-                            Cantidad_013AL = cantidad
+                            CantidadPedida_013AL = cantidad
                         });
                     }
                     ActualizarDataGridView_013AL();

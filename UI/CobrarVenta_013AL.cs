@@ -87,7 +87,8 @@ namespace UI
                         MessageBox.Show("Tarjeta inválida."); 
                         return; 
                     } 
-                } 
+                }
+                //cambiar blln.CobrarPedido_013AL(pedidoSeleccionado, comboBox1.Text);
                 blln.ActualizarMetodoPago_013AL(pedidoSeleccionado, comboBox1.Text); 
                 blln.ActualizarEstadoPedido_013AL(pedidoSeleccionado, "Cobrado"); 
                 MessageBox.Show("Venta cobrada correctamente."); 

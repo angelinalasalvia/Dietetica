@@ -263,6 +263,12 @@
     <Compile Include="SeleccionarProducto_013AL.Designer.cs">
       <DependentUpon>SeleccionarProducto_013AL.cs</DependentUpon>
     </Compile>
+    <Compile Include="Solicitudes_013AL.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Solicitudes_013AL.Designer.cs">
+      <DependentUpon>Solicitudes_013AL.cs</DependentUpon>
+    </Compile>
     <Compile Include="SolicitudPromocionForm_013AL.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -353,6 +359,12 @@
     <EmbeddedResource Include="SeleccionarProducto_013AL.resx">
       <DependentUpon>SeleccionarProducto_013AL.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Solicitudes_013AL.resx">
+      <DependentUpon>Solicitudes_013AL.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SolicitudPromocionForm_013AL.resx">
+      <DependentUpon>SolicitudPromocionForm_013AL.cs</DependentUpon>
+    </EmbeddedResource>
     <None Include="en.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -409,7 +421,7 @@
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <ProjectExtensions>
     <VisualStudio>
-      <UserProperties es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
+      <UserProperties en_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" es_1json__JsonSchema="https://alec016.github.io/Custom-Machinery/Json%20Schema/src/main/resources/schemas/custom_machinery_machine.json" />
     </VisualStudio>
   </ProjectExtensions>
   <Import Project="..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets" Condition="Exists('..\packages\System.Text.Json.6.0.0\build\System.Text.Json.targets')" />

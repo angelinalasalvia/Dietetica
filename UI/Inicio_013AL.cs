@@ -1,4 +1,5 @@
-﻿using BE_013AL;
+﻿using BE;
+using BE_013AL;
 using BE_013AL.Composite;
 using BLL;
 using BLL_013AL;
@@ -49,8 +50,8 @@ namespace UI
         {
             Usuarios_013AL usuario = SingletonSession_013AL.Instance.GetUsuario_013AL();
 
-            // Reemplazar 3 por el código del rol Almacenista
-            if (usuario.CodRol_013AL != 14)
+            // Almacenista
+            if (usuario.CodRol_013AL != 30)
                 return;
 
             loteBLL.ActualizarEstadosLotes_013AL();
@@ -68,6 +69,36 @@ namespace UI
                 if (r == DialogResult.Yes)
                 {
                     Lotes_013AL frm = new Lotes_013AL();
+                    frm.ShowDialog();
+                }
+            }
+        }
+        SolicitudPromocionBLL_013AL solicitudbll = new SolicitudPromocionBLL_013AL();
+        private void MostrarAvisoSolicitudesPendientes()
+        {
+            Usuarios_013AL usuario = SingletonSession_013AL.Instance.GetUsuario_013AL();
+
+            if (usuario.CodRol_013AL != 15) // Supervisor
+                return;
+
+            int cantidad = solicitudbll.ContarSolicitudesPendientes_013AL();
+
+            if (cantidad > 0)
+            {
+                DialogResult r = MessageBox.Show(
+
+                    $"Existen {cantidad} solicitudes de promoción pendientes.\n\n¿Desea revisarlas ahora?",
+
+                    "Solicitudes pendientes",
+
+                    MessageBoxButtons.YesNo,
+
+                    MessageBoxIcon.Information);
+
+                if (r == DialogResult.Yes)
+                {
+                    SolicitudPromocionForm_013AL frm = new SolicitudPromocionForm_013AL();
+
                     frm.ShowDialog();
                 }
             }
@@ -101,6 +132,7 @@ namespace UI
                     UpdateSessionStatus();
 
                     MostrarAvisoLotesProximosAVencer();
+                    MostrarAvisoSolicitudesPendientes();
                 }
                 else
                 {

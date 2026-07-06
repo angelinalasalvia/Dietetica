@@ -78,6 +78,7 @@
     <Compile Include="ProveedorBLL_013AL.cs" />
     <Compile Include="RolBLL_013AL.cs" />
     <Compile Include="SolicitudCotizacionBLL_013AL.cs" />
+    <Compile Include="SolicitudPromocionBLL_013AL.cs" />
     <Compile Include="TraduccionBLL_013AL.cs" />
     <Compile Include="UsuarioBLL_013AL.cs" />
   </ItemGroup>

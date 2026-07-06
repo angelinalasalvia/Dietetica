@@ -155,10 +155,14 @@ namespace UI
 
                     Lote_013AL lote = new Lote_013AL();
 
+                    
+
                     lote.CodProducto_013AL = codProducto;
                     lote.FechaVencimiento_013AL = fechaVencimiento;
                     lote.CantidadInicial_013AL = cantidadIngresada;
                     lote.CantidadDisponible_013AL = cantidadIngresada;
+                    int diasRestantes = (fechaVencimiento.Date - DateTime.Today).Days;
+                    lote.Estado_013AL = diasRestantes <= 30 ? "Próximo a vencer" : "Disponible";
 
                     loteBLL.AgregarLote_013AL(lote);
 

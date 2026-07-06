@@ -82,6 +82,7 @@ namespace DAL
                 cmd.Parameters.AddWithValue("@CodProducto", lote.CodProducto_013AL);
                 cmd.Parameters.AddWithValue("@FechaVencimiento", lote.FechaVencimiento_013AL);
                 cmd.Parameters.AddWithValue("@Cantidad", lote.CantidadInicial_013AL);
+                cmd.Parameters.AddWithValue("@Estado", lote.Estado_013AL);
 
                 cn.Open();
                 cmd.ExecuteNonQuery();

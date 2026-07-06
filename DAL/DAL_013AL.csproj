@@ -89,6 +89,7 @@
     <Compile Include="DALProveedor_013AL.cs" />
     <Compile Include="DALRol_013AL.cs" />
     <Compile Include="DALSolicitudCotizacion_013AL.cs" />
+    <Compile Include="DALSolicitudPromocion_013AL.cs" />
     <Compile Include="DALTraduccion_013AL.cs" />
     <Compile Include="DALUsuario_013AL.cs" />
     <Compile Include="DietéticaDataSet.Designer.cs">

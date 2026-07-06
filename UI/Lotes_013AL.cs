@@ -1,4 +1,5 @@
-﻿using BLL;
+﻿using BE;
+using BLL;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -38,7 +39,17 @@ namespace UI
         {
             int idLote = Convert.ToInt32(dataGridView1.CurrentRow.Cells["CodLote-013AL"].Value);
 
-            SolicitudPromocionForm_013AL frm = new SolicitudPromocionForm_013AL(idLote);
+            SolicitudPromocionForm_013AL frm = new SolicitudPromocionForm_013AL(
+
+                idLote,
+                textBox1.Text,                     // Producto
+                textBox2.Text,                     // Lote
+                dateTimePicker2.Value,             // Vencimiento
+                Convert.ToInt32(textBox6.Text)     // Stock
+
+            );
+
+            frm.ShowDialog();
             frm.ShowDialog();
 
             CargarLotes();
@@ -85,7 +96,7 @@ namespace UI
                 DateTime fechaVencimiento = dateTimePicker2.Value.Date;
                 int diasRestantes = (fechaVencimiento - DateTime.Today).Days;
 
-                button1.Enabled = diasRestantes >= 0 && diasRestantes <= 14;
+                button1.Enabled = diasRestantes >= 0 && diasRestantes <= 30;
             }
         }
     }

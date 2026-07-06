@@ -72,7 +72,7 @@ namespace UI
                     Width = 150,
                     Height = 150,
                     Cursor = Cursors.Hand,
-                    Tag = producto.CodProducto_013AL
+                    Tag = producto
                 };
 
                 MemoryStream ms = new MemoryStream(producto.Imagen_013AL);
@@ -86,7 +86,7 @@ namespace UI
                     BackColor = Color.FromArgb(202, 81, 0),
                     AutoSize = true,
                     Dock = DockStyle.Top,
-                    Tag = producto.CodProducto_013AL
+                    Tag = producto
                 };
 
                 Label lblstock = new Label
@@ -95,7 +95,7 @@ namespace UI
                     BackColor = Color.FromArgb(202, 81, 0),
                     AutoSize = true,
                     Dock = DockStyle.Left,
-                    Tag = producto.CodProducto_013AL
+                    Tag = producto
                 };
 
                 Label lblname = new Label
@@ -103,7 +103,7 @@ namespace UI
                     Text = producto.Nombre_013AL,
                     Dock = DockStyle.Bottom,
                     ForeColor = Color.White,
-                    Tag = producto.CodProducto_013AL,
+                    Tag = producto,
                     BackColor = Color.FromArgb(36, 36, 36),
                     TextAlign = ContentAlignment.MiddleCenter
                 };
@@ -121,26 +121,45 @@ namespace UI
         private void SalesItem(object sender, EventArgs e)
         {
             try 
-            { 
-                int cantidad = Convert.ToInt32(Interaction.InputBox("Ingrese cantidad:")); 
-                string str = ((PictureBox)sender).Tag.ToString(); 
-                Producto_013AL producto = prbll.Devolver_Producto_Buscado_x_Id_013AL(Convert.ToInt32(str)); 
+            {
+                string entrada = Interaction.InputBox("Ingrese cantidad:");
+
+                if (!int.TryParse(entrada, out int cantidad))
+                {
+                    MessageBox.Show(
+                        "Debe ingresar un número válido.",
+                        "Cantidad inválida",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    return;
+                }
+                Producto_013AL producto = (Producto_013AL)((PictureBox)sender).Tag;
+                Detalle_013AL detalleExistente = dbll.ObtenerDetalle_013AL(IdCompraActual, producto.CodProducto_013AL);
+                int cantidadYaPedida = detalleExistente?.Cantidad_013AL ?? 0;
+                int disponible = producto.Stock_013AL - cantidadYaPedida;
+
                 if (cantidad <= 0) 
                 { 
                     MessageBox.Show("Cantidad inválida."); 
                     return; 
-                } 
-                if (cantidad > producto.Stock_013AL) 
-                { 
-                    MessageBox.Show("Stock insuficiente."); 
-                    return; 
+                }
+                if (cantidad > disponible)
+                {
+                    MessageBox.Show(
+                        $"Stock insuficiente.\n\nDisponible: {disponible} unidades.",
+                        "Aviso",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Warning);
+
+                    return;
                 }
                 if (cantidad > 10000)
                 {
                     MessageBox.Show("Cantidad máxima permitida es 10.000.");
                     return;
                 }
-                Detalle_013AL detalleExistente = dbll.ObtenerDetalle_013AL(IdCompraActual, producto.CodProducto_013AL); 
+                
                 if (detalleExistente != null) 
                 { 
                     int nuevaCantidad = detalleExistente.Cantidad_013AL + cantidad; 
@@ -157,10 +176,9 @@ namespace UI
                     }; 
                     dbll.AgregarDetalle_013AL(detalle); 
                 } 
-                prbll.DescontarStock_013AL(producto.CodProducto_013AL, cantidad); 
                 decimal total = dbll.CalcularTotalPedido_013AL(IdCompraActual); 
                 pbll.ActualizarTotalPedido_013AL(IdCompraActual, total); 
-                //MessageBox.Show("Producto agregado.");
+                
                 MessageBox.Show($"Producto '{producto.Nombre_013AL}' agregado.\nCantidad: {cantidad}\nSubtotal: {(producto.Precio_013AL * cantidad)}",
                     "Producto Agregado", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LoadItems_013AL(); 

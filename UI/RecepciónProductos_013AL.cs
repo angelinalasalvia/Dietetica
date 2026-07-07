@@ -49,6 +49,9 @@ namespace UI
             comboBoxOrdenesCompra.DisplayMember = "CodOrdenCompra-013AL";
             comboBoxOrdenesCompra.ValueMember = "CodOrdenCompra-013AL";
             comboBoxOrdenesCompra.SelectedIndex = -1;
+            comboBoxOrdenesCompra.Text = string.Empty;
+
+            dataGridViewProductos.DataSource = null;
         }
 
         private void ConfigurarDataGridView_013AL()
@@ -180,7 +183,7 @@ namespace UI
 
                 MessageBox.Show("Recepción registrada correctamente.");
 
-                button1.PerformClick();
+                CargarOrdenesCompra_013AL();
             }
 
             catch (Exception ex)

@@ -61,15 +61,15 @@ namespace DAL
         }
         public void RevertirStock_013AL(int idProducto, int cantidad)
         {
-            string query = "UPDATE [Producto-013AL] SET [Stock-013AL] = [Stock-013AL] + @cant WHERE [CodProducto-013AL] = @id";
             try
             {
                 using (SqlConnection con = conexion.ObtenerConexion())
                 {
-                    using (SqlCommand cmd = new SqlCommand(query, con))
+                    using (SqlCommand cmd = new SqlCommand("RevertirStockFIFO-013AL", con))
                     {
-                        cmd.Parameters.AddWithValue("@cant", cantidad);
-                        cmd.Parameters.AddWithValue("@id", idProducto);
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@CodProducto", idProducto);
+                        cmd.Parameters.AddWithValue("@Cantidad", cantidad);
                         con.Open();
                         cmd.ExecuteNonQuery();
                     }
@@ -77,7 +77,7 @@ namespace DAL
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al revertir stock.", ex);
+                throw new Exception("Error al revertir stock al lote más viejo.", ex);
             }
         }
 
@@ -218,7 +218,7 @@ namespace DAL
             return producto;
         }
 
-        
+
 
         public string AgregarProducto_013AL(Producto_013AL obj)
         {
@@ -230,7 +230,7 @@ namespace DAL
                     SqlCommand com = new SqlCommand("[AgregarProducto-013AL]", con);
                     com.CommandType = CommandType.StoredProcedure;
                     com.Parameters.Add("@nombre", SqlDbType.NVarChar).Value = obj.Nombre_013AL;
-                    com.Parameters.Add("@stock", SqlDbType.Int).Value = obj.Stock_013AL;
+                    //com.Parameters.Add("@stock", SqlDbType.Int).Value = obj.Stock_013AL;
                     com.Parameters.Add("@precio", SqlDbType.Int).Value = obj.Precio_013AL;
                     com.Parameters.Add("@imagen", SqlDbType.Image).Value = obj.Imagen_013AL;
                     com.Parameters.Add("@desc", SqlDbType.NVarChar).Value = obj.Descripcion_013AL;
@@ -269,7 +269,6 @@ namespace DAL
                     com.CommandType = CommandType.StoredProcedure;
                     com.Parameters.Add("@id", SqlDbType.Int).Value = obj.CodProducto_013AL;
                     com.Parameters.Add("@nombre", SqlDbType.NVarChar).Value = obj.Nombre_013AL;
-                    com.Parameters.Add("@stock", SqlDbType.Int).Value = obj.Stock_013AL;
                     com.Parameters.Add("@precio", SqlDbType.Int).Value = obj.Precio_013AL;
                     com.Parameters.Add("@imagen", SqlDbType.Image).Value = obj.Imagen_013AL;
                     com.Parameters.Add("@desc", SqlDbType.NVarChar).Value = obj.Descripcion_013AL;
@@ -310,6 +309,77 @@ namespace DAL
 
                 con.Open();
                 cmd.ExecuteNonQuery();
+            }
+        }
+        public void DescontarStockFIFO_013AL(int idProducto, int cantidad)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    using (SqlCommand cmd = new SqlCommand("DescontarStockFIFO-013AL", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@CodProducto", idProducto);
+                        cmd.Parameters.AddWithValue("@Cantidad", cantidad);
+                        con.Open();
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al descontar stock (FIFO) de lotes y producto.", ex);
+            }
+        }
+    
+        public int ObtenerStockDisponibleLotes_013AL(int codProducto)
+        {
+            int stock = 0;
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    using (SqlCommand cmd = new SqlCommand("ObtenerStockDisponibleLotes-013AL", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@CodProducto", codProducto);
+                        con.Open();
+                        object resultado = cmd.ExecuteScalar();
+                        if (resultado != null && resultado != DBNull.Value)
+                            stock = Convert.ToInt32(resultado);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener el stock disponible en lotes.", ex);
+            }
+            return stock;
+        }
+        public DataRow ObtenerPromocionVigenteProducto_013AL(int codProducto)
+        {
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    using (SqlCommand cmd = new SqlCommand("ObtenerPromocionVigenteProducto_013AL", con))
+                    {
+                        cmd.CommandType = CommandType.StoredProcedure;
+                        cmd.Parameters.AddWithValue("@CodProducto", codProducto);
+                        con.Open();
+                        using (SqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            DataTable dt = new DataTable();
+                            dt.Load(reader);
+                            return dt.Rows.Count > 0 ? dt.Rows[0] : null;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la promoción vigente del producto.", ex);
             }
         }
     }

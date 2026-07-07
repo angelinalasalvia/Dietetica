@@ -51,7 +51,7 @@ namespace UI
             Usuarios_013AL usuario = SingletonSession_013AL.Instance.GetUsuario_013AL();
 
             // Almacenista
-            if (usuario.CodRol_013AL != 30)
+            if (usuario.CodRol_013AL != 14)
                 return;
 
             loteBLL.ActualizarEstadosLotes_013AL();

@@ -75,11 +75,10 @@ namespace BLL
         {
             return dal.ObtenerProductoPorId_013AL(idProducto);
         }
-        public string AgregarProducto_013AL(string nombre, int cant, int precio, byte[] image, string desc)
+        public string AgregarProducto_013AL(string nombre, int precio, byte[] image, string desc)
         {
             Producto_013AL p = new Producto_013AL();
             p.Nombre_013AL = nombre;
-            p.Stock_013AL = cant;
             p.Precio_013AL = precio;
             p.Imagen_013AL = image;
             p.Descripcion_013AL = desc;
@@ -91,12 +90,11 @@ namespace BLL
             return dal.ObtenerProductosConImagen_013AL();
         }
 
-        public string ModificarProducto_013AL(int id, string nombre, int cant, int precio, byte[] image, string desc)
+        public string ModificarProducto_013AL(int id, string nombre, int precio, byte[] image, string desc)
         {
             Producto_013AL p = new Producto_013AL();
             p.CodProducto_013AL = id;
             p.Nombre_013AL = nombre;
-            p.Stock_013AL = cant;
             p.Precio_013AL = precio;
             p.Imagen_013AL = image;
             p.Descripcion_013AL = desc;
@@ -133,6 +131,18 @@ namespace BLL
         public void ActualizarStockDesdeLotes_013AL(int codProducto)
         {
             dal.ActualizarStockDesdeLotes_013AL(codProducto);
+        }
+        public void DescontarStockFIFO_013AL(int idProducto, int cantidad)
+        {
+            dal.DescontarStockFIFO_013AL(idProducto, cantidad);
+        }
+        public bool HayStockSuficiente_013AL(int codProducto, int cantidad)
+        {
+            return dal.ObtenerStockDisponibleLotes_013AL(codProducto) >= cantidad;
+        }
+        public DataRow ObtenerPromocionVigenteProducto_013AL(int codProducto)
+        {
+            return dal.ObtenerPromocionVigenteProducto_013AL(codProducto);
         }
     }
 }

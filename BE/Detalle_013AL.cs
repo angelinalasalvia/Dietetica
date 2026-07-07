@@ -16,5 +16,6 @@ namespace BE_013AL
         public decimal DescuentoAplicado_013AL { get; set; }
 
         public decimal Subtotal_013AL => Cantidad_013AL * PrecioUnitario_013AL;
+        public decimal SubtotalConDescuento_013AL => Subtotal_013AL - DescuentoAplicado_013AL;
     }
 }

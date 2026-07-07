@@ -176,6 +176,8 @@ namespace DAL
                 cmd.Parameters.AddWithValue("@UsuarioSupervisor", solicitud.UsuarioSupervisor_013AL);
 
                 cmd.Parameters.AddWithValue("@FechaResolucion", solicitud.FechaResolucion_013AL);
+                
+                cmd.Parameters.AddWithValue("@CodLote", promo.CodLote_013AL);
 
                 con.Open();
 

@@ -50,5 +50,9 @@ namespace BLL
         { 
             return dal.ListarDetallePorCompra_013AL(codCompra); 
         }
+        public string ActualizarPromocionDetalle_013AL(int codCompra, int codProducto, string promocionAplicada, decimal descuentoAplicado)
+        {
+            return dal.ActualizarPromocionDetalle_013AL(codCompra, codProducto, promocionAplicada, descuentoAplicado);
+        }
     }
 }

@@ -32,12 +32,10 @@
             this.btnModificar = new System.Windows.Forms.Button();
             this.txtimagen = new System.Windows.Forms.TextBox();
             this.txtdesc = new System.Windows.Forms.TextBox();
-            this.txtstock = new System.Windows.Forms.TextBox();
             this.txtnombre = new System.Windows.Forms.TextBox();
             this.label7 = new System.Windows.Forms.Label();
             this.label5 = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.txtprecio = new System.Windows.Forms.TextBox();
@@ -73,24 +71,17 @@
             // 
             // txtimagen
             // 
-            this.txtimagen.Location = new System.Drawing.Point(66, 257);
+            this.txtimagen.Location = new System.Drawing.Point(66, 233);
             this.txtimagen.Name = "txtimagen";
             this.txtimagen.Size = new System.Drawing.Size(136, 20);
             this.txtimagen.TabIndex = 32;
             // 
             // txtdesc
             // 
-            this.txtdesc.Location = new System.Drawing.Point(85, 421);
+            this.txtdesc.Location = new System.Drawing.Point(85, 397);
             this.txtdesc.Name = "txtdesc";
             this.txtdesc.Size = new System.Drawing.Size(116, 20);
             this.txtdesc.TabIndex = 31;
-            // 
-            // txtstock
-            // 
-            this.txtstock.Location = new System.Drawing.Point(65, 203);
-            this.txtstock.Name = "txtstock";
-            this.txtstock.Size = new System.Drawing.Size(136, 20);
-            this.txtstock.TabIndex = 29;
             // 
             // txtnombre
             // 
@@ -102,7 +93,7 @@
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(13, 231);
+            this.label7.Location = new System.Drawing.Point(13, 207);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(40, 13);
             this.label7.TabIndex = 27;
@@ -111,7 +102,7 @@
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(13, 260);
+            this.label5.Location = new System.Drawing.Point(13, 236);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(45, 13);
             this.label5.TabIndex = 26;
@@ -120,20 +111,11 @@
             // label4
             // 
             this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(13, 427);
+            this.label4.Location = new System.Drawing.Point(13, 403);
             this.label4.Name = "label4";
             this.label4.Size = new System.Drawing.Size(66, 13);
             this.label4.TabIndex = 25;
             this.label4.Text = "Descripcion:";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(12, 203);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(38, 13);
-            this.label2.TabIndex = 23;
-            this.label2.Text = "Stock:";
             // 
             // button1
             // 
@@ -156,7 +138,7 @@
             // 
             // txtprecio
             // 
-            this.txtprecio.Location = new System.Drawing.Point(53, 228);
+            this.txtprecio.Location = new System.Drawing.Point(53, 204);
             this.txtprecio.Name = "txtprecio";
             this.txtprecio.Size = new System.Drawing.Size(149, 20);
             this.txtprecio.TabIndex = 20;
@@ -171,7 +153,7 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(208, 257);
+            this.button2.Location = new System.Drawing.Point(208, 233);
             this.button2.Name = "button2";
             this.button2.Size = new System.Drawing.Size(21, 20);
             this.button2.TabIndex = 37;
@@ -180,7 +162,7 @@
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Location = new System.Drawing.Point(16, 302);
+            this.pictureBox1.Location = new System.Drawing.Point(16, 278);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(185, 113);
             this.pictureBox1.TabIndex = 38;
@@ -189,7 +171,7 @@
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(13, 286);
+            this.label3.Location = new System.Drawing.Point(13, 262);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(63, 13);
             this.label3.TabIndex = 39;
@@ -219,7 +201,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(412, 453);
+            this.ClientSize = new System.Drawing.Size(412, 437);
             this.Controls.Add(this.button3);
             this.Controls.Add(this.btnHistorial);
             this.Controls.Add(this.label3);
@@ -230,12 +212,10 @@
             this.Controls.Add(this.btnModificar);
             this.Controls.Add(this.txtimagen);
             this.Controls.Add(this.txtdesc);
-            this.Controls.Add(this.txtstock);
             this.Controls.Add(this.txtnombre);
             this.Controls.Add(this.label7);
             this.Controls.Add(this.label5);
             this.Controls.Add(this.label4);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.txtprecio);
@@ -255,12 +235,10 @@
         private System.Windows.Forms.Button btnModificar;
         private System.Windows.Forms.TextBox txtimagen;
         private System.Windows.Forms.TextBox txtdesc;
-        private System.Windows.Forms.TextBox txtstock;
         private System.Windows.Forms.TextBox txtnombre;
         private System.Windows.Forms.Label label7;
         private System.Windows.Forms.Label label5;
         private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.TextBox txtprecio;

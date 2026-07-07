@@ -9,6 +9,7 @@ namespace BE
     public class Promocion_013AL
     {
         public int CodPromocion_013AL { get; set; }
+        public int CodLote_013AL { get; set; }
         public int CodSolicitud_013AL { get; set; }
         public string Tipo_013AL { get; set; }
         public int? Valor_013AL { get; set; }

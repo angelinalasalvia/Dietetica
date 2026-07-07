@@ -172,6 +172,13 @@ namespace UI
             button2.Visible = false;
             button3.Visible = false;
             richTextBox1.Visible = false;
+            label7.Visible = false;
+            label8.Visible = false;
+            label9.Visible = false;
+            label10.Visible = false;
+            comboBox2.Visible = false;
+            textBox5.Visible = false;
+            dateTimePicker2.Visible = false;
         }
 
         private void ConfigurarModoSupervisor()
@@ -323,6 +330,7 @@ namespace UI
             promo.Valor_013AL = valor;
             promo.FechaInicio_013AL = DateTime.Today;
             promo.FechaFin_013AL = dateTimePicker2.Value;
+            promo.CodLote_013AL = _idLote;
 
             bll.AprobarSolicitud_013AL(promo, solicitud);
 

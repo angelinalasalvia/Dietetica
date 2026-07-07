@@ -308,6 +308,28 @@ namespace DAL
             }
             return lista;
         }
-
+        public string ActualizarPromocionDetalle_013AL(int codCompra, int codProducto, string promocionAplicada, decimal descuentoAplicado)
+        {
+            string respuesta = "";
+            try
+            {
+                using (SqlConnection con = conexion.ObtenerConexion())
+                {
+                    SqlCommand cmd = new SqlCommand("ActualizarPromocionDetalle_013AL", con);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.Add("@CodCompra", SqlDbType.Int).Value = codCompra;
+                    cmd.Parameters.Add("@CodProducto", SqlDbType.Int).Value = codProducto;
+                    cmd.Parameters.Add("@PromocionAplicada", SqlDbType.NVarChar, 50).Value = (object)promocionAplicada ?? DBNull.Value;
+                    cmd.Parameters.Add("@DescuentoAplicado", SqlDbType.Decimal).Value = descuentoAplicado;
+                    con.Open();
+                    respuesta = cmd.ExecuteNonQuery() >= 1 ? "OK" : "Error";
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar la promoción del detalle.", ex);
+            }
+            return respuesta;
+        }
     }
 }

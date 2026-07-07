@@ -69,7 +69,8 @@ namespace UI
         private void btnCobrar_Click(object sender, EventArgs e)
         {
             try 
-            { 
+            {
+                btnCobrar.Enabled = false;
                 if (pedidoActual == null) 
                 { 
                     MessageBox.Show("Seleccione un pedido."); 
@@ -88,9 +89,26 @@ namespace UI
                         return; 
                     } 
                 }
-                //cambiar blln.CobrarPedido_013AL(pedidoSeleccionado, comboBox1.Text);
-                blln.ActualizarMetodoPago_013AL(pedidoSeleccionado, comboBox1.Text); 
-                blln.ActualizarEstadoPedido_013AL(pedidoSeleccionado, "Cobrado"); 
+
+                foreach (var item in detallesActuales)
+                {
+                    if (!prbll.HayStockSuficiente_013AL(item.CodProducto_013AL, item.Cantidad_013AL))
+                    {
+                        string nombreProducto = prbll.ObtenerNombreProducto_013AL(item.CodProducto_013AL);
+                        MessageBox.Show($"Stock insuficiente para \"{nombreProducto}\".");
+                        return;
+                    }
+                }
+
+                // NUEVO: descontar stock de lotes (LIFO) y de producto antes de confirmar el cobro
+                foreach (var item in detallesActuales)
+                {
+                    prbll.DescontarStockFIFO_013AL(item.CodProducto_013AL, item.Cantidad_013AL);
+                }
+
+                blln.ActualizarMetodoPago_013AL(pedidoSeleccionado, comboBox1.Text);
+                blln.ActualizarEstadoPedido_013AL(pedidoSeleccionado, "Cobrado");
+
                 MessageBox.Show("Venta cobrada correctamente."); 
                 btnFactura.Enabled = true; 
                 CargarPedidosAprobados();
@@ -103,7 +121,44 @@ namespace UI
             } 
             catch (Exception ex) 
             { 
-                MessageBox.Show(ex.Message); 
+                MessageBox.Show(ex.Message);
+                btnCobrar.Enabled = true;
+            }
+        }
+        private decimal CalcularDescuento_013AL(string tipoPromocion, int? valor, int cantidad, int precioUnitario)
+        {
+            decimal subtotal = cantidad * precioUnitario;
+
+            switch (tipoPromocion)
+            {
+                case "2 X 1":
+                    {
+                        int pares = cantidad / 2;
+                        return pares * precioUnitario;
+                    }
+                case "3 X 2":
+                    {
+                        int tercios = cantidad / 3;
+                        return tercios * precioUnitario;
+                    }
+                case "Segunda unidad al 50%":
+                    {
+                        int pares = cantidad / 2;
+                        return pares * (precioUnitario * 0.5m);
+                    }
+                case "Descuento fijo":
+                    {
+                        // @Valor: monto fijo que se descuenta del total de la línea
+                        return Math.Min(valor ?? 0, subtotal);
+                    }
+                case "Descuento porcentual":
+                    {
+                        // @Valor: porcentaje (0-100)
+                        decimal porcentaje = Math.Max(0, Math.Min(valor ?? 0, 100)) / 100m;
+                        return subtotal * porcentaje;
+                    }
+                default:
+                    return 0m;
             }
         }
         private void btnFactura_Click(object sender, EventArgs e)
@@ -137,8 +192,8 @@ namespace UI
         private void button1_Click(object sender, EventArgs e)
         {
             try 
-            { 
-                if (dataGridView1.SelectedRows.Count == 0) 
+            {
+                /*if (dataGridView1.SelectedRows.Count == 0) 
                 { 
                     MessageBox.Show("Seleccione un pedido."); 
                     return; 
@@ -149,7 +204,42 @@ namespace UI
                 detallesActuales = dbll.ListarDetallePorCompra_013AL(pedidoSeleccionado); 
                 txtcuil.Text = clienteActual.CUIL_013AL.ToString();
                 txttotal.Text = pedidoActual.Total_013AL.ToString("0.00");
-                MessageBox.Show("Pedido cargado."); 
+                MessageBox.Show("Pedido cargado."); */
+                pedidoSeleccionado = Convert.ToInt32(dataGridView1.SelectedRows[0].Cells["CodCompra_013AL"].Value);
+                pedidoActual = blln.BuscarPedidoPorId_013AL(pedidoSeleccionado);
+                clienteActual = cbll.BuscarClientePorCUIL_013AL(pedidoActual.CUIL_013AL);
+                detallesActuales = dbll.ListarDetallePorCompra_013AL(pedidoSeleccionado);
+
+                decimal totalConDescuentos = 0;
+                foreach (var item in detallesActuales)
+                {
+                    DataRow promo = prbll.ObtenerPromocionVigenteProducto_013AL(item.CodProducto_013AL);
+
+                    if (promo != null)
+                    {
+                        string tipo = promo["Tipo-013AL"].ToString();
+                        int? valor = promo["Valor-013AL"] == DBNull.Value ? (int?)null : Convert.ToInt32(promo["Valor-013AL"]);
+
+                        item.PromocionAplicada_013AL = tipo;
+                        item.DescuentoAplicado_013AL = CalcularDescuento_013AL(tipo, valor, item.Cantidad_013AL, item.PrecioUnitario_013AL);
+                    }
+                    else
+                    {
+                        item.PromocionAplicada_013AL = null;
+                        item.DescuentoAplicado_013AL = 0;
+                    }
+
+                    dbll.ActualizarPromocionDetalle_013AL(pedidoSeleccionado, item.CodProducto_013AL,
+                        item.PromocionAplicada_013AL, item.DescuentoAplicado_013AL);
+
+                    totalConDescuentos += item.SubtotalConDescuento_013AL;
+                }
+
+                blln.ActualizarTotalPedido_013AL(pedidoSeleccionado, totalConDescuentos);
+
+                txtcuil.Text = clienteActual.CUIL_013AL.ToString();
+                txttotal.Text = totalConDescuentos.ToString("0.00");
+                MessageBox.Show("Pedido cargado.");
             } 
             catch (Exception ex) 
             { 
@@ -172,7 +262,7 @@ namespace UI
                     PdfWriter.GetInstance(pdfDoc, stream);
                     pdfDoc.Open();
 
-                    decimal total = detalles.Sum(p => p.Cantidad_013AL * p.PrecioUnitario_013AL);
+                    decimal total = detalles.Sum(p => p.SubtotalConDescuento_013AL);
 
                     // Encabezado
                     pdfDoc.Add(new Paragraph("Dietetica Eat Healthy"));
@@ -187,16 +277,17 @@ namespace UI
                     {
                         pdfDoc.Add(new Paragraph($"Número de Tarjeta: {numt}"));
                     }
-                    pdfDoc.Add(new Paragraph(" ")); 
+                    pdfDoc.Add(new Paragraph(" "));
 
                     // Tabla de detalles
-                    PdfPTable table = new PdfPTable(3);
+                    PdfPTable table = new PdfPTable(4);
                     table.WidthPercentage = 100;
-                    table.SetWidths(new float[] { 1, 1, 1 });
-                    
+                    table.SetWidths(new float[] { 1, 1, 1, 1 });
+
                     table.AddCell("Prod.");
                     table.AddCell("Cant.");
                     table.AddCell("Precio Unitario");
+                    table.AddCell("Promoción / Subtotal");
 
                     foreach (var item in detalles)
                     {
@@ -204,6 +295,8 @@ namespace UI
                         table.AddCell(nombreProducto);
                         table.AddCell(item.Cantidad_013AL.ToString());
                         table.AddCell(item.PrecioUnitario_013AL.ToString("C"));
+                        string promoTexto = string.IsNullOrEmpty(item.PromocionAplicada_013AL) ? "-" : item.PromocionAplicada_013AL;
+                        table.AddCell($"{promoTexto} / {item.SubtotalConDescuento_013AL:C}");
                     }
 
                     pdfDoc.Add(table);

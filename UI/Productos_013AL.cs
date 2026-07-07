@@ -37,21 +37,12 @@ namespace UI
         }
         private void button1_Click(object sender, EventArgs e)
         {
-            /*string respuesta = "";
-            respuesta = bll.AgregarProducto(txtnombre.Text, Convert.ToInt32(txtstock.Text), Convert.ToInt32(txtprecio.Text), Convert.ToByte(txtimagen.Text), txtdesc.Text);
-            */
+            
             if (imagenBytes != null)
             {
-                int stock;
-                if (!int.TryParse(txtstock.Text, out stock) || stock < 0)
-                {
-                    MessageBox.Show("El stock no puede ser negativo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
-                }
-
+                
                 string respuesta = bll.AgregarProducto_013AL(
                     txtnombre.Text,
-                    stock,
                     Convert.ToInt32(txtprecio.Text),
                     imagenBytes, 
                     txtdesc.Text
@@ -193,28 +184,17 @@ namespace UI
 
             if (dataGridView1.SelectedRows.Count > 0)
             {
-                
-                
-                // Obtener la fila seleccionada
                 DataGridViewRow filaSeleccionada = dataGridView1.SelectedRows[0];
 
-                // Suponiendo que la columna que almacena el ID del producto se llama "ID" (ajusta si tiene otro nombre)
                 int idProducto = Convert.ToInt32(filaSeleccionada.Cells["CodProducto-013AL"].Value);
 
                 // Verificar que la imagen no sea nula
                 if (imagenBytes != null)
                 {
-                    int stock;
-                    if (!int.TryParse(txtstock.Text, out stock) || stock < 0)
-                    {
-                        MessageBox.Show("El stock no puede ser negativo.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
-                    }
-                    // Llamar al método para modificar el producto
+                    
                     string respuesta = bll.ModificarProducto_013AL(
-                        idProducto, // Pasar el ID del producto
+                        idProducto, 
                         txtnombre.Text,
-                        stock,
                         Convert.ToInt32(txtprecio.Text),
                         imagenBytes,
                         txtdesc.Text
@@ -238,9 +218,6 @@ namespace UI
             {
                 MessageBox.Show("Por favor, selecciona un producto de la lista para modificar.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
             }
-            /*string resultado;
-            resultado = bll.ModificarProducto();
-            CargarProductos();*/
         }
 
         private void btnEliminar_Click(object sender, EventArgs e)

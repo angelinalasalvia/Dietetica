@@ -22,9 +22,9 @@ namespace DAL_013AL
 {
     public class DALConexiones_013AL
     {
-        //private readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dietetica;Integrated Security=True";
+        private readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dietetica;Integrated Security=True";
 
-        private readonly string connectionString = @"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietetica;Integrated Security=True";
+        //private readonly string connectionString = @"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietetica;Integrated Security=True";
 
 
         public SqlConnection ObtenerConexion()

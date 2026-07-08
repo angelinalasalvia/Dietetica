@@ -55,6 +55,7 @@ namespace UI
                 return;
 
             loteBLL.ActualizarEstadosLotes_013AL();
+            loteBLL.ActualizarStockPorVencimientos_013AL();
 
             int cantidad = loteBLL.ContarLotesProximosAVencer_013AL();
 

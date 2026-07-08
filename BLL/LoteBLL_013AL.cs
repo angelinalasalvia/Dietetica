@@ -36,7 +36,10 @@ namespace BLL
         {
             dal.ActualizarEstadosLotes_013AL();
         }
-
+        public void ActualizarStockPorVencimientos_013AL()
+        {
+            dal.ActualizarStockPorVencimientos_013AL();
+        }
         public int ContarLotesProximosAVencer_013AL()
         {
             return dal.ContarLotesProximosAVencer_013AL();

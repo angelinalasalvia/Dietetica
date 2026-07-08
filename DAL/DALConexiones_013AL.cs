@@ -22,18 +22,18 @@ namespace DAL_013AL
 {
     public class DALConexiones_013AL
     {
-        private readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dietetica;Integrated Security=True";
+        //private readonly string connectionString = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=Dietetica;Integrated Security=True";
 
         //private readonly string connectionString = @"Data Source=DESKTOP-QM84P0N\SQLEXPRESS;Initial Catalog=Dietetica;Integrated Security=True";
 
 
-        public SqlConnection ObtenerConexion()
+        /*public SqlConnection ObtenerConexion()
         {
             return new SqlConnection(connectionString);
-        }
+        }*/
 
         //PARA INSTALADOR
-        /*private string ObtenerStringConexion()
+        private string ObtenerStringConexion()
         {
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string path = Path.Combine(baseDir, "config.json");
@@ -54,7 +54,7 @@ namespace DAL_013AL
         public SqlConnection ObtenerConexion()
         {
             return new SqlConnection(ObtenerStringConexion());
-        }*/
+        }
 
     }
 }

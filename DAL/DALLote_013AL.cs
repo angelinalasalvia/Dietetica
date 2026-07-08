@@ -107,6 +107,18 @@ namespace DAL
                 cmd.ExecuteNonQuery();
             }
         }
+        public void ActualizarStockPorVencimientos_013AL()
+        {
+            using (SqlConnection con = conexion.ObtenerConexion())
+            {
+                SqlCommand cmd = new SqlCommand("ActualizarStockPorVencimientos_013AL", con);
+                cmd.CommandType = CommandType.StoredProcedure;
+
+                con.Open();
+                cmd.ExecuteNonQuery();
+            }
+        }
+
         public int ContarLotesProximosAVencer_013AL()
         {
             using (SqlConnection con = conexion.ObtenerConexion())

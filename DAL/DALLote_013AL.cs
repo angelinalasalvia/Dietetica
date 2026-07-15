@@ -111,7 +111,7 @@ namespace DAL
         {
             using (SqlConnection con = conexion.ObtenerConexion())
             {
-                SqlCommand cmd = new SqlCommand("ActualizarStockPorVencimientos_013AL", con);
+                SqlCommand cmd = new SqlCommand("VerificarLotesVencidos_013AL", con);
                 cmd.CommandType = CommandType.StoredProcedure;
 
                 con.Open();
